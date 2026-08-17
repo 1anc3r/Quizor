@@ -1,0 +1,22 @@
+{
+  "Banks": [
+    {
+      "id": "kaoyan_guanzong",
+      "name": "199_管理类综合能力",
+      "bankFile": "Bank_Kaoyan_Guanzong.json",
+      "questionCount": 57,
+      "rule": {
+        "durationMinutes": 120,
+        "totalScore": 200,
+        "passScore": 100,
+        "composition": [
+          { "chapter": "问题求解", "type": "single", "count": 15, "scoreEach": 3, "optionCount": 5 },
+          { "chapter": "条件充分性判断", "type": "single", "count": 10, "scoreEach": 3, "optionCount": 5 },
+          { "chapter": "逻辑推理", "type": "single", "count": 30, "scoreEach": 2, "optionCount": 5 },
+          { "chapter": "论证有效性分析", "type": "text", "count": 1, "scoreEach": 30, "optionCount": 0 },
+          { "chapter": "论说文", "type": "text", "count": 1, "scoreEach": 35, "optionCount": 0 }
+        ]
+      }
+    }
+  ]
+}

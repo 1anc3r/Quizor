@@ -1,0 +1,525 @@
+/* ========== 全局样式与主题变量 ========== */
+
+:root {
+  --q-bg: #f5f7fa;
+  --q-card: #ffffff;
+  --q-text: #303133;
+  --q-text-secondary: #909399;
+  --q-border: #e4e7ed;
+  --q-primary: #409eff;
+  --q-success: #67c23a;
+  --q-danger: #f56c6c;
+  --q-warning: #e6a23c;
+  --q-nav-height: 56px;
+  --q-radius: 10px;
+}
+
+html.dark {
+  --q-bg: #141414;
+  --q-card: #1d1e1f;
+  --q-text: #e5eaf3;
+  --q-text-secondary: #8d9095;
+  --q-border: #363637;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--q-bg);
+  color: var(--q-text);
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* 主区域：桌面端为顶部导航让位 */
+.app-main {
+  /* max-width: 1100px; */
+  margin: 0 auto;
+  padding: calc(var(--q-nav-height) + 16px) 16px 0px;
+}
+
+.app-main.immersive {
+  max-width: none;
+  padding: 0;
+}
+
+/* ========== 顶部 / 底部导航 ========== */
+
+.app-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--q-nav-height);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+  background: var(--q-card);
+  border-bottom: 1px solid var(--q-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.app-nav .brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--q-primary);
+  margin-right: 24px;
+  white-space: nowrap;
+}
+
+.app-nav .brand span {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--q-text-secondary);
+  margin-left: 4px;
+}
+
+.app-nav .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 16px;
+  color: var(--q-text);
+  text-decoration: none;
+  font-size: 14px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.app-nav .nav-item.active {
+  color: var(--q-primary);
+  border-bottom-color: var(--q-primary);
+}
+
+/* ========== 字号偏好（题干 / 选项） ========== */
+
+.font-small .q-stem {
+  font-size: 14px;
+}
+.font-small .option-item {
+  font-size: 13px;
+}
+.font-standard .q-stem {
+  font-size: 16px;
+}
+.font-standard .option-item {
+  font-size: 15px;
+}
+.font-large .q-stem {
+  font-size: 19px;
+}
+.font-large .option-item {
+  font-size: 17px;
+}
+
+/* ========== 通用卡片与页面 ========== */
+
+.page-card {
+  margin-bottom: 16px;
+  border-radius: var(--q-radius);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-title .title-text {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.muted {
+  display: flex;
+  align-items: center;
+  color: var(--q-text-secondary);
+  font-size: 13px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 12px 4px;
+  border-radius: var(--q-radius);
+  background: var(--q-bg);
+}
+
+.stat-item .num {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--q-primary);
+}
+
+.stat-item .label {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--q-text-secondary);
+}
+
+/* ========== 富文本展示 ========== */
+
+.rich-text {
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+.rich-text img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.rich-text p {
+  margin: 0 0 6px;
+}
+
+/* ========== 选项（圆形按钮 + 自动换行） ========== */
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--q-border);
+  border-radius: var(--q-radius);
+  cursor: pointer;
+  background: var(--q-card);
+  transition: border-color 0.15s, background-color 0.15s;
+  word-break: break-word;
+}
+
+.option-item:hover {
+  border-color: var(--q-primary);
+}
+
+.option-item.disabled {
+  cursor: default;
+}
+
+.option-item.disabled:hover {
+  border-color: var(--q-border);
+}
+
+.option-key {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--q-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--q-text-secondary);
+  background: var(--q-card);
+  margin-top: 1px;
+}
+
+.option-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.option-item.is-selected {
+  border-color: var(--q-primary);
+}
+
+.option-item.is-selected .option-key {
+  background: var(--q-primary);
+  border-color: var(--q-primary);
+  color: #fff;
+}
+
+.option-item.is-correct {
+  border-color: var(--q-success);
+  background: rgba(103, 194, 58, 0.08);
+}
+
+.option-item.is-correct .option-key {
+  background: var(--q-success);
+  border-color: var(--q-success);
+  color: #fff;
+}
+
+.option-item.is-wrong {
+  border-color: var(--q-danger);
+  background: rgba(245, 108, 108, 0.08);
+}
+
+.option-item.is-wrong .option-key {
+  background: var(--q-danger);
+  border-color: var(--q-danger);
+  color: #fff;
+}
+
+/* ========== 答题卡 ========== */
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+  gap: 8px;
+}
+
+.sheet-cell {
+  height: 36px;
+  border: 1px solid var(--q-border);
+  border-radius: 8px;
+  background: var(--q-card);
+  color: var(--q-text);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sheet-cell.answered {
+  background: rgba(103, 194, 58, 0.2);
+  border-color: var(--q-success);
+  color: var(--q-success);
+}
+
+.sheet-cell.marked {
+  background: rgba(230, 162, 60, 0.2);
+  border-color: var(--q-warning);
+  color: var(--q-warning);
+}
+
+.sheet-cell.current {
+  outline: 2px solid var(--q-primary);
+  outline-offset: 1px;
+}
+
+.sheet-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--q-text-secondary);
+}
+
+.sheet-legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 4px;
+  vertical-align: -1px;
+  border: 1px solid var(--q-border);
+}
+
+.sheet-legend .lg-answered {
+  background: rgba(103, 194, 58, 0.35);
+  border-color: var(--q-success);
+}
+
+.sheet-legend .lg-marked {
+  background: rgba(230, 162, 60, 0.35);
+  border-color: var(--q-warning);
+}
+
+/* ========== 做题页 ========== */
+
+.quiz-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--q-bg);
+}
+
+.quiz-top {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--q-nav-height);
+  padding: 0 8px;
+  background: var(--q-card);
+  border-bottom: 1px solid var(--q-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.quiz-top .timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.quiz-top .timer.danger {
+  color: var(--q-danger);
+}
+
+.quiz-top .progress {
+  color: var(--q-text-secondary);
+  font-size: 13px;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.quiz-top .spacer {
+  flex: 1;
+}
+
+.quiz-body {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  gap: 16px;
+}
+
+.quiz-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-side {
+  flex: none;
+  width: 280px;
+  position: sticky;
+  top: calc(var(--q-nav-height) + 16px);
+  background: var(--q-card);
+  border: 1px solid var(--q-border);
+  border-radius: var(--q-radius);
+  padding: 16px;
+}
+
+.q-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.feedback {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--q-radius);
+  background: var(--q-bg);
+  border: 1px solid var(--q-border);
+}
+
+.feedback .fb-line {
+  margin-bottom: 8px;
+}
+
+.feedback .fb-label {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+/* ========== 富文本编辑器 ========== */
+
+.rich-editor .ql-toolbar {
+  border-radius: 8px 8px 0 0;
+  border-color: var(--q-border);
+}
+
+.rich-editor .ql-container {
+  border-radius: 0 0 8px 8px;
+  border-color: var(--q-border);
+  font-size: 14px;
+  min-height: 120px;
+  background: var(--q-card);
+}
+
+.rich-editor .ql-editor {
+  min-height: 120px;
+}
+
+html.dark .rich-editor .ql-toolbar .ql-stroke {
+  stroke: #cfd3dc;
+}
+
+html.dark .rich-editor .ql-toolbar .ql-fill {
+  fill: #cfd3dc;
+}
+
+html.dark .rich-editor .ql-toolbar .ql-picker {
+  color: #cfd3dc;
+}
+
+/* ========== 移动端自适应（>=375px） ========== */
+
+@media (max-width: 768px) {
+  .app-main {
+    padding: 12px 10px calc(var(--q-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 导航栏固定在页面最下端 */
+  .app-nav {
+    top: auto;
+    bottom: 0;
+    border-bottom: none;
+    border-top: 1px solid var(--q-border);
+    padding: 0 4px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    justify-content: space-around;
+  }
+
+  .app-nav .brand {
+    display: none;
+  }
+
+  .app-nav .nav-item {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    font-size: 11px;
+    padding: 0 10px;
+    border-bottom: none;
+    border-top: 2px solid transparent;
+  }
+
+  .app-nav .nav-item.active {
+    border-top-color: var(--q-primary);
+    border-bottom-color: transparent;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quiz-body {
+    padding: 10px;
+  }
+
+  .sheet-side {
+    display: none;
+  }
+}

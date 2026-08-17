@@ -1,0 +1,32 @@
+{
+  "name": "quizor",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Quizor 做题家 — 纯静态题库刷题 Web 应用（Vue 3 + TypeScript + Vite）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit -p tsconfig.json && vite build",
+    "build:only": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "@opentiny/fluent-editor": "^3.25.0",
+    "echarts": "^5.5.0",
+    "element-plus": "^2.7.8",
+    "katex": "^0.16.10",
+    "pinia": "^2.1.7",
+    "pinyin-pro": "^3.19.6",
+    "vue": "^3.4.31",
+    "vue-router": "^4.3.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "typescript": "~5.4.5",
+    "unplugin-auto-import": "^0.17.6",
+    "unplugin-vue-components": "^0.26.0",
+    "vite": "^5.2.13",
+    "vue-tsc": "^2.0.26"
+  }
+}

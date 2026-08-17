@@ -1,0 +1,171 @@
+<script setup lang="ts">
+/**
+ * 设置页：外观偏好、练习/考试偏好记忆、滑动切题、错题阈值、导入导出。
+ */
+import { computed, ref } from 'vue'
+import { useBankStore } from '@/stores/bank'
+import { useSettingsStore } from '@/stores/settings'
+import { createBank, defaultRule, exportBackup, exportBankFile, saveBank } from '@/services/bank'
+import { loadBank } from '@/services/bank'
+import * as storage from '@/services/storage'
+import type { BankData, BankRule } from '@/types'
+import { fmtTime, typeLabel } from '@/utils/format'
+
+const bankStore = useBankStore()
+const settingsStore = useSettingsStore()
+const s = settingsStore.settings
+
+const darkMode = computed({
+  get: () => s.theme === 'dark',
+  set: (v: boolean) => (s.theme = v ? 'dark' : 'light')
+})
+
+/* ---------- 导入导出 ---------- */
+
+const importing = ref(false)
+
+function onExportBank(): void {
+  const meta = bankStore.meta
+  if (!meta) {
+    ElMessage.warning('当前没有可用题库')
+    return
+  }
+  void loadBank(meta.id).then((data) => {
+    exportBankFile(meta, data)
+    ElMessage.success('题库已导出')
+  })
+}
+
+function onExportBackup(): void {
+  exportBackup()
+  ElMessage.success('备份已导出')
+}
+
+function isBankFile(json: unknown): json is { name?: string; rule?: BankRule } & BankData {
+  return !!json && typeof json === 'object' && Array.isArray((json as BankData).Questions)
+}
+
+function isBackupFile(json: unknown): json is Record<string, unknown> {
+  return !!json && typeof json === 'object' && Object.keys(json as object).some((k) => k.startsWith('quizor:'))
+}
+
+async function onImportFile(uploadFile: { raw?: File }): Promise<void> {
+  const file = uploadFile.raw
+  if (!file) return
+  importing.value = true
+  try {
+    const text = await file.text()
+    const json: unknown = JSON.parse(text)
+    if (isBankFile(json)) {
+      // 题库文件：{ name?, rule?, Questions, Papers? }
+      const name = json.name || file.name.replace(/\.json$/i, '')
+      const meta = await createBank(name, json.rule ?? defaultRule())
+      const data: BankData = {
+        Questions: Array.isArray(json.Questions) ? json.Questions : [],
+        Papers: Array.isArray(json.Papers) ? json.Papers : []
+      }
+      await saveBank(meta, data)
+      await bankStore.afterBankEdited(meta.id)
+      ElMessage.success(`题库「${meta.name}」导入成功`)
+    } else if (isBackupFile(json)) {
+      try {
+        await ElMessageBox.confirm('导入备份将覆盖本浏览器内的全部题库编辑、错题、收藏、记录与设置，确定继续吗？', '导入备份', {
+          type: 'warning',
+          confirmButtonText: '覆盖导入',
+          cancelButtonText: '取消'
+        })
+      } catch {
+        return
+      }
+      storage.importAll(json)
+      ElMessage.success('备份导入成功，即将刷新页面')
+      window.setTimeout(() => window.location.reload(), 800)
+    } else {
+      ElMessage.error('无法识别的 JSON 文件格式')
+    }
+  } catch {
+    ElMessage.error('文件解析失败，请确认是合法的 JSON 文件')
+  } finally {
+    importing.value = false
+  }
+}
+</script>
+
+<template>
+  <div>
+    <!-- 外观偏好 -->
+    <el-card class="page-card" shadow="never">
+      <div class="card-title"><span class="title-text">外观偏好</span></div>
+      <el-form label-width="110px" style="margin-top: 12px; max-width: 560px">
+        <el-form-item label="深色模式">
+          <el-switch v-model="darkMode" active-text="深色" inactive-text="浅色" />
+        </el-form-item>
+        <el-form-item label="题干/选项字号">
+          <el-radio-group v-model="s.fontSize">
+            <el-radio-button value="small">小</el-radio-button>
+            <el-radio-button value="standard">标准</el-radio-button>
+            <el-radio-button value="large">大</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <!-- 练习偏好 -->
+    <el-card class="page-card" shadow="never">
+      <div class="card-title">
+        <span class="title-text">练习偏好</span>
+        <el-button size="small" @click="settingsStore.resetPractice()">重置</el-button>
+      </div>
+      <div class="muted" style="margin-top: 8px">
+        自动记住上次练习模式设置，进入做题设置页时恢复。当前记忆：范围「{{
+          { all: '全部', chapter: '按章节', wrong: '仅错题', favorite: '仅收藏' }[s.practice.scope]
+        }}」、题量「{{ s.practice.count === 'all' ? '全部' : s.practice.count }}」、题型「{{
+          s.practice.types.length ? s.practice.types.map(typeLabel).join('、') : '全部'
+        }}」
+      </div>
+    </el-card>
+
+    <!-- 考试偏好 -->
+    <el-card class="page-card" shadow="never">
+      <div class="card-title">
+        <span class="title-text">考试偏好</span>
+        <el-button size="small" @click="settingsStore.resetExam()">重置</el-button>
+      </div>
+      <div class="muted" style="margin-top: 8px">
+        自动记住上次考试模式设置。当前记忆：模式「{{ s.exam.source === 'simulate' ? '模拟模式' : '真题模式' }}」
+      </div>
+    </el-card>
+
+    <!-- 做题偏好 -->
+    <el-card class="page-card" shadow="never">
+      <div class="card-title"><span class="title-text">做题偏好</span></div>
+      <el-form label-width="110px" style="margin-top: 12px; max-width: 560px">
+        <el-form-item label="滑动切题">
+          <el-switch v-model="s.swipe" active-text="开" inactive-text="关" />
+          <span class="muted" style="margin-left: 10px">左滑下一题、右滑上一题</span>
+        </el-form-item>
+        <el-form-item label="错题移出阈值">
+          <el-input-number v-model="s.wrongThreshold" :min="1" :max="10" />
+          <span class="muted" style="margin-left: 10px">练习中连续答对达到该次数后自动移出错题本</span>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <!-- 导入导出 -->
+    <el-card class="page-card" shadow="never">
+      <div class="card-title"><span class="title-text">导入导出</span></div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px">
+        <el-button @click="onExportBank" style="margin: 0px;">导出当前题库 JSON</el-button>
+        <el-button @click="onExportBackup" style="margin: 0px;">导出全部数据备份</el-button>
+        <el-upload :show-file-list="false" accept=".json,application/json" :http-request="() => {}" :on-change="onImportFile">
+          <el-button type="primary" :loading="importing">导入题库 / 备份 JSON</el-button>
+        </el-upload>
+      </div>
+      <el-alert type="info" :closable="false" show-icon style="margin-top: 12px">
+        题库文件格式：{ name, rule, Questions, Papers }；备份文件为应用全部本地数据（quizor: 前缀）。当前题库 ID：{{
+          bankStore.currentId || '无'
+        }}<template v-if="bankStore.meta">，最近更新以浏览器本地存储为准（{{ fmtTime(Date.now()) }}）</template>。
+      </el-alert>
+    </el-card>
+  </div>
+</template>

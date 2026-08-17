@@ -1,0 +1,2141 @@
+{
+  "Questions": [
+    {
+      "id": "kaoyan_guanzong_000001",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 2,
+      "stem": "电影开演时观众中女士与男士人数之比为5：4，开演后无观众入场，放映一个小时后，女士的20%，男士的15%离场，则此时在场的女士与男士人数之比为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "4：5"
+        },
+        {
+          "key": "B",
+          "text": "1：1"
+        },
+        {
+          "key": "C",
+          "text": "5：4"
+        },
+        {
+          "key": "D",
+          "text": "20：17"
+        },
+        {
+          "key": "E",
+          "text": "85：64"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "性别 开演时\t放映一个小时后\n女士\t5/9\t5/9*80%=4/9\n男士\t4/9\t4/9*85%=3.4/9\n4:3.4=20:17",
+      "source": "2010年真题",
+      "tags": [
+        "应用题",
+        "比例问题"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000002",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 2,
+      "stem": "某商品的成本为240元，若按该商品标价的8折出售，利润率是15%，则该商品的标价为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "276元"
+        },
+        {
+          "key": "B",
+          "text": "331元"
+        },
+        {
+          "key": "C",
+          "text": "345元"
+        },
+        {
+          "key": "D",
+          "text": "360元"
+        },
+        {
+          "key": "E",
+          "text": "400元"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "设标价为x\n(0.8x−240)/240=0.15,x=345",
+      "source": "2010年真题",
+      "tags": [
+        "应用题",
+        "价格问题"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000003",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 2,
+      "stem": "三名小孩中有一名学龄前儿童（年龄不足6岁），他们的年龄都是质数（素数），且依次相差6岁，他们的年龄之和为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "21"
+        },
+        {
+          "key": "B",
+          "text": "27"
+        },
+        {
+          "key": "C",
+          "text": "33"
+        },
+        {
+          "key": "D",
+          "text": "39"
+        },
+        {
+          "key": "E",
+          "text": "51"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "2、3、5、7、11、13、17\n5+11+17=33",
+      "source": "2010年真题",
+      "tags": [
+        "质数"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000004",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 2,
+      "stem": "在右边的表格中每行为等差数列，每列为等比数列，x+y+z=（）\n2\t\t5/2\t\t3\nx\t\t5/4\t\t3/2\na\t\ty\t\t3/4\nb\t\tc\t\tz",
+      "options": [
+        {
+          "key": "A",
+          "text": "2"
+        },
+        {
+          "key": "B",
+          "text": "5/2"
+        },
+        {
+          "key": "C",
+          "text": "3"
+        },
+        {
+          "key": "D",
+          "text": "7/2"
+        },
+        {
+          "key": "E",
+          "text": "4"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "x=5/4−(3/2−5/4)=1\ny=5/8\nz=3/8",
+      "source": "2010年真题",
+      "tags": [
+        "等差数列",
+        "等比数列"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000005",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 2,
+      "stem": "<p>如图1所示.在直角三角形ABC区域内部有座山，现计划从BC边上某点D开凿一条隧道到点A，要求隧道长度最短，已知AB长为5km，AC长为12km,则所开凿的的隧道AD的长度约为（）</p><p><img src=\"data:image/png;base64,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\"></p>",
+      "options": [
+        {
+          "key": "A",
+          "text": "4.12km"
+        },
+        {
+          "key": "B",
+          "text": "4.22km"
+        },
+        {
+          "key": "C",
+          "text": "4.42km"
+        },
+        {
+          "key": "D",
+          "text": "4.62km"
+        },
+        {
+          "key": "E",
+          "text": "4.92km"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "<p>射影定理\nAB*AC=BC*AD\n5*12=13*AD\nAD=4.62</p>",
+      "source": "2010年真题",
+      "tags": [
+        "平面几何"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000006",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "某商店举行店庆活动，顾客消费达到一定数量后，可以在4中赠品中随机选取2个不同的赠品，任意两位顾客所选的赠品中，恰有1件品种相同的概率是（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "1/6"
+        },
+        {
+          "key": "B",
+          "text": "1/4"
+        },
+        {
+          "key": "C",
+          "text": "1/3"
+        },
+        {
+          "key": "D",
+          "text": "1/2"
+        },
+        {
+          "key": "E",
+          "text": "2/3"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "(4*3*2)/(C_4^2 C_4^2 )=24/36=2/3",
+      "source": "2010年真题",
+      "tags": [
+        "排列组合概率"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000007",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "多项式x^3+ax^2+bx−6的两个因式是x−1和x−2，则其第三个一次因式为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "x-6"
+        },
+        {
+          "key": "B",
+          "text": "x-3"
+        },
+        {
+          "key": "C",
+          "text": "x+1"
+        },
+        {
+          "key": "D",
+          "text": "x+2"
+        },
+        {
+          "key": "E",
+          "text": "x+3"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "−6=(−1)(−2)m,m=−3",
+      "source": "2010年真题",
+      "tags": [
+        "代数"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000008",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "某公司的员工中，拥有本科毕业证、计算机等级证、汽车驾驶证的人数分别为130、110、90，又知只有一种证的人数为140，三证齐全的人数为30，则恰有双证的人数为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "45"
+        },
+        {
+          "key": "B",
+          "text": "50"
+        },
+        {
+          "key": "C",
+          "text": "52"
+        },
+        {
+          "key": "D",
+          "text": "65"
+        },
+        {
+          "key": "E",
+          "text": "100"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "(130+110+90−90−140)/2=50",
+      "source": "2010年真题",
+      "tags": [
+        "集合"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000009",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 2,
+      "stem": "甲商品销售某种商品，该商品的进价为每件90元，若每件定价为100元，则一天内能售出500件；在此基础上，定价每增加1元，一天便少售出10件，甲商店欲获得最大利润，则该商品的定价应为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "115元"
+        },
+        {
+          "key": "B",
+          "text": "120元"
+        },
+        {
+          "key": "C",
+          "text": "125元"
+        },
+        {
+          "key": "D",
+          "text": "130元"
+        },
+        {
+          "key": "E",
+          "text": "135元"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "(10+x)(500−10x)=−10x^2+400x+5000\nx=−b/2a=20",
+      "source": "2010年真题",
+      "tags": [
+        "应用题",
+        "价格问题"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000010",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 2,
+      "stem": "已知直线ax−by+3=0（a>0,b>0）过圆x^2+4x+y^2−2y+1=0的圆心，则ab的最大值为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "9/16"
+        },
+        {
+          "key": "B",
+          "text": "11/16"
+        },
+        {
+          "key": "C",
+          "text": "3/4"
+        },
+        {
+          "key": "D",
+          "text": "9/8"
+        },
+        {
+          "key": "E",
+          "text": "9/4"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "(x+2)^2+(y−1)^2=4\n圆心（-2，1）\n−2a−b+3=0，2a+b=3\nab=−2a^2+3a\na=3/4，ab=9/8",
+      "source": "2010年真题",
+      "tags": [
+        "解析几何"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000011",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "某大学派出5名志愿者到西部4所中学支教，若每所中学至少有一名志愿者，则不同的分配方案共有（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "240种"
+        },
+        {
+          "key": "B",
+          "text": "144种"
+        },
+        {
+          "key": "C",
+          "text": "120种"
+        },
+        {
+          "key": "D",
+          "text": "60种"
+        },
+        {
+          "key": "E",
+          "text": "24种"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "（1）将 5 名志愿者分成 “2 人组 + 1 人组 + 1 人组 + 1 人组” 的 4 个小组；\n（2）将这 4 个小组分配到 4 所不同的中学\nC_5^2*A_4^4=240",
+      "source": "2010年真题",
+      "tags": [
+        "排列组合概率"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000012",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "某装置的启动密码是由0到9中的3个不同数字组成，连续3次输入错误密码，就会导致该装置永久关闭，一个仅记得密码是由3个不同数字组成的人能够启动此装置的概率为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "1/120"
+        },
+        {
+          "key": "B",
+          "text": "1/168"
+        },
+        {
+          "key": "C",
+          "text": "1/240"
+        },
+        {
+          "key": "D",
+          "text": "1/720"
+        },
+        {
+          "key": "E",
+          "text": "3/1000"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "所有可能的 3 位不同数字密码总数：A_10^3=720\n（1）第 1 次猜错的概率：P_1=719/720\n（2）第 2 次猜错的概率：P_2=718/719\n（3）第 3 次猜错的概率：P_3=717/718\n1−P_1∗P_2∗P_3=1−717/720=1/240",
+      "source": "2010年真题",
+      "tags": [
+        "排列组合概率"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000013",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "某居民小区决定投资15万元修建停车位，据测算，修建一个室内车位的费用为5000元，修建一个室外车位的费用为1000元，考虑到实际因素，计划室外车位的数量不少于室内车位的2倍，也不多于室内车位的3倍，这笔投资最多可建车位的数量为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "78"
+        },
+        {
+          "key": "B",
+          "text": "74"
+        },
+        {
+          "key": "C",
+          "text": "72"
+        },
+        {
+          "key": "D",
+          "text": "70"
+        },
+        {
+          "key": "E",
+          "text": "66"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "室内车位x，室外车位y\n{█(2x≤y≤3x@5000x+1000y≤150000)┤\n5x+3x≥150，x≥18.75\n5x+2x≤150，x≤21.4\n{█(x=19@y=55)┤，x+y=74\n{█(x=20@y=50)┤，x+y=70\n{█(x=21@y=45)┤，x+y=66",
+      "source": "2010年真题",
+      "tags": [
+        "应用题",
+        "不等式"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000014",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "<p>如图2，长方形ABCD的两条边分别为8m和6m，四边形OEFG的面积是4m^2，则阴影部分的面积为（）</p><p><img src=\"data:image/png;base64,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\"></p>",
+      "options": [
+        {
+          "key": "A",
+          "text": "32m^2"
+        },
+        {
+          "key": "B",
+          "text": "28m^2"
+        },
+        {
+          "key": "C",
+          "text": "24m^2 "
+        },
+        {
+          "key": "D",
+          "text": "20m^2"
+        },
+        {
+          "key": "E",
+          "text": "16m^2"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "<p>S_blank=S_BDF+S_ACF−S_OEFG=1/2∗8∗6−4=20\nS_shadow=S_ABCD−S_blank=48−20=28</p>",
+      "source": "2010年真题",
+      "tags": [
+        "平面几何"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000015",
+      "type": "single",
+      "chapter": "问题求解",
+      "difficulty": 4,
+      "stem": "在一次竞猜活动中，设有5关，如果连续通过2关就算闯关成功，小王通过每关的概率都是1/2，他闯关成功的该率为（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "1/8"
+        },
+        {
+          "key": "B",
+          "text": "1/4"
+        },
+        {
+          "key": "C",
+          "text": "3/8"
+        },
+        {
+          "key": "D",
+          "text": "4/8"
+        },
+        {
+          "key": "E",
+          "text": "19/32"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "【方法】穷举\n1\t2\t3\t4\t5\t概率\n√\t√\t\t\t\t1/4\n╳\t√\t√\t\t\t1/8\n╳\t╳\t√\t√\t\t1/16\n√\t╳\t√\t√\t\t1/16\n╳\t╳\t╳\t√\t√\t1/32\n√\t╳\t╳\t√\t√\t1/32\n╳\t√\t╳\t√\t√\t1/32",
+      "source": "2010年真题",
+      "tags": [
+        "排列组合概率"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000016",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "a|a _ b| ≥ |a|(a _ b)\n（1）实数a>0\n（2）实数a,b满足a>b",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】绝对值\n若a>0\n|a _ b| ≥ (a _ b)\nb _ a ≥ a _ b, b ≥ a",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000017",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "有偶数位来宾\n（1）聚会时所有来宾都被安排坐在一张圆桌周围，且每位来宾与其邻座性别不同。\n（2）聚会时男宾人数是女宾人数的两倍。",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】算术\n（1）2n\n（2）2x+x=3x",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000018",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "售出一件甲商品比售出一件乙商品利润要高。\n（1）售出5件甲商品，4件乙商品共获利50元。\n（2）售出4件甲商品， 5件乙商品共获利47元。",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】方程",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000019",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "已知数列{an}为等差数列，公差为d ，a1  + a2  + a3  + a4  = 12，则a4  = 0\n（1）d = _2\n（2）a2 + a4  = 4",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】等差数列\na1 + a2 + a3 + a4  = 12\na1 + 3a3  = 12\n（1）d = _2\n（2）a2 + a4  = 4 ，2a3  = 4 ，a3  = 2\na1 + 6 = 12 ，a1  = 6",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000020",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "甲企业今年人均成本是去年的60%。\n（1） 甲企业今年总成本比去年减少25%，员工人数增加25%。\n（2） 甲企业今年总成本比去年减少28%，员工人数增加20%。",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】算术",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000021",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 4,
+      "stem": "该股票涨了\n（1）某股票连续三天涨10%后，又连续三天跌10%。\n（2）某股票连续三天跌10%后，又连续三天涨10%。",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "【考点】增长率\n(1 + 0.1)3 (1 _ 0.1)3  = 0.993\n(1 _ 0.1)3 (1 + 0.1)3  = 0.993",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000022",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "某班有50名学生，其中女生26名，在某次选拔测试中，有27名学生未通过，则有9名男生通过。\n（1）在通过的学生中，女生比男生多5人。\n（2）在男生中，未通过的人数比通过的人数多6人。",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】集合\n学生 | 女生 | 男生\n50 | 26 | 24\n通过 | 14 | 9\n未通过 | 12 | 15",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000023",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "甲企业一年的总产值为\n（1） 甲企业一月份的产值为a，以后每月产值的增长率为p.\n（2） 甲企业一月份的产值为，以后每月产值的增长率为2p.",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】增长率",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000024",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "设a,b为非负实数，则a + b ≤\n（1）ab ≤\n（2）a2 + b2  ≤ 1",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】代数",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000025",
+      "type": "single",
+      "chapter": "条件充分性判断",
+      "difficulty": 2,
+      "stem": "如图3所示，在三角形ABC中， 已知EF//BC，则三角形AEF的面积等于梯形EBCF的面积\n（1） |AG| = 2|GD|\n（2） |BC| = √2 |EF|",
+      "options": [
+        {
+          "key": "A",
+          "text": "条件（1）充分，但条件（2）不充分"
+        },
+        {
+          "key": "B",
+          "text": "条件（2）充分，但条件（1）不充分"
+        },
+        {
+          "key": "C",
+          "text": "条件（1）和条件（2）单独都不充分，但条件（1）和条件（2）联合起来充分"
+        },
+        {
+          "key": "D",
+          "text": "条件（1）充分，条件（2）也充分"
+        },
+        {
+          "key": "E",
+          "text": "条件（1）和条件（2）单独都不充分，条件（1）和条件（2）联合起来也不充分"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "【考点】平面几何，相似三角形",
+      "source": "2010年真题",
+      "tags": [
+        "条件充分性判断"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000026",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "针对威胁人类健康的甲型H1N1流感，研究人员研制出了相应的疫苗，尽管这些疫苗是有效的，但某大学研究人员发现，阿司匹林、羟苯基乙酰胺等抑制某些酶的药物会影响疫苗的效果，这位研究员指出： \"如果你服用了阿司匹林或者对乙酰氨基酚，那么你注射疫苗后就必然不会产生良好的抗体反映。\"\n如果小张注射疫苗后产生了良好的抗体反映，那么根据上述研究结果可以得出以下哪项结论？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "小张服用了阿司匹林，但没有服用对乙酰氨基酚。"
+        },
+        {
+          "key": "B",
+          "text": "小张没有服用阿司匹林，但感染了H1N1流感病毒。"
+        },
+        {
+          "key": "C",
+          "text": "小张服用了阿司匹林，但没有感染H1N1流感病毒。"
+        },
+        {
+          "key": "D",
+          "text": "小张没有服用阿司匹林，也没有服用对乙酰氨基酚。"
+        },
+        {
+          "key": "E",
+          "text": "小张服用了对乙酰氨基酚，但没有服用羟苯基乙酰胺。"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】推理\n如果你服用了阿司匹林或者对乙酰氨基酚，那么你注射疫苗后就必然不会产生良好的抗体反映",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000027",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "为了调查当前的人们的识字水平，其实验者列举了20个词语，请30位文化人士识读，这些\n人的文化程度都在大专以上。识读结果显示，多数人只读对3到5个词语，极少数人读对15以上，甚至有人全部读错。其中， \"蹒跚\"的辨识率最高， 30人中有19人读对， \"呱呱坠地\"所有人都读错。20个词语的整体误读率接近80%，该实验者由此得出，当前人们的识字水平并没有提高，甚至有所下降。\n以下哪项如果是真，最能对该实验者的结论构成质疑？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "实验者选取的20个词语不具有代表性。"
+        },
+        {
+          "key": "B",
+          "text": "实验者选取的30位识读者均没有博士学位。"
+        },
+        {
+          "key": "C",
+          "text": "实验者选取的20个词语在网络流行语言中不常用。"
+        },
+        {
+          "key": "D",
+          "text": "\"呱呱坠地\"这个词的读音有些大学老师也经常读错。"
+        },
+        {
+          "key": "E",
+          "text": "实验者选取的30位识读者约有50%的大学成绩不佳。"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】削弱\n论点 | 当前人们的识字水平并没有提高，甚至有所下降",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000028",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "域控制器储存了域内的账户、密码和属于这个域的计算机三项信息。当计算机接入网络时，\n域控制器首先要鉴别这台计算机是否属于这个域，用户使用的登陆账户是否存在，密码是否正确。如果三项信息均是正确，则允许登陆；如果以上信息有一项不正确，那么域控制器就会拒绝这个用户从这台计算机登陆。小张的登陆帐号是正确的，但是域控制器拒绝小张的计算机登陆。\n基于以上陈述能得出以下哪项结论？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "小张输入的密码是错误的。"
+        },
+        {
+          "key": "B",
+          "text": "小张的计算机不属于这个域。"
+        },
+        {
+          "key": "C",
+          "text": "如果小张的计算机属于这个域，那么他输入的密码是错误的。"
+        },
+        {
+          "key": "D",
+          "text": "只有小张输入的密码是正确的，它的计算机才属于这个域。"
+        },
+        {
+          "key": "E",
+          "text": "如果小张输入的密码是正确的，那么他的计算机属于这个域。"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】推理\n如果三项信息均是正确，则允许登陆\n如果以上信息有一项不正确，那么域控制器就会拒绝这个用户从这台计算机登陆答案：C",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000029",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "现在越来越多的人拥有了自己的轿车，但他们明显地缺乏汽车保养的基本知识。这些人会按\n照维修保养手册或4S店售后服务人员的提示做定期保养。可是，某位有经验的司机会告诉你，每行驶5000公里做一次定期检查，只能检查出汽车可能存在问题的一小部分，这样的检查是没有意义的，是浪费时间和金钱。\n以下哪项不能削弱该司机的结论？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "每行驶5000公里做一次定期检查是保障车主安全所需要的。"
+        },
+        {
+          "key": "B",
+          "text": "每行驶5000公里做一次定期检查能发现引擎的某些主要故障。"
+        },
+        {
+          "key": "C",
+          "text": "在定期检查中所做的常规维护是保证汽车正常运行所必需的。"
+        },
+        {
+          "key": "D",
+          "text": "赵先生的新车未作定期检查行驶到5100公里时出了问题。"
+        },
+        {
+          "key": "E",
+          "text": "某公司新购的一批汽车未作定期检查，均安全行驶了7000公里以上。"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "【考点】支持\n论点 | 每行驶5000公里做一次定期检查，只能检查出汽车可能存在问题的一小部分，这样的检查是没有意义的，是浪费时间和金钱",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000030",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "化学课上，张老师演示了两个同时进行得教学实验：一个实验是KCI03加热后，有02缓慢产生：另一个实验KCI03加热后迅速撒入少量Mn02，这时立即有大量的02产生。张老师由此\n指出:Mn02是02快速产生的原因。\n以下哪项与张老师得出结论的方法类似？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "同一品牌的化妆品价格越高卖得越火。由此可见，消费者喜欢价格高得化妆品。"
+        },
+        {
+          "key": "B",
+          "text": "居里夫人在沥青矿物中提取放射性元素时发现，从一定量的沥青矿物中提取的全部纯铀的放射线强度比同等数量的沥青矿物质中放射线强度低数倍。她据此推断，沥青矿物中还存在其它放射性更强元素。"
+        },
+        {
+          "key": "C",
+          "text": "统计分析发现， 30岁-60岁之间，年纪越大胆子越小，有理由相信；岁月是勇敢的腐蚀剂。"
+        },
+        {
+          "key": "D",
+          "text": "将闹钟放在玻璃罩里，使它打铃，可以听到铃声;然后把玻璃罩里得空气抽空，再使闹钟打铃，就听不到铃声了。由此可见，空气是声音传播的介质。"
+        },
+        {
+          "key": "E",
+          "text": "人们通过对绿藻、蓝藻、红藻的大量观察，发现结构简单、无根叶是藻类植物的主要特征。"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】论证\n类比论证",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000031",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 4,
+      "stem": "湖队是不可能进入决赛的。如果湖队进入决赛，那么太阳就从西边出来了。以下哪项与上述论证方式最相似？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "今天天气不冷。如果冷，湖面怎么结冰了？"
+        },
+        {
+          "key": "B",
+          "text": "语言是不能创造财富的。若语言能够创造财富，则夸夸其谈的人就是世界上最富有的了。"
+        },
+        {
+          "key": "C",
+          "text": "草木之生也柔脆，其死也枯槁。故坚强者死之徙，柔弱者生之徙。"
+        },
+        {
+          "key": "D",
+          "text": "天上是不会掉馅饼得。若果你不相信这一点，那上当受骗是迟早的事。"
+        },
+        {
+          "key": "E",
+          "text": "古典音乐不流行。若果流行，那就说明大众的音乐欣赏水平打大大提高了。"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "【考点】论证",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000032",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 4,
+      "stem": "在某次课程教学改革研讨会上，负责工程类教学的齐老师说，在工程设计中，用于解决数\n学问题的计算机程序越来越多了，这样就不必要求工程技术类大学生对基础数学有深刻的理解。因此，在未来的教学体系中，基础数学课程可以用其它重要的工程类课程代替。\n以下哪项如果为真，就能削弱齐老师得上述论证？  ()\nⅠ.工程类基础课程中已经包含了相关得基础数学的内容。\nⅡ.在工程设计中，设计计算机程序需要对基础数学有全面的理解。\nⅢ.基础数学课程的一个重要目标是培养学生的思维能力，这种能力对工程设计来说很关键。",
+      "options": [
+        {
+          "key": "A",
+          "text": "只有Ⅱ"
+        },
+        {
+          "key": "B",
+          "text": "只有Ⅰ和Ⅱ"
+        },
+        {
+          "key": "C",
+          "text": "只有Ⅰ和Ⅲ"
+        },
+        {
+          "key": "D",
+          "text": "只有Ⅱ和Ⅲ"
+        },
+        {
+          "key": "E",
+          "text": "Ⅰ、Ⅱ和Ⅲ"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】削弱\n论点1 | 在工程设计中，用于解决数学问题的计算机程序越来越多了，这样就不必要求工程技术类大学生对基础数学有深刻的理解",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000033",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "蟋蟀是一种非常有趣的小动物，宁静的夏夜，草丛中传来阵阵清脆悦耳的鸣叫声，那是蟋蟀\n在唱歌，蟋蟀优美动听的歌声并不是出自它的好嗓子，而是来自它的翅膀。左右两翅一张一合，相互摩擦，就可以发出悦耳的声响了。蟋蟀还是建筑专家。与它那柔软的挖掘工具相\n比，蟋蟀的住宅真可以算得上是伟大的工程了。在其住宅门口，有一个收拾得非常舒适的平台。夏夜，除非下雨或者刮风，否则蟋蟀肯定会在这个平台上唱歌。\n根据以上陈述，以下哪项是蟋蟀在无雨的夏夜所做的？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "修建住宅。"
+        },
+        {
+          "key": "B",
+          "text": "收拾平台。"
+        },
+        {
+          "key": "C",
+          "text": "在平台上唱歌。"
+        },
+        {
+          "key": "D",
+          "text": "如果没有刮风，它就在抢修工程。"
+        },
+        {
+          "key": "E",
+          "text": "如果没有刮风，它就在平台上唱歌。"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "【考点】推理\n除非下雨或者刮风，否则蟋蟀肯定会在这个平台上唱歌\n非下雨或者刮风，则蟋蟀肯定会在这个平台上唱歌",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000034",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 4,
+      "stem": "一般认为， 出生地间隔较远的夫妻所生子女的智商较高。有资料显示，夫妻均是本地人，其所生子女的平均智商为102.45;夫妻是省内异地的，其所生子女的平均智商为106.17;而隔\n省婚配的，其所生子女的智商则高达109.35。因此，异地通婚可提高下一代智商水平。以下哪项如果为真，最能削弱上述结论？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "统计孩子平均智商的样本数量不够多。"
+        },
+        {
+          "key": "B",
+          "text": "不难发现，一些天才儿童的父母均是本地人"
+        },
+        {
+          "key": "C",
+          "text": "不难发现，一些低智商儿童的父母的出生地间隔较远。"
+        },
+        {
+          "key": "D",
+          "text": "能够异地通婚者是智商比较高的，他们自身的高智商促成了异地通婚。"
+        },
+        {
+          "key": "E",
+          "text": "一些情况下，夫妻双方出生地间隔很远，但他们的基因可能接近。"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】削弱\n论点 | 异地通婚可提高下一代智商水平",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000035",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "成品油生产商的利润很大程度上受国际市场原油价格的影响， 因为大部分原油是按国际市场\n价购进的。近年来，随着国际原油市场市场价格的不断提高，成品油生产商的运营成本大幅度增加，但某国成品油生产商的利润并没有减少，反而增加了。\n以下哪项如果为真，最有助于解释上述看似矛盾的现象？  ()\n有所提高。",
+      "options": [
+        {
+          "key": "A",
+          "text": "原油成本只占成品油生产商运营成本的一半。"
+        },
+        {
+          "key": "B",
+          "text": "该国成品油价格根据市场供需确定。随着国际原油市场价格的上涨，该国政府为成品油生产商提供相应的补助。"
+        },
+        {
+          "key": "C",
+          "text": "在国际原油市场价格不断上涨期间，该国成品油生产商降低了个别高薪雇员的工资。"
+        },
+        {
+          "key": "D",
+          "text": "在国际原油市场价格上涨之后，除进口成本增加以外，成品油生产的其他运营成本也"
+        },
+        {
+          "key": "E",
+          "text": "该国成品油生产商的原油有一部分来自国内，这部分受国际市场价格波动影响较小。"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "【考点】解释\n现象 | 随着国际原油市场市场价格的不断提高，成品油生产商的运营成本大幅度增加，但某国成品油生产商的利润并没有减少，反而增加了",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000036",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "太阳风中的一部分带电粒子可以到达M星表面，将足够的能量传递给M星表面粒子，使后者\n脱离M星表面，逃逸到M星大气中。为了判定这些逃逸的粒子，科学家们通过三个实验获得了如下信息：\n实验一：或者是X粒子，或者是Y粒子;\n实验二：或者不是Y粒子，或者不是Z粒子;\n实验三：如果不是Z粒子，就不是Y粒子。\n根据上述三个实验，以下哪项一定为真？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "这种粒子是X粒子。"
+        },
+        {
+          "key": "B",
+          "text": "这种粒子是Y粒子。"
+        },
+        {
+          "key": "C",
+          "text": "这种粒子是Z粒子。"
+        },
+        {
+          "key": "D",
+          "text": "这种粒子不是X粒子。"
+        },
+        {
+          "key": "E",
+          "text": "这种粒子不是Z粒子。"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】推理\nX∪Y\n¬Y∪ ¬Z=Z→ ¬Y=Y→ ¬Z\n¬Z→ ¬Y=Y→Z",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000037",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 4,
+      "stem": "美国某大学医学院的研究人员在《小儿科杂志》上发表论文指出，在对2702个家庭的孩子\n进行跟踪调查后发现，如果孩子在5岁前每天看电视超过2小时，他们长大后出现行为问题的风险将会增加1倍多。所谓行为问题是指性格孤僻、言行粗鲁、侵犯他人、难以与他人合作等。\n以下哪项最好地解释了以上论述？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "电视节目会使孩子产生好奇心，容易导致孩子出现暴力倾向。"
+        },
+        {
+          "key": "B",
+          "text": "电视节目中有不少内容容易使孩子长时间处于紧张、恐惧的状态。"
+        },
+        {
+          "key": "C",
+          "text": "看电视时间过长，会影响孩子与其他人的交往，久而久之，孩子便会缺乏与他人打交道的经验。"
+        },
+        {
+          "key": "D",
+          "text": "儿童模仿能力强，如果只对电视节目感兴趣，长此以往，会阻碍他们分析能力的发展。"
+        },
+        {
+          "key": "E",
+          "text": "每天长时间地看电视，容易使孩子神经系统产生疲劳，影响身心健康发展。"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】解释\n现象 | 如果孩子在5岁前每天看电视超过2小时，他们长大后出现行为问题的风险将",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000038",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "一种常见的现象是，从国外引进的一些畅销科普读物在国内并不畅销，有人对此解释说，这\n与我们多年来沿袭的文理分科有关。文理分科人为地造成了自然科学与人文社会科学的割裂，导致科普类图书的读者市场还没有真正形成。\n以下哪项如果成真，最能加强上述观点？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "有些自然科学工作者对科普读物也不感兴趣。"
+        },
+        {
+          "key": "B",
+          "text": "科普读物不是没有需求，而是有效供给不足。"
+        },
+        {
+          "key": "C",
+          "text": "由于缺乏理科背景，非自然科学工作者对科学敬而远之。"
+        },
+        {
+          "key": "D",
+          "text": "许多科普电视节目都拥有固定的收视群，相应的科普读物也大受欢迎。"
+        },
+        {
+          "key": "E",
+          "text": "国内大部分科普读物只是介绍科学常识，很少真正关注科学精神的传播。"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】支持\n论点 | 文理分科人为地造成了自然科学与人文社会科学的割裂，导致科普类图书的读者市场还没有真正形成",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000039",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "大小行星悬浮在太阳系边缘，极易受附近星体引力作用的影响。据研究人员计算，有时这些力量会将彗星从奥尔特星云拖出。这样，它们更有可能靠近太阳。两位研究人员据此分别做出了以下两种有所不同的断定：一、木星的引力作用要么将它们推至更小的轨道，要么将它们逐出太阳系；二、木星的引力作用或者将它们推至更小的轨道，或者将它们逐出太阳系。如果上述两种断定只有一种为真 ，可以推出以下哪项结论？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "木星的引力作用将它们推至更小的轨道，并且将它们逐出太阳系。"
+        },
+        {
+          "key": "B",
+          "text": "木星的引力作用没有将它们推至更小的轨道，但是将它们逐出太阳系。"
+        },
+        {
+          "key": "C",
+          "text": "木星的引力作用将它们推至更小的轨道，但是没有将它们逐出太阳系。"
+        },
+        {
+          "key": "D",
+          "text": "木星的引力作用既没有将它们推至更小的轨道，也没有将它们逐出太阳系。"
+        },
+        {
+          "key": "E",
+          "text": "木星的引力作用如果将它们推至更小的轨道，就不会将它们逐出太阳系。"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】推理\n一、木星的引力作用要么将它们推至更小的轨道，要么将它们逐出太阳系；\n二、木星的引力作用或者将它们推至更小的轨道，或者将它们逐出太阳系",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000040",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "鸽子走路时，头部并不是有规律地前后移动，而是一直在往前伸。行走时，鸽子脖子往前一探，然后头部保持静止，等待着身体和爪子跟进。有学者曾就鸽子走路时伸脖子的现象作出假设：在等待身体跟进的时候，暂时静止的头部有利于鸽子获得稳定的视野，看清周围的食物。\n以下哪项如果为真，最能支持上述假设？  ()\n运动。",
+      "options": [
+        {
+          "key": "A",
+          "text": "鸽子行走时如果不伸脖子，很难发现远处的食物。"
+        },
+        {
+          "key": "B",
+          "text": "步伐太大的鸟类，伸脖子的幅度远比步伐要小得多。"
+        },
+        {
+          "key": "C",
+          "text": "鸽子行走速度的变化，刺激内耳控制平衡的器官，导致伸脖子。"
+        },
+        {
+          "key": "D",
+          "text": "鸽子行走时\"一举翅一投足\" ，都可能出现脖子和头部肌肉的自然反射，所以头部不断"
+        },
+        {
+          "key": "E",
+          "text": "如果雏鸽步态受到限制，功能发育不够完善，那么，成年后鸽子的步伐变小，脖子伸缩幅度则会随之降低。"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】支持\n论点 | 在等待身体跟进的时候，暂时静止的头部有利于鸽子获得稳定的视野，看清周围的食物",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000041",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "S市环保监测中心的统计分析表明，2009年空气质量为优的天数达到了150天，比2008年多\n出22天：二氧化碳、一氧化碳、二氧化氮、可吸入颗粒物四项污染物浓度平均值，与2008年相比分别下降了约21.3%、25.6%、26.2%、 15.4% ，S市环保负责人指出，这得益于近年来本市政府持续采取的控制大气污染的相关措施。\n以下除哪项外，均能支持上述S市环保负责人的看法？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "S市广泛开展环保宣传，加强了市民的生态理念和环保意识。"
+        },
+        {
+          "key": "B",
+          "text": "S市启动了内部控制污染方案；凡是排放不达标的燃煤锅炉停止运行。"
+        },
+        {
+          "key": "C",
+          "text": "S市执行了机动车排放国IV标准，单车排放比Ⅲ标准降低了49%。"
+        },
+        {
+          "key": "D",
+          "text": "S市市长办公室最近研究了焚烧秸秆的问题，并着手制定相关条例。"
+        },
+        {
+          "key": "E",
+          "text": "S市制定了\"绿色企业\"标准，继续加快污染重、能耗高企业的退出。"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】削弱\n论点 | 这得益于近年来本市政府持续采取的控制大气污染的相关措施",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000042",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "在某次思维训练课上，张老师提出\"尚左数\"这一概念的定义；在连续排列的一组数字中，如\n果一个数字左边的数字都比其大（或无数字） ，且其右边的数字都比其小（或无数字） ，则称这个数字为尚左数。\n根据张老师的定义，在8、9、 7、6、4、 5、 3、2这列数字中，以下哪项包含了该列数字中所有的尚左数？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "4、 5、 7和9"
+        },
+        {
+          "key": "B",
+          "text": "2、 3、6和7"
+        },
+        {
+          "key": "C",
+          "text": "3、6、 7和8"
+        },
+        {
+          "key": "D",
+          "text": "5、6、 7和8"
+        },
+        {
+          "key": "E",
+          "text": "2、 3、6和8"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "【考点】匹配\n8、9、7、6、4、 5、3、2 答案： B",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000043",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "一般认为，剑乳齿象是从北美洲迁入南美洲的。剑乳齿象的显著特征是具有较尖的长剑型门齿，鄂骨较短， 臼齿的齿冠隆起，齿板数目为7至8个，并呈乳状突起，剑乳齿象因此得名。剑乳齿象的牙齿结构比较复杂，这表明它能吃草。在南美洲的许多地方都有证据显示史前人类捕捉过剑乳齿象。 由此可以推测 ，剑乳齿象的灭绝可能与人类的过度捕杀有密切关系。\n以下哪项如果为真，最能反驳上述论证？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "史前动物之间经常发生大规模相互捕杀的现象。"
+        },
+        {
+          "key": "B",
+          "text": "剑乳齿象在遇到人类攻击时缺乏自我保护能力。"
+        },
+        {
+          "key": "C",
+          "text": "剑乳齿象也存在由南美洲进入北美洲的回迁现象。"
+        },
+        {
+          "key": "D",
+          "text": "由于人类活动范围的扩大，大型食草动物难以生存。"
+        },
+        {
+          "key": "E",
+          "text": "幼年剑乳齿象的牙齿结构比较简单， 自我生存能力弱。"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】削弱\n论点 | 剑乳齿象的灭绝可能与人类的过度捕杀有密切关系",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000044",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "小东在玩\"勇士大战\"游戏，进入第二关时，界面出现四个选项，第一个选项是\"选择任意选项\n都需要支付游戏币\" ，第二个选项是\"选择本项后可以得到额外游戏奖励\" ，第三个选项是\"选择本项游戏后游戏不会进行下去\" ，第四个选项是\"选择某个选项不需支付游戏币。\n如果四个选项中的陈述中有一句为真，则以下哪项一定为真？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "选择任意选项都需支付游戏币。"
+        },
+        {
+          "key": "B",
+          "text": "选择任意选项都无需支付游戏币。"
+        },
+        {
+          "key": "C",
+          "text": "选择任意选项都不能得到额外游戏奖励"
+        },
+        {
+          "key": "D",
+          "text": "选择第二个选项后可以得到额外游戏奖励"
+        },
+        {
+          "key": "E",
+          "text": "选择第三个选项后游戏能继续进行下去。"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "【考点】推理\n第一个选项 | 选择任意选项都需要支付游戏币\n第二个选项 | 选择本项后可以得到额外游戏奖励\n第三个选项 | 选择本项游戏后游戏不会进行下去\n第四个选项 | 选择某个选项不需支付游戏币",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000045",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "有位美国学者做了一个实验，给被试儿童看三辐图画：鸡、牛和青草，然后让儿童将其分为\n两类。结果大部分中国儿童把牛和青草一类，把鸡归为另一类，大部分美国儿童则把牛和鸡归为一类，把青草归为另一类。这们美国学者由此得出： 中国儿童习惯于按照事物之间的关系来分类，美国儿童则习惯于把事物按照各自所属的\"实体\"范畴进行分类。\n以下哪项是这位学者得出结论所必须假设的？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "马和青草是按照事物之间的关系被列为一类。"
+        },
+        {
+          "key": "B",
+          "text": "鸭和鸡蛋是按照各自所属的\"实体\"范畴被归为一类。"
+        },
+        {
+          "key": "C",
+          "text": "美国儿童只要把牛和鸡归为一类，就是习惯于按照各自所属\"实体\"范畴进行分类。"
+        },
+        {
+          "key": "D",
+          "text": "美国儿童只要把牛和鸡归为一类，就不是习惯于按照事物之间的关系来分类。"
+        },
+        {
+          "key": "E",
+          "text": "中国儿童只要把牛和青草归为一类，就不是习惯于按照各自所属\"实体\"范畴进行分类。"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】假设\n论点 | 中国儿童习惯于按照事物之间的关系来分类，美国儿童则习惯于把事物按照各自所属的\"实体\"范畴进行分类",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000046",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 4,
+      "stem": "相互尊重是相互理解的基础，相互理解是相互信任的前提。在人与人的相互交往中， 自\n重、自信也是非常重要的，没有一个人尊重不自重的人。没有一个人信任他所不尊重的人。\n以上陈述可以推出以下哪项结论？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "不自重的人也不被任何人信任。"
+        },
+        {
+          "key": "B",
+          "text": "相互信任才能相互尊重。"
+        },
+        {
+          "key": "C",
+          "text": "不自信的人也不自重。"
+        },
+        {
+          "key": "E",
+          "text": "不自信的人也不受任何人尊重。"
+        },
+        {
+          "key": "D",
+          "text": "不自信的人也不被任何人信任"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】推理\n相互理解→相互尊重\n相互信任→相互理解\n不自重→不被尊重\n不被尊重→不被信任",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000047",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "学生：IQ和EQ哪个更重要?您能否给我指点一下？\n学生：你去书店问问工作人员，关于IQ和EQ的书哪类销得快，哪类就更重要。\n以下哪项与上述题干中的问答方式最为相似？  ()\n经理：现在年终了，各公司都在安排出去旅游，你去问问其它公司的同行，他们计划去哪里，我们就不去哪里，不凑热闹。\n佳佳：你在母亲节前一天去花店看一下，看看买花的人多不多就行了嘛.\n店员：这个需要结合自己的性格与穿衣习惯，各人可以有自己的选择与喜好。\n导游：你仔细看看，哪一条山路上车马的痕迹深，我们就走哪一条。\n老师：你去问问高年级得分高的同学，他们是否经常背书、做练习。",
+      "options": [
+        {
+          "key": "A",
+          "text": "员工：我们正制定一个度假方案,你说是在本市好，还是去外地好？"
+        },
+        {
+          "key": "B",
+          "text": "平平：母亲节那天我准备送给妈妈送一份礼物，你说是送花还是送巧克力好？"
+        },
+        {
+          "key": "C",
+          "text": "顾客：我准备买一件毛衣，你看颜色是鲜艳一点，还是素一点好？"
+        },
+        {
+          "key": "D",
+          "text": "游客：我们前面有两条山路，走哪一条更好？"
+        },
+        {
+          "key": "E",
+          "text": "学生：我正在准备期末复习，是做教材上的练习重要还是理解教材内容更重要？"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】论证",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000048",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "李赫、张岚、林宏，何柏、邱辉五位同事，近日他们各自买了一辆不同品牌小轿车，分别为\n雪铁龙、奥迪、宝马、奔驰、桑塔纳。这五辆车的颜色分别与五人名字最后一个字谐音的颜色不同。已知，李赫买的是蓝色的雪铁龙。\n以下哪项排列可能依次对应张岚、林宏、何柏、邱辉所买的车？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "灰色的奥迪、白色的宝马、灰色的奔驰、红色的桑塔纳"
+        },
+        {
+          "key": "B",
+          "text": "黑色的奥迪、红色的宝马、灰色的奔驰、白色的桑塔纳"
+        },
+        {
+          "key": "C",
+          "text": "红色的奥迪、灰色的宝马、 白色的奔驰、黑色的桑塔纳"
+        },
+        {
+          "key": "D",
+          "text": "白色的奥迪、黑色的宝马、红色的奔驰、灰色的桑塔纳"
+        },
+        {
+          "key": "E",
+          "text": "黑色的奥迪、灰色的宝马、 白色的奔驰、红色的桑塔纳"
+        }
+      ],
+      "answer": [
+        "A"
+      ],
+      "analysis": "【考点】匹配",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000049",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 4,
+      "stem": "克鲁特是德国家喻户晓的\"明星\"北极熊，北极熊是名副其实的北极霸主。因此，克鲁特是名副其实的北极霸主。\n以下除哪项外，均与上述论证中出现的谬误相似？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "儿童是祖国的花朵，小雅是儿童。因此，小雅是祖国的花朵。"
+        },
+        {
+          "key": "B",
+          "text": "鲁迅的作品不是一天能读完的，《祝福》是鲁迅的作品。因此，《祝福》不是一天能读完的。"
+        },
+        {
+          "key": "C",
+          "text": "中国人是不怕困难的，我是中国人。因此，我是不怕困难的。"
+        },
+        {
+          "key": "D",
+          "text": "康怡花园坐落在清水街，清水街的建筑属于违章建筑。因此，康怡花园的建筑属于违章建筑"
+        },
+        {
+          "key": "E",
+          "text": "西班牙语是外语，外语是普通高等学校招生的必考科目。因此，西班牙语是普通高校招生的必考科目"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】论证\n群体具备的特质，个体不一定具备",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000050",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "在本年度篮球联赛中，长江队主教练发现，黄河队五名主力队员之间的上场配置有如下规律：\n（1）若甲上场，则乙也要上场\n（2）只有甲不上场，丙才不上场\n（3）要么丙不上场，要么乙和戊中有人不上场\n（4）除非丙不上场，否则丁上场\n若乙不上场，则以下哪项配置合乎上述规律？（）",
+      "options": [
+        {
+          "key": "A",
+          "text": "甲、丙、丁同时上场。"
+        },
+        {
+          "key": "B",
+          "text": "丙不上场，丁、戊同时上场。"
+        },
+        {
+          "key": "C",
+          "text": "甲不上场，丙、丁都上场。"
+        },
+        {
+          "key": "D",
+          "text": "甲、丁都上场，戊不上场。"
+        },
+        {
+          "key": "E",
+          "text": "甲、丁、戊都不上场"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】匹配",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000051",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 4,
+      "stem": "陈先生：未经许可侵入别人的电脑，就好像开偷来的汽车撞伤了人，这些都是犯罪行为。\n但后者性质更严重因为它既侵占了有形财产，又造成了人身伤害；而前者只是在虚拟世界中捣乱。\n林女士：我不同意，例如，非法侵入医院的电脑，有可能扰乱医疗数据，甚至危及病人的生命。因此，非法侵入电脑同样会造成人身伤害。\n以下哪项最为准确地概括了两人争论的焦点？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "非法侵入别人的电脑和开偷来的汽车是否同样会危及人的生命？"
+        },
+        {
+          "key": "B",
+          "text": "非法侵入别人的电脑和开偷来的汽车伤人是否同样构成犯罪？"
+        },
+        {
+          "key": "C",
+          "text": "非法侵入别人电脑和开偷来的汽车伤人是否是同样性质的犯罪？"
+        },
+        {
+          "key": "D",
+          "text": "非法侵入别人电脑的犯罪性质是否和开偷来的汽车伤人一样严重？"
+        },
+        {
+          "key": "E",
+          "text": "是否只有侵占有形财产才构成犯罪？"
+        }
+      ],
+      "answer": [
+        "D"
+      ],
+      "analysis": "【考点】论证",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000052",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "小明、小红、小丽、小强、小梅五人去听音乐会。他们五人在同一排且座位相连，其中只有\n一个座位最靠近走廊，如果小强想坐在最靠近走廊的座位上，小丽想跟小明紧挨着，小红不想跟小丽紧挨着，小梅想跟小丽紧挨着，但不想跟小强或小明紧挨着。\n以下哪项排序符合上述五人的意愿？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "小明、小梅、小丽、小红、小强"
+        },
+        {
+          "key": "B",
+          "text": "小强、小红、小明、小丽、小梅"
+        },
+        {
+          "key": "C",
+          "text": "小强、小梅、小红、小丽、小明"
+        },
+        {
+          "key": "D",
+          "text": "小明、小红、小梅、小丽、小强"
+        },
+        {
+          "key": "E",
+          "text": "小强、小丽、小梅、小明、小红"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "【考点】匹配",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000053",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "参加某国际学术研讨会的60名学者中，亚裔学者31人，博士33人，非亚裔学者中无博士学位的4人。根据上述陈述，参加此次国际研讨会的亚裔博士有几人？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "1人"
+        },
+        {
+          "key": "B",
+          "text": "2人"
+        },
+        {
+          "key": "C",
+          "text": "4人"
+        },
+        {
+          "key": "D",
+          "text": "7人"
+        },
+        {
+          "key": "E",
+          "text": "8人"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "【考点】匹配\n亚裔学者31人 | 非亚裔学者29人\n博士33人 | 非博士27人\n非亚裔学者中无博士学位的4人，有博士学位的25人",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000054",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "对某高校本科生的某项调查统计发现：在因成绩优异被推荐免试攻读硕士研究生的文科专业生中，女生占有70%， 由此可见,该校本科文科专业的女生比男生优秀。\n以下哪项如果为真，能最有力地消弱上述结论？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "在该校本科文科专业学生中,女生占30%以上。"
+        },
+        {
+          "key": "B",
+          "text": "在该校本科文科专业学生中,女生占30%以下。"
+        },
+        {
+          "key": "C",
+          "text": "在该校本科文科专业学生中,男生占30%以下。"
+        },
+        {
+          "key": "D",
+          "text": "在该校本科文科专业学生中,女生占70%以下。"
+        },
+        {
+          "key": "E",
+          "text": "在该校本科文科专业学生中,男生占70%以上。"
+        }
+      ],
+      "answer": [
+        "C"
+      ],
+      "analysis": "【考点】削弱\n论点 | 该校本科文科专业的女生比男生优秀",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000055",
+      "type": "single",
+      "chapter": "逻辑推理",
+      "difficulty": 2,
+      "stem": "某中药配方有如要求：\n（1）如果有甲药材，那么也要有乙药材；\n（2）如果没有丙药材，那么必须有丁药材；\n（3）人参和天麻不能都有；\n（4）如果没有甲药材而有丙药材，则需要有人参。如果含有天麻，则关于该配方的断定哪项为真？  ()",
+      "options": [
+        {
+          "key": "A",
+          "text": "含有甲药材"
+        },
+        {
+          "key": "B",
+          "text": "含有丙药材"
+        },
+        {
+          "key": "C",
+          "text": "没有丙药材"
+        },
+        {
+          "key": "D",
+          "text": "没有乙药材和丁药材"
+        },
+        {
+          "key": "E",
+          "text": "含有乙药材或丁药材"
+        }
+      ],
+      "answer": [
+        "E"
+      ],
+      "analysis": "【考点】匹配\n（1） 甲→ 乙；\n（2） ¬丙→丁；\n（3）人参和天麻不能都有；\n（4） ¬甲∩丙→人参。\n天麻→→人参→ 甲∪¬丙",
+      "source": "2010年真题",
+      "tags": [
+        "逻辑推理"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000056",
+      "type": "text",
+      "chapter": "论证有效性分析",
+      "difficulty": 2,
+      "stem": "美国学者弗里德曼的《世界是平的》一书认为，全球化对当代人类社会的思想、经济、政治和文化等领域产生了深刻影响。全球化抹去了各国的疆界，是世界从立体变成了平面，也就是说，世界各国之间的社会发展差距正在日益缩小。\n“世界是平的”这一观点，是基于近几十年信息传播技术迅猛发展的状况而提出的，互联网的普及、软件的创新使海量信息迅速扩散到世界各地。由于世界是平的，穷国可以和富国一样在同一平台上接受同样的最新信息。这样就大大促进了穷国的经济发展，而改善了它们的国际地位。\n事实也是如此，所谓“金砖四国”国际声望的上升，无不得益于他们的经济成就，无不得益于互联网技术的发展。特别是中国经济的起飞，中国在世界上的崛起，无疑也依靠了互联网技术的普及，同时也可作为“世界是平的”这一观点的有力佐证。\n毋庸置疑，信息传播技术革命还远未结束，互联网技术将会有更大发展，人类社会将有更惊人的变化。可以预言，由于信息技术的迅猛发展，世界的经济格局与政治格局将会发生巨大的变化，世界最不发达的国家和最发达的国家之间再也不会让人有天壤之别的感觉，非洲大陆将会成为另一个北美。同样也可以预言，由于中国信息技术发展迅猛，中国和世界一样，也会从立体变为平面，中国东西部之间的经济鸿沟将被填平，中国西部的崛起指日可待。",
+      "answer": [
+        "见解析"
+      ],
+      "analysis": "世界真的是平的吗?\n上述材料通过一系列论证试图证明世界是平的，然而由于其在论证过程中犯了一系列逻辑错误，所以其结论的有效性是值得商榷的。\n首先，穷国和富国可以在同一平台上接受同样的最新消息，但仅仅获取消息并不必然会大大促进穷国的经济发展。因为实际上，信息差并非是发展不均衡的主要原因，而且资源禀赋、产业结构、政策导向等因素才是经济发展的关键参数。显而易见，该结论存在不妥。\n其次，”金砖四国”国际声望的上升真的是得益于互联网技术的发展吗？“金砖四国“在制造业、能源等领域的贸易规模不断扩大，在全球产业链中占据重要地位，像中国制造业的崛起，大量产品出口到世界各地，提升了在国际贸易中的影响力，进而提高了国际声望。这表明其声望上升是多种因素共同作用，而非单纯依赖互联网技术发展。所以，该结论是值得商榷的。\n再次，信息技术的迅猛发展并不意味着世界经济与政治格局将会发生巨大变化的。信息技术的迅猛发展，使得富国凭借先进的技术基础和强大的科研投入，能够更快地将新技术应用于生产和经济活动中，进一步提升生产效率和经济收益。而穷国由于缺乏技术研发能力和资金支持，无法有效利用信息技术带来的机遇，甚至可能在数字鸿沟的影响下，与富国的差距越来越大。这种情况下，固有世界秩序难以被打破，更谈不上世界经济与政治格局发生巨大变化。\n最后，中国信息技术发展迅猛，中国东西部的经济鸿沟就能被填平吗？中国西部地区地理位置偏远，交通不便，增加了物流成本和市场交易成本，限制了企业的发展和产业的集聚。同时，基础设施水平相对落后，网络覆盖质量、电力供应稳定性等方面不如东部地区，即便信息技术发展迅猛，但缺乏良好的基础设施支撑，信息技术难以充分发挥对经济的促进作用。因此，东西部的经济鸿沟不会轻易因信息技术发展而被填平。\n综上所述，由于材料在推理论证过程中存在着诸如此类的逻辑漏洞，所以该论证的有效性及其得出的结论是值得商榷的。",
+      "source": "2010年真题",
+      "tags": [
+        "论证有效性分析"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000057",
+      "type": "text",
+      "chapter": "论说文",
+      "difficulty": 2,
+      "stem": "真正的学者，其崇高使命是追求真理。学者个人的名利乃至生命与之相比都微不足道，但正因为其献身于真理就会变得无限伟大。一些著名大学的校训中都含有追求真理的内容。然而，近年学术界的一些状况与追求真理这一使命相去甚远，部分学者的功利化倾向越来越严重，抄袭剽窃、学术造假、自我炒作、沽名钓誉等现象时有所闻。",
+      "answer": [
+        "见解析"
+      ],
+      "analysis": "坚持真理，拒绝功利（层次并列式）\n（引论）一个人、一家企业、一个国家，只有坚持真理、拒绝功利，才能不断迈向成功。\n（分论点：个人）真理是个人通往成功的必经之路。一个人无论是做人还是做事都离不开坚持真理。正面的例子如牛顿，若他不坚持真理、仍笃信上帝，则他不可能写出《自然哲学的数学原理》，不可能发现万有引力，更不可能总结出牛顿三定律，因为数学和物理就是宇宙中最基础的真理。反面的例子如赵高，他通过指鹿为马、玩弄人心，虽满足了一时的权力欲，却造成秦帝国二世而亡，自己也身首异处。由此可见，坚持真理是个人必备的品质。\n（分论点：企业）真理是企业通往成功的必经之路。一家企业必须尊重市场规律和法律法规的真理，才能获得长久的成动。小米公司，看到了平价手机的市场需求，主动为消费者提供便宜可靠的手机产品，从而奠定了公司成功的基础。而西贝餐厅无视消费者对预制菜的质疑，钻法律空子，与消费者辩论，甚至反过来教育消费者，导致了门可罗雀的下场。显而易见，坚持真理是企业成功的前提。\n（分论点：国家）真理是国家通往成功的必经之路。民意便是国家的真理，如果不坚持真理，就没有农村包国城市的成功实践；如果不坚持真理，就没有谁海战役人民群众小推车推出来的胜利；如果不坚持真理，就没有家庭联产承包责任制的顺利执行；如果不坚持真理，就没自改革开放以来的辉煌成就。因此，坚持真理是国家的应有之意。\n（结论）坚持真理或许如“欲渡黄河冰塞川，将登太行雪满山”，也许像“剑阁峥嵘而崔巍”，但坚持真理、拒绝功利，值得个人、企业、国家为之不懈攀登。",
+      "source": "2010年真题",
+      "tags": [
+        "论说文"
+      ]
+    }
+  ],
+  "Papers": [
+    {
+      "id": "paper_1785472444134",
+      "name": "2010年199管理类综合能力考试",
+      "source": "2010年真题",
+      "difficulty": 4,
+      "questionIds": [
+        "kaoyan_guanzong_000001",
+        "kaoyan_guanzong_000002",
+        "kaoyan_guanzong_000003",
+        "kaoyan_guanzong_000004",
+        "kaoyan_guanzong_000005",
+        "kaoyan_guanzong_000006",
+        "kaoyan_guanzong_000007",
+        "kaoyan_guanzong_000008",
+        "kaoyan_guanzong_000009",
+        "kaoyan_guanzong_000010",
+        "kaoyan_guanzong_000011",
+        "kaoyan_guanzong_000012",
+        "kaoyan_guanzong_000013",
+        "kaoyan_guanzong_000014",
+        "kaoyan_guanzong_000015",
+        "kaoyan_guanzong_000016",
+        "kaoyan_guanzong_000017",
+        "kaoyan_guanzong_000018",
+        "kaoyan_guanzong_000019",
+        "kaoyan_guanzong_000020",
+        "kaoyan_guanzong_000021",
+        "kaoyan_guanzong_000022",
+        "kaoyan_guanzong_000023",
+        "kaoyan_guanzong_000024",
+        "kaoyan_guanzong_000025",
+        "kaoyan_guanzong_000026",
+        "kaoyan_guanzong_000027",
+        "kaoyan_guanzong_000028",
+        "kaoyan_guanzong_000029",
+        "kaoyan_guanzong_000030",
+        "kaoyan_guanzong_000031",
+        "kaoyan_guanzong_000032",
+        "kaoyan_guanzong_000033",
+        "kaoyan_guanzong_000034",
+        "kaoyan_guanzong_000035",
+        "kaoyan_guanzong_000036",
+        "kaoyan_guanzong_000037",
+        "kaoyan_guanzong_000038",
+        "kaoyan_guanzong_000039",
+        "kaoyan_guanzong_000040",
+        "kaoyan_guanzong_000041",
+        "kaoyan_guanzong_000042",
+        "kaoyan_guanzong_000043",
+        "kaoyan_guanzong_000044",
+        "kaoyan_guanzong_000045",
+        "kaoyan_guanzong_000046",
+        "kaoyan_guanzong_000047",
+        "kaoyan_guanzong_000048",
+        "kaoyan_guanzong_000049",
+        "kaoyan_guanzong_000050",
+        "kaoyan_guanzong_000051",
+        "kaoyan_guanzong_000052",
+        "kaoyan_guanzong_000053",
+        "kaoyan_guanzong_000054",
+        "kaoyan_guanzong_000055",
+        "kaoyan_guanzong_000056",
+        "kaoyan_guanzong_000057"
+      ]
+    }
+  ]
+}
