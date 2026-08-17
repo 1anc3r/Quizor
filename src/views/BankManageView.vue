@@ -319,7 +319,7 @@ function confirmAddToPaper(): void {
     <!-- 题库基本信息卡片 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title">
-        <span class="title-text">{{ isNew ? '新增题库' : `题库管理：${meta.name}` }}</span>
+        <span class="title-text">{{ isNew ? '新增题库' : `题库管理（${meta.name}）` }}</span>
         <div>
           <el-button v-if="isNew" type="primary" @click="onCreateBank">创建题库</el-button>
           <el-button v-else type="danger" plain :icon="Delete" @click="onDeleteBank">删除题库</el-button>
@@ -347,9 +347,9 @@ function confirmAddToPaper(): void {
         </el-form-item>
         <el-form-item label="组卷规则">
           <div style="width: 100%">
-            <div style="margin-bottom: 8px; display: flex; flex-wrap: wrap">
+            <div style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 12px;">
               <el-button type="primary" plain :icon="Plus" @click="addCompose">新增规则</el-button>
-              <el-button type="danger" plain :disabled="!composeSelection.length" @click="removeComposeBatch">
+              <el-button type="danger" plain :disabled="!composeSelection.length" @click="removeComposeBatch" style="margin-left: 0px;">
                 批量删除（{{ composeSelection.length }}）
               </el-button>
             </div>

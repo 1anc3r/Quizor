@@ -16,6 +16,8 @@ const userStore = useUserDataStore()
 
 const sortedRecords = computed(() => [...userStore.records].sort((a, b) => b.endTime - a.endTime))
 
+const isMobile = ref(window.innerWidth <= 768)
+
 function selectedKeysOf(rec: QuizRecord, qid: string): string[] {
   const d = rec.details.find((x) => x.questionId === qid)
   if (!d || d.type === 'text' || d.yourAnswer === '（未作答）') return []
@@ -168,9 +170,9 @@ onBeforeUnmount(() => {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="bankName" label="题库名称" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="total" label="题数" width="80" />
-        <el-table-column prop="answered" label="已答" width="80" />
+        <el-table-column prop="bankName" label="题库名称" v-if="!isMobile" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="total" v-if="!isMobile" label="题数" width="80" />
+        <el-table-column prop="answered" v-if="!isMobile" label="已答" width="80" />
         <el-table-column prop="correct" label="正确" width="80" />
         <el-table-column prop="wrong" label="错误" width="80" />
         <el-table-column label="正确率" width="80">

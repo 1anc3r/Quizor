@@ -20,6 +20,7 @@ const filterChapter = ref('')
 const filterType = ref<'' | QuestionType>('')
 const filterSource = ref('')
 const selection = ref<FavRow[]>([])
+const isMobile = ref(window.innerWidth <= 768)
 
 interface FavRow {
   item: FavoriteItem
@@ -106,21 +107,21 @@ async function removeBatch(): Promise<void> {
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="题号" width="80">
+      <el-table-column label="题号" v-if="!isMobile" width="80">
         <template #default="{ row }">
           <span :title="row.question.id">{{ shortId(row.question.id) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="章节" width="150" show-overflow-tooltip>
+      <el-table-column label="章节" v-if="!isMobile" width="150" show-overflow-tooltip>
         <template #default="{ row }">{{ row.question.chapter }}</template>
       </el-table-column>
-      <el-table-column label="题型" width="80">
+      <el-table-column label="题型" v-if="!isMobile" width="80">
         <template #default="{ row }">{{ typeLabel(row.question.type) }}</template>
       </el-table-column>
       <el-table-column label="题干" min-width="200" show-overflow-tooltip>
         <template #default="{ row }">{{ truncate(plainText(row.question.stem), 50) }}</template>
       </el-table-column>
-      <el-table-column label="难度" width="130">
+      <el-table-column label="难度" v-if="!isMobile" width="130">
         <template #default="{ row }">
           <el-rate v-model="row.question.difficulty" :max="5" size="small" disabled />
         </template>

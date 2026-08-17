@@ -134,7 +134,7 @@ function start(): void {
           <el-checkbox-group v-model="practice.types">
             <el-checkbox v-for="t in TYPE_OPTIONS" :key="t.value" :value="t.value">{{ t.label }}</el-checkbox>
           </el-checkbox-group>
-          <div class="muted">不勾选表示全部题型</div>
+          <div class="muted" style="margin-left: 8px">不勾选表示全部题型</div>
         </el-form-item>
       </el-form>
       <el-alert type="info" :closable="false" show-icon style="max-width: 640px">
@@ -152,7 +152,7 @@ function start(): void {
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="exam.source === 'paper'" label="试卷">
-          <el-select v-model="exam.paperId" style="width: 320px" placeholder="选择试卷">
+          <el-select v-model="exam.paperId" style="width: 640px" placeholder="选择试卷">
             <el-option v-for="p in papers" :key="p.id" :label="`${p.name}（${p.questionIds.length} 题）`" :value="p.id" />
           </el-select>
         </el-form-item>

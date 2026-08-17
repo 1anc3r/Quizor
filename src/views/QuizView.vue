@@ -252,7 +252,7 @@ onBeforeUnmount(() => {
       <span class="timer" :class="{ danger: timeDanger }">
         <el-icon><Timer /></el-icon>{{ timeText }}
       </span>
-      <span class="progress">{{ index + 1 }}/{{ total }}</span>
+      <span v-if="!isMobile"class="progress">{{ index + 1 }}/{{ total }}</span>
       <span class="spacer"></span>
       <el-button text @click="toggleFav">
         <el-icon :color="isFaved ? '#e6a23c' : undefined">
@@ -260,8 +260,8 @@ onBeforeUnmount(() => {
           <Star v-else />
         </el-icon>
       </el-button>
-      <el-button text :icon="Grid" @click="sheetOpen = !sheetOpen">答题卡</el-button>
-      <el-button type="primary" size="small" @click="submit(false)">交卷</el-button>
+      <el-button text :icon="Grid" @click="sheetOpen = !sheetOpen" style="margin-left: 0px;">答题卡</el-button>
+      <el-button type="primary" size="small" @click="submit(false)" style="margin-left: 0px; margin-right: 15px;">交卷</el-button>
     </header>
 
     <div class="quiz-body">
