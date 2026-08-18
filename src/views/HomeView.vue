@@ -51,7 +51,6 @@ function refreshUnfinished(): void {
   unfinished.value = bankStore.currentId ? getUnfinished(bankStore.currentId) : null
 }
 
-onMounted(refreshUnfinished)
 watch(() => bankStore.currentId, refreshUnfinished)
 
 function continueSession(): void {
@@ -67,6 +66,7 @@ function goSetup(mode: 'practice' | 'exam'): void {
 const paperKeyword = ref('')
 const questionKeyword = ref('')
 const activeChapters = ref<string[]>([])
+const isMobile = ref(window.innerWidth <= 768)
 
 const filteredPapers = computed(() => {
   const kw = paperKeyword.value.trim().toLowerCase()
@@ -141,10 +141,20 @@ function getPagedQuestions(chapter: string, allQuestions: Question[]): Question[
   const end = start + state.pageSize
   return allQuestions.slice(start, end)
 }
+
+function onResize(): void {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(async () => {
+  refreshUnfinished()
+  window.addEventListener('resize', onResize)
+})
 </script>
 
 <template>
   <div>
+    <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · 首页</span></div>
     <!-- 题库切换卡片 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title">

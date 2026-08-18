@@ -117,6 +117,7 @@ async function renderCharts(): Promise<void> {
 function onResize(): void {
   trendChart?.resize()
   chapterChart?.resize()
+  isMobile.value = window.innerWidth <= 768
 }
 
 onMounted(() => {
@@ -136,6 +137,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · 记录</span></div>
   <div>
     <el-card v-if="sortedRecords.length" class="page-card" shadow="never">
       <div class="card-title" style="margin-bottom: 8px">

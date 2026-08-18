@@ -74,16 +74,16 @@ body {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-.app-nav .brand {
-  font-size: 18px;
+.brand {
+  font-size: 24px;
   font-weight: 700;
   color: var(--q-primary);
   margin-right: 24px;
   white-space: nowrap;
 }
 
-.app-nav .brand span {
-  font-size: 12px;
+.brand span {
+  font-size: 14px;
   font-weight: 400;
   color: var(--q-text-secondary);
   margin-left: 4px;
