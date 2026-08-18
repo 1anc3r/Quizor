@@ -9,7 +9,7 @@ import { useBankStore } from '@/stores/bank'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { Question, QuestionType, WrongItem } from '@/types'
-import { difficultyStars, fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
+import { fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
 import QuestionDetail from '@/components/QuestionDetail.vue'
 
 const router = useRouter()

@@ -5,7 +5,7 @@
  */
 import { computed, ref, watch } from 'vue'
 import type { Paper, Question } from '@/types'
-import { difficultyStars, plainText, shortId, truncate, typeLabel } from '@/utils/format'
+import { plainText, shortId, truncate, typeLabel } from '@/utils/format'
 
 const props = defineProps<{
   modelValue: boolean

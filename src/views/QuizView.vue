@@ -24,7 +24,7 @@ import {
   setUnfinished
 } from '@/services/session'
 import type { QuizSession, SessionQuestion } from '@/types'
-import { difficultyStars, fmtDuration, typeLabel } from '@/utils/format'
+import { fmtDuration, typeLabel } from '@/utils/format'
 import AnswerSheet from '@/components/AnswerSheet.vue'
 import OptionGroup from '@/components/OptionGroup.vue'
 import RichText from '@/components/RichText.vue'

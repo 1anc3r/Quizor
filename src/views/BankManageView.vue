@@ -13,7 +13,7 @@ import type { BankData, BankMeta, ComposeItem, Paper, Question, QuestionType } f
 import { createBank, defaultRule, loadBank, loadManifest, saveBank } from '@/services/bank'
 import { nameToBankId } from '@/services/pinyin'
 import { useBankStore } from '@/stores/bank'
-import { difficultyStars, plainText, shortId, truncate, typeLabel } from '@/utils/format'
+import { plainText, shortId, truncate, typeLabel } from '@/utils/format'
 import { genId } from '@/utils/id'
 import PaperFormDialog from '@/components/PaperFormDialog.vue'
 import QuestionFormDialog from '@/components/QuestionFormDialog.vue'

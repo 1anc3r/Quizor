@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bank'
 import { useUserDataStore } from '@/stores/userData'
 import type { FavoriteItem, Question, QuestionType } from '@/types'
-import { difficultyStars, fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
+import { fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
 import QuestionDetail from '@/components/QuestionDetail.vue'
 
 const router = useRouter()

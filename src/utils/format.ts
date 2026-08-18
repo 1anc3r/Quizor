@@ -36,12 +36,6 @@ export function fmtTimeShort(ts: number): string {
   return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
 }
 
-/** 难度 → 星级文本 */
-export function difficultyStars(d: number): string {
-  const n = Math.min(5, Math.max(1, Math.round(d || 1)))
-  return '★'.repeat(n) + '☆'.repeat(5 - n)
-}
-
 /** 去除 HTML 标签得到纯文本（列表展示、关键字查询用） */
 export function plainText(html: string): string {
   return html

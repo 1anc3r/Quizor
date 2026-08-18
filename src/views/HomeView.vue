@@ -9,7 +9,7 @@ import { useBankStore } from '@/stores/bank'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/services/session'
 import type { Question, QuizSession } from '@/types'
-import { difficultyStars, plainText, truncate } from '@/utils/format'
+import { plainText, truncate } from '@/utils/format'
 
 const router = useRouter()
 const bankStore = useBankStore()

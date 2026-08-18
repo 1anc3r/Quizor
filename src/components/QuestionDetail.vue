@@ -6,7 +6,7 @@
 import type { Question } from '@/types'
 import OptionGroup from './OptionGroup.vue'
 import RichText from './RichText.vue'
-import { difficultyStars, typeLabel } from '@/utils/format'
+import { typeLabel } from '@/utils/format'
 
 withDefaults(
   defineProps<{
