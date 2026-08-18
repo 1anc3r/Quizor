@@ -17,6 +17,20 @@
           { "chapter": "论说文", "type": "text", "count": 1, "scoreEach": 35, "optionCount": 0 }
         ]
       }
+    },
+    {
+      "id": "fund_law",
+      "name": "基金从业资格考试_基金基础知识与法律法规",
+      "bankFile": "Bank_Fund_Law.json",
+      "questionCount": 100,
+      "rule": {
+        "durationMinutes": 120,
+        "totalScore": 100,
+        "passScore": 60,
+        "composition": [
+          { "chapter": "单项选择题", "type": "single", "count": 100, "scoreEach": 1, "optionCount": 4 }
+        ]
+      }
     }
   ]
 }

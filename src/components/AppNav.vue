@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Document, HomeFilled, Notebook, Setting, Star } from '@element-plus/icons-vue'
+import { Failed, HomeFilled, List, Setting, StarFilled, Tools } from '@element-plus/icons-vue'
 
 const route = useRoute()
 
 const items = [
   { path: '/', label: '首页', icon: HomeFilled },
-  { path: '/wrong', label: '错题本', icon: Notebook },
-  { path: '/favorite', label: '收藏夹', icon: Star },
-  { path: '/records', label: '记录', icon: Document },
-  { path: '/settings', label: '设置', icon: Setting }
+  { path: '/wrong', label: '错题本', icon: Failed },
+  { path: '/favorite', label: '收藏夹', icon: StarFilled },
+  { path: '/records', label: '记录', icon: List },
+  { path: '/settings', label: '设置', icon: Tools },
 ]
 
 const currentPath = computed(() => route.path)

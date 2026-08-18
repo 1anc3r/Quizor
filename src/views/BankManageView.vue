@@ -176,6 +176,34 @@ const filteredPapers = computed(() => {
   return data.Papers.filter((p) => p.name.toLowerCase().includes(kw) || p.source.toLowerCase().includes(kw))
 })
 
+// 分页相关
+const paperPage = ref(1)
+const paperPageSize = ref(20)
+
+const pagedPapers = computed(() => {
+  const start = (paperPage.value - 1) * paperPageSize.value
+  const end = start + paperPageSize.value
+  return filteredPapers.value.slice(start, end)
+})
+
+// 每页条数变化时重置页码到1
+watch(paperPageSize, () => {
+  paperPage.value = 1
+})
+
+// 当总记录数变化时，自动修正当前页（防止超出范围）
+watch(
+  () => filteredPapers.value.length,
+  (newLen) => {
+    const totalPages = Math.ceil(newLen / paperPageSize.value)
+    if (paperPage.value > totalPages && totalPages > 0) {
+      paperPage.value = totalPages
+    } else if (newLen === 0) {
+      paperPage.value = 1
+    }
+  }
+)
+
 function openPaperDialog(p?: Paper): void {
   editingPaper.value = p
     ? (JSON.parse(JSON.stringify(p)) as Paper)
@@ -240,6 +268,32 @@ const filteredQuestions = computed(() => {
     )
   })
 })
+
+// 分页相关
+const questionPage = ref(1)
+const questionPageSize = ref(20)
+
+const pagedQuestions = computed(() => {
+  const start = (questionPage.value - 1) * questionPageSize.value
+  const end = start + questionPageSize.value
+  return filteredQuestions.value.slice(start, end)
+})
+
+watch(questionPageSize, () => {
+  questionPage.value = 1
+})
+
+watch(
+  () => filteredQuestions.value.length,
+  (newLen) => {
+    const totalPages = Math.ceil(newLen / questionPageSize.value)
+    if (questionPage.value > totalPages && totalPages > 0) {
+      questionPage.value = totalPages
+    } else if (newLen === 0) {
+      questionPage.value = 1
+    }
+  }
+)
 
 const allTags = computed<string[]>(() => {
   const set = new Set<string>()
@@ -425,7 +479,7 @@ function confirmAddToPaper(): void {
           </div>
         </div>
         <el-table
-          :data="filteredPapers"
+          :data="pagedPapers"
           style="margin-top: 12px"
           @selection-change="(rows: Paper[]) => (paperSelection = rows)"
         >
@@ -447,6 +501,23 @@ function confirmAddToPaper(): void {
             </template>
           </el-table-column>
         </el-table>
+        <!-- 试卷分页 -->
+        <div style="margin-top: 12px; display: flex; gap: 16px; align-items: start;">
+          <div>
+            <span style="margin-right: 8px; font-size: 14px;">每页条数</span>
+            <el-select v-model="paperPageSize" style="width: 80px;" allow-create filterable>
+              <el-option label="20" :value="20" />
+              <el-option label="50" :value="50" />
+              <el-option label="100" :value="100" />
+            </el-select>
+          </div>
+          <el-pagination
+            v-model:current-page="paperPage"
+            :page-size="paperPageSize"
+            :total="filteredPapers.length"
+            layout="total, prev, pager, next, jumper"
+          />
+        </div>
       </el-card>
 
       <!-- 题目列表卡片 -->
@@ -474,7 +545,7 @@ function confirmAddToPaper(): void {
           </div>
         </div>
         <el-table
-          :data="filteredQuestions"
+          :data="pagedQuestions"
           style="margin-top: 12px"
           @selection-change="(rows: Question[]) => (qSelection = rows)"
         >
@@ -504,6 +575,23 @@ function confirmAddToPaper(): void {
             </template>
           </el-table-column>
         </el-table>
+        <!-- 题目分页 -->
+        <div style="margin-top: 12px; display: flex; gap: 16px; align-items: start;">
+          <div>
+            <span style="margin-right: 8px; font-size: 14px;">每页条数</span>
+            <el-select v-model="questionPageSize" style="width: 80px;" allow-create filterable>
+              <el-option label="20" :value="20" />
+              <el-option label="50" :value="50" />
+              <el-option label="100" :value="100" />
+            </el-select>
+          </div>
+          <el-pagination
+            v-model:current-page="questionPage"
+            :page-size="questionPageSize"
+            :total="filteredQuestions.length"
+            layout="total, prev, pager, next, jumper"
+          />
+        </div>
       </el-card>
 
       <!-- 试卷管理窗口 -->
