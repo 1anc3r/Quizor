@@ -32,6 +32,12 @@ const inSelection = ref<Question[]>([])
 const outSelection = ref<Question[]>([])
 const activePanels = ref<string[]>([])
 
+// 分页状态
+const inPageSize = ref(20)
+const inCurrentPage = ref(1)
+const outPageSize = ref(20)
+const outCurrentPage = ref(1)
+
 const qMap = computed(() => new Map(props.questions.map((q) => [q.id, q])))
 
 watch(visible, (v) => {
@@ -42,6 +48,11 @@ watch(visible, (v) => {
     inSelection.value = []
     outSelection.value = []
     activePanels.value = []
+    // 重置分页
+    inCurrentPage.value = 1
+    outCurrentPage.value = 1
+    inPageSize.value = 20
+    outPageSize.value = 20
   }
 })
 
@@ -55,6 +66,7 @@ function matchKeyword(q: Question, kw: string): boolean {
   )
 }
 
+// 全量过滤后的列表（用于总数和分页）
 const inList = computed(() =>
   form.value.questionIds
     .map((id) => qMap.value.get(id))
@@ -65,6 +77,39 @@ const inList = computed(() =>
 const outList = computed(() =>
   props.questions.filter((q) => !form.value.questionIds.includes(q.id)).filter((q) => matchKeyword(q, outKeyword.value))
 )
+
+// 分页后的数据
+const pagedInList = computed(() => {
+  const start = (inCurrentPage.value - 1) * inPageSize.value
+  const end = start + inPageSize.value
+  return inList.value.slice(start, end)
+})
+
+const pagedOutList = computed(() => {
+  const start = (outCurrentPage.value - 1) * outPageSize.value
+  const end = start + outPageSize.value
+  return outList.value.slice(start, end)
+})
+
+// 监听关键词变化重置页码
+watch(inKeyword, () => { inCurrentPage.value = 1 })
+watch(outKeyword, () => { outCurrentPage.value = 1 })
+
+// 监听列表总条数变化，修正当前页（防止超出）
+watch(inList, (newList) => {
+  const total = newList.length
+  const maxPage = Math.ceil(total / inPageSize.value) || 1
+  if (inCurrentPage.value > maxPage) inCurrentPage.value = maxPage
+})
+watch(outList, (newList) => {
+  const total = newList.length
+  const maxPage = Math.ceil(total / outPageSize.value) || 1
+  if (outCurrentPage.value > maxPage) outCurrentPage.value = maxPage
+})
+
+// 分页大小变化时重置页码到1（由 el-pagination 自动处理，但可显式重置）
+watch(inPageSize, () => { inCurrentPage.value = 1 })
+watch(outPageSize, () => { outCurrentPage.value = 1 })
 
 function addOne(q: Question): void {
   if (!form.value.questionIds.includes(q.id)) form.value.questionIds.push(q.id)
@@ -112,7 +157,7 @@ function onSave(): void {
     <el-collapse v-model="activePanels">
       <el-collapse-item name="in">
         <template #title>
-          <span>已添加题目（{{ form.questionIds.length }}）</span>
+          <span>已添加题目（{{ inList.length }}）</span>
         </template>
         <div style="display: flex; gap: 12px; margin-bottom: 8px">
           <el-input v-model="inKeyword" placeholder="关键字查询" clearable style="max-width: 240px" />
@@ -121,7 +166,7 @@ function onSave(): void {
           </el-button>
         </div>
         <el-table
-          :data="inList"
+          :data="pagedInList"
           @selection-change="(rows: Question[]) => (inSelection = rows)"
         >
           <el-table-column type="selection" width="40" />
@@ -146,6 +191,16 @@ function onSave(): void {
             </template>
           </el-table-column>
         </el-table>
+        <!-- 已添加题目分页 -->
+        <el-pagination
+          v-model:current-page="inCurrentPage"
+          v-model:page-size="inPageSize"
+          :page-sizes="[20, 50, 100]"
+          :total="inList.length"
+          :hide-on-single-page="true"
+          layout="total, sizes, prev, pager, next, jumper"
+          style="margin-top: 10px;"
+        />
       </el-collapse-item>
 
       <el-collapse-item name="out">
@@ -159,7 +214,7 @@ function onSave(): void {
           </el-button>
         </div>
         <el-table
-          :data="outList"
+          :data="pagedOutList"
           max-height="260"
           @selection-change="(rows: Question[]) => (outSelection = rows)"
         >
@@ -185,6 +240,16 @@ function onSave(): void {
             </template>
           </el-table-column>
         </el-table>
+        <!-- 未添加题目分页 -->
+        <el-pagination
+          v-model:current-page="outCurrentPage"
+          v-model:page-size="outPageSize"
+          :page-sizes="[20, 50, 100]"
+          :total="outList.length"
+          :hide-on-single-page="true"
+          layout="total, sizes, prev, pager, next, jumper"
+          style="margin-top: 10px;"
+        />
       </el-collapse-item>
     </el-collapse>
 
