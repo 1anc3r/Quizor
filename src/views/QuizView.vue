@@ -250,9 +250,11 @@ onBeforeUnmount(() => {
     <header class="quiz-top">
       <el-button text :icon="Close" @click="exit">退出</el-button>
       <span class="timer" :class="{ danger: timeDanger }">
-        <el-icon><Timer /></el-icon>{{ timeText }}
+        <el-icon>
+          <Timer />
+        </el-icon>{{ timeText }}
       </span>
-      <span v-if="!isMobile"class="progress">{{ index + 1 }}/{{ total }}</span>
+      <span v-if="!isMobile" class="progress">{{ index + 1 }}/{{ total }}</span>
       <span class="spacer"></span>
       <el-button text @click="toggleFav">
         <el-icon :color="isFaved ? '#e6a23c' : undefined">
@@ -261,7 +263,8 @@ onBeforeUnmount(() => {
         </el-icon>
       </el-button>
       <el-button text :icon="Grid" @click="sheetOpen = !sheetOpen" style="margin-left: 0px;">答题卡</el-button>
-      <el-button type="primary" size="small" @click="submit(false)" style="margin-left: 0px; margin-right: 15px;">交卷</el-button>
+      <el-button type="primary" size="small" @click="submit(false)"
+        style="margin-left: 0px; margin-right: 15px;">交卷</el-button>
     </header>
 
     <div class="quiz-body">
@@ -270,34 +273,22 @@ onBeforeUnmount(() => {
         <el-card v-if="current" shadow="never" class="page-card">
           <div class="muted" style="margin-bottom: 10px">
             第 {{ index + 1 }} 题 · {{ current.chapter }} · {{ typeLabel(current.type) }} · 难度
-            <el-rate v-model="current.difficulty" size="small" :max="5" disabled/>
+            <el-rate v-model="current.difficulty" size="small" :max="5" disabled />
             <template v-if="mode === 'exam'"> · {{ current.score }} 分</template>
           </div>
           <RichText class="q-stem" :content="current.stem" />
 
           <!-- 选择题 -->
-          <OptionGroup
-            v-if="current.type !== 'text' && answer"
-            :question="current"
-            :selected="answer.keys"
-            :revealed="revealed"
-            @select="onSelect"
-          />
+          <OptionGroup v-if="current.type !== 'text' && answer" :question="current" :selected="answer.keys"
+            :revealed="revealed" @select="onSelect" />
           <div v-if="mode === 'practice' && current.type === 'multiple' && !revealed" style="margin-top: 12px">
             <el-button type="primary" :disabled="!answer || !answer.keys.length" @click="reveal">确认作答</el-button>
           </div>
 
           <!-- 简答题 -->
           <template v-if="current.type === 'text' && answer">
-            <el-input
-              :model-value="answer.text"
-              type="textarea"
-              :rows="5"
-              placeholder="请输入你的作答"
-              :disabled="mode === 'practice' && revealed"
-              style="margin-top: 12px"
-              @update:model-value="onTextInput"
-            />
+            <el-input :model-value="answer.text" type="textarea" :rows="5" placeholder="请输入你的作答"
+              :disabled="mode === 'practice' && revealed" style="margin-top: 12px" @update:model-value="onTextInput" />
             <div v-if="mode === 'practice' && !revealed" style="margin-top: 12px">
               <el-button type="primary" @click="reveal">提交作答</el-button>
             </div>
@@ -338,28 +329,16 @@ onBeforeUnmount(() => {
           <div class="card-title" style="margin-bottom: 12px">
             <span class="title-text">答题卡</span>
           </div>
-          <AnswerSheet
-            :questions="questions"
-            :answers="session.answers"
-            :marks="session.marks"
-            :current="index"
-            :mode="mode"
-            @jump="jump"
-          />
+          <AnswerSheet :questions="questions" :answers="session.answers" :marks="session.marks" :current="index"
+            :mode="mode" @jump="jump" />
         </aside>
       </transition>
     </div>
 
     <!-- 移动端答题卡：右侧抽屉滑入 -->
     <el-drawer v-if="isMobile" v-model="sheetOpen" direction="rtl" title="答题卡" size="70%">
-      <AnswerSheet
-        :questions="questions"
-        :answers="session.answers"
-        :marks="session.marks"
-        :current="index"
-        :mode="mode"
-        @jump="jump"
-      />
+      <AnswerSheet :questions="questions" :answers="session.answers" :marks="session.marks" :current="index"
+        :mode="mode" @jump="jump" />
     </el-drawer>
   </div>
 </template>
@@ -369,6 +348,7 @@ onBeforeUnmount(() => {
 .slide-leave-active {
   transition: all 0.25s ease;
 }
+
 .slide-enter-from,
 .slide-leave-to {
   transform: translateX(40px);

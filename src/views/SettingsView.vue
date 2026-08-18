@@ -92,7 +92,7 @@ async function onImportFile(uploadFile: { raw?: File }): Promise<void> {
 </script>
 
 <template>
-  <div>
+  <div class="app-content">
     <!-- 外观偏好 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title"><span class="title-text">外观偏好</span></div>
@@ -157,7 +157,8 @@ async function onImportFile(uploadFile: { raw?: File }): Promise<void> {
       <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px">
         <el-button @click="onExportBank" style="margin: 0px;">导出当前题库 JSON</el-button>
         <el-button @click="onExportBackup" style="margin: 0px;">导出全部数据备份</el-button>
-        <el-upload :show-file-list="false" accept=".json,application/json" :http-request="() => {}" :on-change="onImportFile">
+        <el-upload :show-file-list="false" accept=".json,application/json" :http-request="() => { }"
+          :on-change="onImportFile">
           <el-button type="primary" :loading="importing">导入题库 / 备份 JSON</el-button>
         </el-upload>
       </div>

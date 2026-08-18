@@ -81,7 +81,7 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
 </script>
 
 <template>
-  <div v-if="record">
+  <div class="app-content" v-if="record">
     <el-card class="page-card" shadow="never">
       <div class="card-title">
         <span class="title-text">
@@ -93,7 +93,8 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
       <div class="stat-grid" style="margin-top: 16px">
         <div class="stat-item">
           <div class="num">
-            {{ record.score }}<span v-if="isExam" style="font-size: 14px; font-weight: 400"> / {{ record.totalScore }}</span>
+            {{ record.score }}<span v-if="isExam" style="font-size: 14px; font-weight: 400"> / {{ record.totalScore
+              }}</span>
           </div>
           <div class="label">{{ isExam ? '得分 / 试卷总分' : '本次得分' }}</div>
         </div>
@@ -127,13 +128,8 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
         </el-radio-group>
       </div>
       <div class="sheet-grid">
-        <button
-          v-for="(d, i) in record.details"
-          :key="d.questionId"
-          class="sheet-cell"
-          :class="detailClass(d)"
-          @click="jumpTo(d.questionId)"
-        >
+        <button v-for="(d, i) in record.details" :key="d.questionId" class="sheet-cell" :class="detailClass(d)"
+          @click="jumpTo(d.questionId)">
           {{ i + 1 }}
         </button>
       </div>
@@ -145,28 +141,20 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
     </el-card>
 
     <!-- 逐题回顾 -->
-    <el-card
-      v-for="d in filteredDetails"
-      :id="`review-${d.questionId}`"
-      :key="d.questionId"
-      class="page-card"
-      shadow="never"
-    >
+    <el-card v-for="d in filteredDetails" :id="`review-${d.questionId}`" :key="d.questionId" class="page-card"
+      shadow="never">
       <div class="card-title" style="margin-bottom: 8px">
         <span>
           第 {{ record.details.indexOf(d) + 1 }} 题
           <el-tag v-if="d.correct === true" type="success" size="small" style="margin-left: 8px">正确</el-tag>
           <el-tag v-else-if="d.correct === false" type="danger" size="small" style="margin-left: 8px">错误</el-tag>
-          <el-tag v-else type="info" size="small" style="margin-left: 8px">{{ d.type === 'text' ? '待自评' : '未作答' }}</el-tag>
+          <el-tag v-else type="info" size="small" style="margin-left: 8px">{{ d.type === 'text' ? '待自评' : '未作答'
+            }}</el-tag>
         </span>
         <span class="muted">{{ d.gotScore }} / {{ d.score }} 分</span>
       </div>
-      <QuestionDetail
-        v-if="qMap.get(d.questionId)"
-        :question="qMap.get(d.questionId)!"
-        :selected="selectedKeys(d)"
-        :your-answer="d.yourAnswer"
-      />
+      <QuestionDetail v-if="qMap.get(d.questionId)" :question="qMap.get(d.questionId)!" :selected="selectedKeys(d)"
+        :your-answer="d.yourAnswer" />
       <RichText v-else class="q-stem" :content="d.stem" />
       <div class="muted" style="margin-top: 8px">你的答案：{{ d.yourAnswer }} · 正确答案：{{ d.rightAnswer }}</div>
       <div v-if="d.type === 'text' && isExam" style="margin-top: 10px">
@@ -188,18 +176,22 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
   border-color: var(--q-success);
   color: var(--q-success);
 }
+
 .cell-wrong {
   background: rgba(245, 108, 108, 0.2);
   border-color: var(--q-danger);
   color: var(--q-danger);
 }
+
 .cell-pending {
   background: var(--q-card);
 }
+
 .lg-right {
   background: rgba(103, 194, 58, 0.35);
   border-color: var(--q-success);
 }
+
 .lg-wrong {
   background: rgba(245, 108, 108, 0.35);
   border-color: var(--q-danger);

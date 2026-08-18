@@ -112,23 +112,33 @@ body {
 .font-small .q-stem {
   font-size: 14px;
 }
+
 .font-small .option-item {
   font-size: 13px;
 }
+
 .font-standard .q-stem {
   font-size: 16px;
 }
+
 .font-standard .option-item {
   font-size: 15px;
 }
+
 .font-large .q-stem {
   font-size: 19px;
 }
+
 .font-large .option-item {
   font-size: 17px;
 }
 
 /* ========== 通用卡片与页面 ========== */
+
+.app-content {
+  width: 60vw;
+  margin: 0 auto;
+}
 
 .page-card {
   margin-bottom: 16px;
@@ -509,6 +519,10 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
   .app-nav .nav-item.active {
     border-top-color: var(--q-primary);
     border-bottom-color: transparent;
+  }
+
+  .app-content {
+    width: 100%;
   }
 
   .stat-grid {

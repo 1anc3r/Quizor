@@ -153,7 +153,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="app-content">
     <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · 首页</span></div>
     <!-- 题库切换卡片 -->
     <el-card class="page-card" shadow="never">
@@ -161,12 +161,8 @@ onMounted(async () => {
         <span class="title-text">题库</span>
       </div>
       <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap">
-        <el-select
-          :model-value="bankStore.currentId"
-          placeholder="选择题库"
-          style="flex: 1; min-width: 220px"
-          @change="onSwitchBank"
-        >
+        <el-select :model-value="bankStore.currentId" placeholder="选择题库" style="flex: 1; min-width: 220px"
+          @change="onSwitchBank">
           <el-option v-for="b in bankStore.manifest" :key="b.id" :label="b.name" :value="b.id">
             <span>{{ b.name }}</span>
             <span class="muted" style="float: right">{{ b.questionCount }} 题</span>
@@ -209,7 +205,8 @@ onMounted(async () => {
             检测到未完成的{{ unfinished.mode === 'exam' ? '考试' : '练习' }}会话（{{ unfinished.questions.length }} 题）
           </template>
         </el-alert>
-        <el-button type="success" size="large" style="flex: 1; width: 100%; margin-top: 12px" @click="continueSession">继续上次答题</el-button>
+        <el-button type="success" size="large" style="flex: 1; width: 100%; margin-top: 12px"
+          @click="continueSession">继续上次答题</el-button>
       </div>
       <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap">
         <el-button type="primary" size="large" style="flex: 1; min-width: 140px" @click="goSetup('practice')">
@@ -243,13 +240,10 @@ onMounted(async () => {
         <el-table-column prop="source" label="来源" width="120" show-overflow-tooltip />
       </el-table>
 
-      <el-divider content-position="left"><strong>题目列表（{{ chapterGroups.reduce((s, g) => s + g.questions.length, 0) }}）</strong></el-divider>
-      <el-input
-        v-model="questionKeyword"
-        placeholder="关键字查询题目（题干 / 章节 / 标签）"
-        clearable
-        style="max-width: 280px; margin-bottom: 10px"
-      />
+      <el-divider content-position="left"><strong>题目列表（{{chapterGroups.reduce((s, g) => s + g.questions.length, 0)
+          }}）</strong></el-divider>
+      <el-input v-model="questionKeyword" placeholder="关键字查询题目（题干 / 章节 / 标签）" clearable
+        style="max-width: 280px; margin-bottom: 10px" />
 
       <el-collapse v-model="activeChapters">
         <el-collapse-item v-for="g in chapterGroups" :key="g.chapter" :name="g.chapter">
@@ -274,22 +268,16 @@ onMounted(async () => {
           </el-table>
 
           <!-- 分页组件（仅当题目总数大于每页条数时显示） -->
-          <el-pagination
-            :current-page="chapterPageState[g.chapter].currentPage"
+          <el-pagination :current-page="chapterPageState[g.chapter].currentPage"
             @update:current-page="(val: number) => (chapterPageState[g.chapter].currentPage = val)"
-            :page-size="chapterPageState[g.chapter].pageSize"
-            @update:page-size="
+            :page-size="chapterPageState[g.chapter].pageSize" @update:page-size="
               (val: number) => {
                 const state = chapterPageState[g.chapter]
                 state.pageSize = val
                 state.currentPage = 1
               }
-            "
-            :page-sizes="[20, 50, 100]"
-            :total="g.questions.length"
-            layout="total, sizes, prev, pager, next, jumper"
-            style="margin-top: 10px"
-          />
+            " :page-sizes="[20, 50, 100]" :total="g.questions.length" layout="total, sizes, prev, pager, next, jumper"
+            style="margin-top: 10px" />
         </el-collapse-item>
       </el-collapse>
 

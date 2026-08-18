@@ -369,7 +369,7 @@ function confirmAddToPaper(): void {
 </script>
 
 <template>
-  <div v-if="ready">
+  <div class="app-content" v-if="ready">
     <!-- 题库基本信息卡片 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title">
@@ -382,7 +382,8 @@ function confirmAddToPaper(): void {
       </div>
       <el-form label-width="90px" style="margin-top: 16px;">
         <el-form-item label="题库名称" required>
-          <el-input v-model="meta.name" :disabled="!isNew" placeholder="如：199_管理类综合能力" style="max-width: 320px" @input="persist" />
+          <el-input v-model="meta.name" :disabled="!isNew" placeholder="如：199_管理类综合能力" style="max-width: 320px"
+            @input="persist" />
         </el-form-item>
         <el-form-item label="题库 ID">
           <el-tag>{{ meta.id || '（由名称自动生成拼音 ID）' }}</el-tag>
@@ -403,25 +404,18 @@ function confirmAddToPaper(): void {
           <div style="width: 100%">
             <div style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 12px;">
               <el-button type="primary" plain :icon="Plus" @click="addCompose">新增规则</el-button>
-              <el-button type="danger" plain :disabled="!composeSelection.length" @click="removeComposeBatch" style="margin-left: 0px;">
+              <el-button type="danger" plain :disabled="!composeSelection.length" @click="removeComposeBatch"
+                style="margin-left: 0px;">
                 批量删除（{{ composeSelection.length }}）
               </el-button>
             </div>
-            <el-table
-              :data="meta.rule.composition"
-              @selection-change="(rows: ComposeItem[]) => (composeSelection = rows)"
-            >
-              <el-table-column type="selection" width="40" fixed="left"/>
+            <el-table :data="meta.rule.composition"
+              @selection-change="(rows: ComposeItem[]) => (composeSelection = rows)">
+              <el-table-column type="selection" width="40" fixed="left" />
               <el-table-column label="章节" width="200">
                 <template #default="{ row }">
-                  <el-select
-                    v-model="row.chapter"
-                    filterable
-                    allow-create
-                    default-first-option
-                    placeholder="选择或录入"
-                    @change="persist"
-                  >
+                  <el-select v-model="row.chapter" filterable allow-create default-first-option placeholder="选择或录入"
+                    @change="persist">
                     <el-option v-for="c in chapterOptions" :key="c" :label="c" :value="c" />
                   </el-select>
                 </template>
@@ -445,13 +439,8 @@ function confirmAddToPaper(): void {
               </el-table-column>
               <el-table-column label="选项数" width="180">
                 <template #default="{ row }">
-                  <el-input-number
-                    v-model="row.optionCount"
-                    :min="0"
-                    :max="8"
-                    :disabled="row.type === 'text'"
-                    @change="persist"
-                  />
+                  <el-input-number v-model="row.optionCount" :min="0" :max="8" :disabled="row.type === 'text'"
+                    @change="persist" />
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="80" fixed="right">
@@ -472,17 +461,16 @@ function confirmAddToPaper(): void {
           <span class="title-text">试卷列表（{{ filteredPapers.length }}）</span>
           <div style="display: flex; flex-wrap: wrap; gap: 12px;">
             <el-input v-model="paperKeyword" placeholder="关键字查询" clearable style="width: 200px;" />
-            <el-button type="primary" plain :icon="Plus" @click="openPaperDialog()" style="margin-left: 0px;">新增试卷</el-button>
-            <el-button type="danger" plain :disabled="!paperSelection.length" @click="removePaperBatch" style="margin-left: 0px;">
+            <el-button type="primary" plain :icon="Plus" @click="openPaperDialog()"
+              style="margin-left: 0px;">新增试卷</el-button>
+            <el-button type="danger" plain :disabled="!paperSelection.length" @click="removePaperBatch"
+              style="margin-left: 0px;">
               批量删除（{{ paperSelection.length }}）
             </el-button>
           </div>
         </div>
-        <el-table
-          :data="pagedPapers"
-          style="margin-top: 12px"
-          @selection-change="(rows: Paper[]) => (paperSelection = rows)"
-        >
+        <el-table :data="pagedPapers" style="margin-top: 12px"
+          @selection-change="(rows: Paper[]) => (paperSelection = rows)">
           <el-table-column type="selection" width="40" />
           <el-table-column prop="name" label="试卷名称" min-width="200" show-overflow-tooltip />
           <el-table-column label="题数" width="80">
@@ -502,15 +490,9 @@ function confirmAddToPaper(): void {
           </el-table-column>
         </el-table>
         <!-- 试卷分页 -->
-        <el-pagination
-          v-model:current-page="paperPage"
-          v-model:page-size="paperPageSize"
-          :page-sizes="[20, 50, 100]"
-          :total="filteredPapers.length"
-          :hide-on-single-page="true"
-          layout="total, sizes, prev, pager, next, jumper"
-          style="margin-top: 12px;"
-        />
+        <el-pagination v-model:current-page="paperPage" v-model:page-size="paperPageSize" :page-sizes="[20, 50, 100]"
+          :total="filteredPapers.length" :hide-on-single-page="true" layout="total, sizes, prev, pager, next, jumper"
+          style="margin-top: 12px;" />
       </el-card>
 
       <!-- 题目列表卡片 -->
@@ -531,17 +513,16 @@ function confirmAddToPaper(): void {
             <el-button plain :disabled="!qSelection.length" @click="openAddToPaper" style="margin-left: 0px;">
               添加到试卷（{{ qSelection.length }}）
             </el-button>
-            <el-button type="primary" plain :icon="Plus" @click="openQuestionDialog()" style="margin-left: 0px;">新增题目</el-button>
-            <el-button type="danger" plain :disabled="!qSelection.length" @click="removeQuestionBatch" style="margin-left: 0px;">
+            <el-button type="primary" plain :icon="Plus" @click="openQuestionDialog()"
+              style="margin-left: 0px;">新增题目</el-button>
+            <el-button type="danger" plain :disabled="!qSelection.length" @click="removeQuestionBatch"
+              style="margin-left: 0px;">
               批量删除（{{ qSelection.length }}）
             </el-button>
           </div>
         </div>
-        <el-table
-          :data="pagedQuestions"
-          style="margin-top: 12px"
-          @selection-change="(rows: Question[]) => (qSelection = rows)"
-        >
+        <el-table :data="pagedQuestions" style="margin-top: 12px"
+          @selection-change="(rows: Question[]) => (qSelection = rows)">
           <el-table-column type="selection" width="40" />
           <el-table-column label="题号" width="80">
             <template #default="{ row }">
@@ -569,37 +550,25 @@ function confirmAddToPaper(): void {
           </el-table-column>
         </el-table>
         <!-- 试卷分页 -->
-        <el-pagination
-          v-model:current-page="questionPage"
-          v-model:page-size="questionPageSize"
-          :page-sizes="[20, 50, 100]"
-          :total="filteredQuestions.length"
-          :hide-on-single-page="true"
-          layout="total, sizes, prev, pager, next, jumper"
-          style="margin-top: 12px;"
-        />
+        <el-pagination v-model:current-page="questionPage" v-model:page-size="questionPageSize"
+          :page-sizes="[20, 50, 100]" :total="filteredQuestions.length" :hide-on-single-page="true"
+          layout="total, sizes, prev, pager, next, jumper" style="margin-top: 12px;" />
       </el-card>
 
       <!-- 试卷管理窗口 -->
-      <PaperFormDialog v-model="paperDialogVisible" :paper="editingPaper" :questions="data.Questions" @save="onSavePaper" />
+      <PaperFormDialog v-model="paperDialogVisible" :paper="editingPaper" :questions="data.Questions"
+        @save="onSavePaper" />
 
       <!-- 题目管理窗口 -->
-      <QuestionFormDialog
-        v-model="qDialogVisible"
-        :question="editingQuestion"
-        :bank-id="meta.id"
-        :chapters="chapterOptions"
-        :chapter-type="chapterType"
-        :chapter-option-count="chapterOptionCount"
-        :all-tags="allTags"
-        :existing-ids="data.Questions.map((q) => q.id)"
-        @save="onSaveQuestion"
-      />
+      <QuestionFormDialog v-model="qDialogVisible" :question="editingQuestion" :bank-id="meta.id"
+        :chapters="chapterOptions" :chapter-type="chapterType" :chapter-option-count="chapterOptionCount"
+        :all-tags="allTags" :existing-ids="data.Questions.map((q) => q.id)" @save="onSaveQuestion" />
 
       <!-- 添加到目标试卷 -->
       <el-dialog v-model="addToPaperVisible" title="添加到目标试卷" width="420px">
         <el-select v-model="addToPaperTarget" style="width: 100%">
-          <el-option v-for="p in data.Papers" :key="p.id" :label="`${p.name}（${p.questionIds.length} 题）`" :value="p.id" />
+          <el-option v-for="p in data.Papers" :key="p.id" :label="`${p.name}（${p.questionIds.length} 题）`"
+            :value="p.id" />
         </el-select>
         <template #footer>
           <el-button @click="addToPaperVisible = false">取消</el-button>

@@ -138,7 +138,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · 记录</span></div>
-  <div>
+  <div class="app-content">
     <el-card v-if="sortedRecords.length" class="page-card" shadow="never">
       <div class="card-title" style="margin-bottom: 8px">
         <span class="title-text">统计（{{ bankStore.meta?.name }}）</span>
@@ -157,27 +157,21 @@ onBeforeUnmount(() => {
         <el-table-column type="expand">
           <template #default="{ row }">
             <div style="padding: 8px 16px">
-              <el-card
-                v-for="(d, i) in (row as QuizRecord).details"
-                :key="d.questionId"
-                shadow="never"
-                style="margin-bottom: 10px"
-              >
+              <el-card v-for="(d, i) in (row as QuizRecord).details" :key="d.questionId" shadow="never"
+                style="margin-bottom: 10px">
                 <div class="card-title" style="margin-bottom: 6px">
                   <span>
                     第 {{ i + 1 }} 题 · {{ d.chapter }} · {{ typeLabel(d.type) }}
                     <el-tag v-if="d.correct === true" type="success" size="small" style="margin-left: 8px">正确</el-tag>
-                    <el-tag v-else-if="d.correct === false" type="danger" size="small" style="margin-left: 8px">错误</el-tag>
+                    <el-tag v-else-if="d.correct === false" type="danger" size="small"
+                      style="margin-left: 8px">错误</el-tag>
                     <el-tag v-else type="info" size="small" style="margin-left: 8px">未答/待评</el-tag>
                   </span>
                   <span class="muted">{{ d.gotScore }} / {{ d.score }} 分</span>
                 </div>
-                <QuestionDetail
-                  v-if="bankStore.questionMap.get(d.questionId)"
-                  :question="bankStore.questionMap.get(d.questionId)!"
-                  :selected="selectedKeysOf(row, d.questionId)"
-                  :your-answer="d.yourAnswer"
-                />
+                <QuestionDetail v-if="bankStore.questionMap.get(d.questionId)"
+                  :question="bankStore.questionMap.get(d.questionId)!" :selected="selectedKeysOf(row, d.questionId)"
+                  :your-answer="d.yourAnswer" />
                 <div v-else class="muted">题目已删除。你的答案：{{ d.yourAnswer }} · 正确答案：{{ d.rightAnswer }}</div>
               </el-card>
             </div>
@@ -207,15 +201,9 @@ onBeforeUnmount(() => {
       </el-table>
 
       <!-- 分页 -->
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[20, 50, 100]"
-        :total="sortedRecords.length"
-        :hide-on-single-page="true"
-        layout="total, sizes, prev, pager, next, jumper"
-        style="margin-top: 12px"
-      />
+      <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[20, 50, 100]"
+        :total="sortedRecords.length" :hide-on-single-page="true" layout="total, sizes, prev, pager, next, jumper"
+        style="margin-top: 12px" />
 
       <el-empty v-if="!sortedRecords.length" description="暂无做题记录" />
     </el-card>
@@ -228,6 +216,7 @@ onBeforeUnmount(() => {
   gap: 16px;
   flex-wrap: wrap;
 }
+
 .chart-box {
   flex: 1;
   min-width: 300px;
