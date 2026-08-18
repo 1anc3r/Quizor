@@ -478,7 +478,7 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
 
 @media (max-width: 768px) {
   .app-main {
-    padding: 12px 10px calc(var(--q-nav-height) + env(safe-area-inset-bottom, 0px));
+    padding: 16px 16px calc(var(--q-nav-height) + env(safe-area-inset-bottom, 0px));
   }
 
   /* 导航栏固定在页面最下端 */

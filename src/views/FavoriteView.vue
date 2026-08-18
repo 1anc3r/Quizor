@@ -100,7 +100,7 @@ async function removeBatch(): Promise<void> {
     </div>
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0">
-      <el-input v-model="keyword" placeholder="关键字查询" clearable style="width: 180px" />
+      <el-input v-model="keyword" placeholder="关键字查询" clearable style="width: 262px" />
       <el-select v-model="filterChapter" placeholder="章节" clearable style="width: 140px">
         <el-option v-for="c in bankStore.chapters" :key="c" :label="c" :value="c" />
       </el-select>
