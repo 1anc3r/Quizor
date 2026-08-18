@@ -3,7 +3,7 @@
  * 收藏夹（当前题库）：关键字查询、章节/题型/来源筛选、按时间排序、
  * 明细展开、练习入口、单条/批量移除。
  */
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bank'
 import { useUserDataStore } from '@/stores/userData'
@@ -21,6 +21,10 @@ const filterType = ref<'' | QuestionType>('')
 const filterSource = ref('')
 const selection = ref<FavRow[]>([])
 const isMobile = ref(window.innerWidth <= 768)
+
+// ---------- 分页 ----------
+const pageSize = ref(20)
+const currentPage = ref(1)
 
 interface FavRow {
   item: FavoriteItem
@@ -41,6 +45,20 @@ const rows = computed<FavRow[]>(() => {
   }
   out.sort((a, b) => b.item.time - a.item.time)
   return out
+})
+
+const pagedRows = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return rows.value.slice(start, end)
+})
+
+// 过滤条件变化时重置页码
+watch(rows, () => {
+  currentPage.value = 1
+})
+watch(pageSize, () => {
+  currentPage.value = 1
 })
 
 const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
@@ -97,7 +115,7 @@ async function removeBatch(): Promise<void> {
       </el-button>
     </div>
 
-    <el-table :data="rows" @selection-change="(r: FavRow[]) => (selection = r)">
+    <el-table :data="pagedRows" @selection-change="(r: FavRow[]) => (selection = r)">
       <el-table-column type="selection" width="40" />
       <el-table-column type="expand">
         <template #default="{ row }">
@@ -135,6 +153,18 @@ async function removeBatch(): Promise<void> {
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 分页 -->
+    <el-pagination
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      :page-sizes="[20, 50, 100]"
+      :total="rows.length"
+      :hide-on-single-page="true"
+      layout="total, sizes, prev, pager, next, jumper"
+      style="margin-top: 12px"
+    />
+
     <el-empty v-if="!rows.length" description="暂无收藏" />
   </el-card>
 </template>

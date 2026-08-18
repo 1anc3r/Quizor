@@ -2,7 +2,7 @@
 /**
  * 首页：题库切换 + 统计卡片 + 做题入口（含断点续答）+ 题库浏览卡片。
  */
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { Plus, Edit } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bank'
@@ -80,6 +80,9 @@ interface ChapterGroup {
   questions: Question[]
 }
 
+// ---------- 章节题目分页状态 ----------
+const chapterPageState = reactive<Record<string, { pageSize: number; currentPage: number }>>({})
+
 const chapterGroups = computed<ChapterGroup[]>(() => {
   const kw = questionKeyword.value.trim().toLowerCase()
   const questions = (bankStore.bank?.Questions ?? []).filter((q) => {
@@ -96,8 +99,48 @@ const chapterGroups = computed<ChapterGroup[]>(() => {
     arr.push(q)
     map.set(q.chapter, arr)
   }
-  return [...map.entries()].map(([chapter, qs]) => ({ chapter, questions: qs }))
+  const groups = [...map.entries()].map(([chapter, qs]) => ({ chapter, questions: qs }))
+
+  // 初始化每个章节的分页状态，并修正 currentPage 不超出总页数
+  for (const g of groups) {
+    if (!chapterPageState[g.chapter]) {
+      chapterPageState[g.chapter] = { pageSize: 20, currentPage: 1 }
+    } else {
+      const total = g.questions.length
+      const size = chapterPageState[g.chapter].pageSize
+      const maxPage = Math.ceil(total / size) || 1
+      if (chapterPageState[g.chapter].currentPage > maxPage) {
+        chapterPageState[g.chapter].currentPage = maxPage
+      }
+    }
+  }
+
+  // 移除已经不存在章节的分页状态
+  const existingChapters = new Set(groups.map((g) => g.chapter))
+  for (const key in chapterPageState) {
+    if (!existingChapters.has(key)) {
+      delete chapterPageState[key]
+    }
+  }
+
+  return groups
 })
+
+// 当搜索关键词变化时，重置所有章节的当前页为第一页
+watch(questionKeyword, () => {
+  for (const key in chapterPageState) {
+    chapterPageState[key].currentPage = 1
+  }
+})
+
+// 辅助：获取某个章节分页后的题目列表（用于模板）
+function getPagedQuestions(chapter: string, allQuestions: Question[]): Question[] {
+  const state = chapterPageState[chapter]
+  if (!state) return allQuestions
+  const start = (state.currentPage - 1) * state.pageSize
+  const end = start + state.pageSize
+  return allQuestions.slice(start, end)
+}
 </script>
 
 <template>
@@ -197,10 +240,13 @@ const chapterGroups = computed<ChapterGroup[]>(() => {
         clearable
         style="max-width: 280px; margin-bottom: 10px"
       />
+
       <el-collapse v-model="activeChapters">
         <el-collapse-item v-for="g in chapterGroups" :key="g.chapter" :name="g.chapter">
           <template #title>{{ g.chapter }}（{{ g.questions.length }}）</template>
-          <el-table :data="g.questions">
+
+          <!-- 题目表格（分页数据） -->
+          <el-table :data="getPagedQuestions(g.chapter, g.questions)">
             <el-table-column label="题号" width="80">
               <template #default="{ row }">
                 <span :title="row.id">{{ row.id.slice(-6) }}</span>
@@ -214,10 +260,29 @@ const chapterGroups = computed<ChapterGroup[]>(() => {
                 <el-rate v-model="row.difficulty" :max="5" size="small" disabled />
               </template>
             </el-table-column>
-          <el-table-column prop="source" label="来源" width="120" show-overflow-tooltip />
+            <el-table-column prop="source" label="来源" width="120" show-overflow-tooltip />
           </el-table>
+
+          <!-- 分页组件（仅当题目总数大于每页条数时显示） -->
+          <el-pagination
+            :current-page="chapterPageState[g.chapter].currentPage"
+            @update:current-page="(val: number) => (chapterPageState[g.chapter].currentPage = val)"
+            :page-size="chapterPageState[g.chapter].pageSize"
+            @update:page-size="
+              (val: number) => {
+                const state = chapterPageState[g.chapter]
+                state.pageSize = val
+                state.currentPage = 1
+              }
+            "
+            :page-sizes="[20, 50, 100]"
+            :total="g.questions.length"
+            layout="total, sizes, prev, pager, next, jumper"
+            style="margin-top: 10px"
+          />
         </el-collapse-item>
       </el-collapse>
+
       <el-empty v-if="!bankStore.loading && !chapterGroups.length" description="当前题库暂无题目" />
     </el-card>
   </div>

@@ -16,6 +16,24 @@ const userStore = useUserDataStore()
 
 const sortedRecords = computed(() => [...userStore.records].sort((a, b) => b.endTime - a.endTime))
 
+// ---------- 分页 ----------
+const pageSize = ref(20)
+const currentPage = ref(1)
+
+const pagedRecords = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return sortedRecords.value.slice(start, end)
+})
+
+// 当总记录数变化或每页条数变化时重置页码
+watch(sortedRecords, () => {
+  currentPage.value = 1
+})
+watch(pageSize, () => {
+  currentPage.value = 1
+})
+
 const isMobile = ref(window.innerWidth <= 768)
 
 function selectedKeysOf(rec: QuizRecord, qid: string): string[] {
@@ -133,7 +151,7 @@ onBeforeUnmount(() => {
       <div class="card-title" style="margin-bottom: 8px">
         <span class="title-text">做题记录（{{ bankStore.meta?.name }}）</span>
       </div>
-      <el-table :data="sortedRecords">
+      <el-table :data="pagedRecords">
         <el-table-column type="expand">
           <template #default="{ row }">
             <div style="padding: 8px 16px">
@@ -185,6 +203,18 @@ onBeforeUnmount(() => {
           <template #default="{ row }">{{ fmtTime(row.endTime) }}</template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页 -->
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[20, 50, 100]"
+        :total="sortedRecords.length"
+        :hide-on-single-page="true"
+        layout="total, sizes, prev, pager, next, jumper"
+        style="margin-top: 12px"
+      />
+
       <el-empty v-if="!sortedRecords.length" description="暂无做题记录" />
     </el-card>
   </div>

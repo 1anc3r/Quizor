@@ -107,7 +107,7 @@ watch(outList, (newList) => {
   if (outCurrentPage.value > maxPage) outCurrentPage.value = maxPage
 })
 
-// 分页大小变化时重置页码到1（由 el-pagination 自动处理，但可显式重置）
+// 分页大小变化时重置页码到1
 watch(inPageSize, () => { inCurrentPage.value = 1 })
 watch(outPageSize, () => { outCurrentPage.value = 1 })
 
@@ -199,7 +199,7 @@ function onSave(): void {
           :total="inList.length"
           :hide-on-single-page="true"
           layout="total, sizes, prev, pager, next, jumper"
-          style="margin-top: 10px;"
+          style="margin-top: 12px;"
         />
       </el-collapse-item>
 
@@ -248,7 +248,7 @@ function onSave(): void {
           :total="outList.length"
           :hide-on-single-page="true"
           layout="total, sizes, prev, pager, next, jumper"
-          style="margin-top: 10px;"
+          style="margin-top: 12px;"
         />
       </el-collapse-item>
     </el-collapse>

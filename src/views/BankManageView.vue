@@ -501,7 +501,7 @@ function confirmAddToPaper(): void {
             </template>
           </el-table-column>
         </el-table>
-        <!-- 试卷分页（直接使用 el-pagination 内置 page-sizes） -->
+        <!-- 试卷分页 -->
         <el-pagination
           v-model:current-page="paperPage"
           v-model:page-size="paperPageSize"
@@ -568,7 +568,7 @@ function confirmAddToPaper(): void {
             </template>
           </el-table-column>
         </el-table>
-        <!-- 题目分页（直接使用 el-pagination 内置 page-sizes） -->
+        <!-- 试卷分页 -->
         <el-pagination
           v-model:current-page="questionPage"
           v-model:page-size="questionPageSize"

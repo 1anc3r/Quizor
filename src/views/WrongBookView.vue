@@ -3,7 +3,7 @@
  * 错题本（当前题库）：答错自动收录（同题更新），支持关键字查询、
  * 章节/题型/来源筛选、按错误次数/时间排序、明细展开、练习入口、单条/批量移除。
  */
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bank'
 import { useSettingsStore } from '@/stores/settings'
@@ -25,6 +25,10 @@ const sortBy = ref<'count' | 'time'>('time')
 const selection = ref<WrongRow[]>([])
 const isMobile = ref(window.innerWidth <= 768)
 
+// ---------- 分页 ----------
+const pageSize = ref(20)
+const currentPage = ref(1)
+
 interface WrongRow {
   item: WrongItem
   question: Question
@@ -44,6 +48,20 @@ const rows = computed<WrongRow[]>(() => {
   }
   out.sort((a, b) => (sortBy.value === 'count' ? b.item.count - a.item.count : b.item.lastTime - a.item.lastTime))
   return out
+})
+
+const pagedRows = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return rows.value.slice(start, end)
+})
+
+// 过滤条件变化时重置页码
+watch(rows, () => {
+  currentPage.value = 1
+})
+watch(pageSize, () => {
+  currentPage.value = 1
 })
 
 const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
@@ -107,7 +125,7 @@ async function removeBatch(): Promise<void> {
     </div>
 
     <el-table
-      :data="rows"
+      :data="pagedRows"
       row-key="item.questionId"
       @selection-change="(r: WrongRow[]) => (selection = r)"
     >
@@ -158,6 +176,18 @@ async function removeBatch(): Promise<void> {
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 分页 -->
+    <el-pagination
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      :page-sizes="[20, 50, 100]"
+      :total="rows.length"
+      :hide-on-single-page="true"
+      layout="total, sizes, prev, pager, next, jumper"
+      style="margin-top: 12px"
+    />
+
     <el-empty v-if="!rows.length" description="暂无错题" />
   </el-card>
 </template>
