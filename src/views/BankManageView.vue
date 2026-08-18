@@ -501,23 +501,16 @@ function confirmAddToPaper(): void {
             </template>
           </el-table-column>
         </el-table>
-        <!-- 试卷分页 -->
-        <div style="margin-top: 12px; display: flex; gap: 16px; align-items: start;">
-          <div>
-            <span style="margin-right: 8px; font-size: 14px;">每页条数</span>
-            <el-select v-model="paperPageSize" style="width: 80px;" allow-create filterable>
-              <el-option label="20" :value="20" />
-              <el-option label="50" :value="50" />
-              <el-option label="100" :value="100" />
-            </el-select>
-          </div>
-          <el-pagination
-            v-model:current-page="paperPage"
-            :page-size="paperPageSize"
-            :total="filteredPapers.length"
-            layout="total, prev, pager, next, jumper"
-          />
-        </div>
+        <!-- 试卷分页（直接使用 el-pagination 内置 page-sizes） -->
+        <el-pagination
+          v-model:current-page="paperPage"
+          v-model:page-size="paperPageSize"
+          :page-sizes="[20, 50, 100]"
+          :total="filteredPapers.length"
+          :hide-on-single-page="true"
+          layout="total, sizes, prev, pager, next, jumper"
+          style="margin-top: 12px;"
+        />
       </el-card>
 
       <!-- 题目列表卡片 -->
@@ -575,23 +568,16 @@ function confirmAddToPaper(): void {
             </template>
           </el-table-column>
         </el-table>
-        <!-- 题目分页 -->
-        <div style="margin-top: 12px; display: flex; gap: 16px; align-items: start;">
-          <div>
-            <span style="margin-right: 8px; font-size: 14px;">每页条数</span>
-            <el-select v-model="questionPageSize" style="width: 80px;" allow-create filterable>
-              <el-option label="20" :value="20" />
-              <el-option label="50" :value="50" />
-              <el-option label="100" :value="100" />
-            </el-select>
-          </div>
-          <el-pagination
-            v-model:current-page="questionPage"
-            :page-size="questionPageSize"
-            :total="filteredQuestions.length"
-            layout="total, prev, pager, next, jumper"
-          />
-        </div>
+        <!-- 题目分页（直接使用 el-pagination 内置 page-sizes） -->
+        <el-pagination
+          v-model:current-page="questionPage"
+          v-model:page-size="questionPageSize"
+          :page-sizes="[20, 50, 100]"
+          :total="filteredQuestions.length"
+          :hide-on-single-page="true"
+          layout="total, sizes, prev, pager, next, jumper"
+          style="margin-top: 12px;"
+        />
       </el-card>
 
       <!-- 试卷管理窗口 -->
