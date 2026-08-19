@@ -28,6 +28,8 @@ const visible = computed({
 const form = ref<Paper>({ id: '', name: '', source: '', difficulty: 3, questionIds: [] })
 const inKeyword = ref('')
 const outKeyword = ref('')
+const inSource = ref('')
+const outSource = ref('')
 const inSelection = ref<Question[]>([])
 const outSelection = ref<Question[]>([])
 const activePanels = ref<string[]>([])
@@ -66,16 +68,26 @@ function matchKeyword(q: Question, kw: string): boolean {
   )
 }
 
+const sourceOptions = computed<{ label: string; value: string }[]>(() => {
+  const set = new Set<string>()
+  props.questions.forEach((q) => q.source && set.add(q.source))
+  return [...set].map((s) => ({ label: s, value: s }))
+})
+
 // 全量过滤后的列表（用于总数和分页）
 const inList = computed(() =>
   form.value.questionIds
     .map((id) => qMap.value.get(id))
     .filter((q): q is Question => !!q)
     .filter((q) => matchKeyword(q, inKeyword.value))
+    .filter((q) => !(inSource.value && q.source !== inSource.value))
 )
 
 const outList = computed(() =>
-  props.questions.filter((q) => !form.value.questionIds.includes(q.id)).filter((q) => matchKeyword(q, outKeyword.value))
+  props.questions
+  .filter((q) => !form.value.questionIds.includes(q.id))
+  .filter((q) => matchKeyword(q, outKeyword.value))
+  .filter((q) => !(outSource.value && q.source !== outSource.value))
 )
 
 // 分页后的数据
@@ -161,6 +173,9 @@ function onSave(): void {
         </template>
         <div style="display: flex; gap: 12px; margin-bottom: 8px">
           <el-input v-model="inKeyword" placeholder="关键字查询" clearable style="max-width: 240px" />
+          <el-select v-model="inSource" placeholder="来源" clearable style="width: 100px;">
+            <el-option v-for="t in sourceOptions" :key="t.value" :label="t.label" :value="t.value" />
+          </el-select>
           <el-button type="danger" plain :disabled="!inSelection.length" @click="removeBatch">
             批量移除（{{ inSelection.length }}）
           </el-button>
@@ -209,13 +224,15 @@ function onSave(): void {
         </template>
         <div style="display: flex; gap: 12px; margin-bottom: 8px">
           <el-input v-model="outKeyword" placeholder="关键字查询" clearable style="max-width: 240px" />
-          <el-button type="primary" plain :disabled="!outSelection.length" @click="addBatch">
+          <el-select v-model="outSource" placeholder="来源" clearable style="width: 100px;">
+            <el-option v-for="t in sourceOptions" :key="t.value" :label="t.label" :value="t.value" />
+          </el-select>
+          <el-button type="success" plain :disabled="!outSelection.length" @click="addBatch">
             批量添加（{{ outSelection.length }}）
           </el-button>
         </div>
         <el-table
           :data="pagedOutList"
-          max-height="260"
           @selection-change="(rows: Question[]) => (outSelection = rows)"
         >
           <el-table-column type="selection" width="40" />

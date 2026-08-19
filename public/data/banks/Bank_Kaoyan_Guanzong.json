@@ -6207,6 +6207,34 @@
       "tags": [
         "匹配"
       ]
+    },
+    {
+      "id": "kaoyan_guanzong_000170",
+      "type": "text",
+      "chapter": "论证有效性分析",
+      "difficulty": 3,
+      "stem": "<p><span style=\"font-size: 11pt;\">地球的气候变化已经成为当代世界关注的热点。这一问题看似复杂，其实简单。</span><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">只要</strong><strong style=\"font-size: 11pt;\">我们运用科学原理——如爱因斯坦的相对论——去对待，也许</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">就会</strong><strong style=\"font-size: 11pt;\">找到解决这一问题的方法</strong><span style=\"font-size: 11pt;\">。</span></p><p><span style=\"font-size: 11pt;\">众所周知，爱因斯坦提出的相对论颠覆了人类关于宇宙和自然的常识性观念。</span><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">不管是</strong><strong style=\"font-size: 11pt;\">狭义相对论</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">还是</strong><strong style=\"font-size: 11pt;\">广义相对论，</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">都</strong><strong style=\"font-size: 11pt;\">揭示了宇宙间事物运动中普遍存在的相对性</strong><span style=\"font-size: 11pt;\">。</span></p><p><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">既然</strong><strong style=\"font-size: 11pt;\">宇宙万物的运动都是相对的，</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">那么</strong><strong style=\"font-size: 11pt;\">我们观察问题时也应该采用相对的方法，如变换视角等</strong><span style=\"font-size: 11pt;\">。</span></p><p><span style=\"font-size: 11pt;\">假如我们变换视角去看一些问题，也许会得出和一般常识完全不同的观点。例如，我们称之为灾害的那些自然现象，包括海啸、地震、台风、暴雨等，其实也是大自然本身的一般现象而已，</span><strong style=\"font-size: 11pt;\">从大自然的视角来看，无所谓灾害不灾害，</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">只是</strong><strong style=\"font-size: 11pt;\">当它损害了人类利益、危及了人类生存的时候，从人类的视角来看，我们才称之为灾害</strong><span style=\"font-size: 11pt;\">。</span></p><p><span style=\"font-size: 11pt;\">假如再变换一下视角，</span><strong style=\"font-size: 11pt;\">从一个更广泛的范围来看，</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">连</strong><strong style=\"font-size: 11pt;\">我们人类自己</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">也是</strong><strong style=\"font-size: 11pt;\">大自然的一部分</strong><span style=\"font-size: 11pt;\">。既然我们的祖先是类人猿，而类人猿正像大熊猫、华南虎、藏羚羊、扬子鳄乃至银杏、水杉、五针松等一样，是整个自然生态中的有机组成部分，那为什么我们自己就不是了呢?</span></p><p><span style=\"font-size: 11pt;\">由此可见，人类的问题就是大自然的问题。即使人类在某一时期部分地改变了气候，也还是整个大自然系统中的一个自然问题。自然问题自然会解决，人类不必过多干预。</span></p>",
+      "options": [],
+      "answer": [],
+      "analysis": "<p class=\"ql-align-center\"><strong style=\"font-size: 11pt;\">人类不应对气候过多干预吗？</strong></p><p><strong style=\"font-size: 11pt;\">上述论证围绕</strong><span style=\"font-size: 11pt;\">气候变化问题展开，认为人类不必过多干预，</span><strong style=\"font-size: 11pt;\">但其论证过程存在诸多缺陷，难以令人信服。 </strong></p><p><strong style=\"font-size: 11pt;\">首先</strong><span style=\"font-size: 11pt;\">，论证将运用科学原理等同于运用爱因斯坦相对论来解决气候变化问题，</span><strong style=\"font-size: 11pt;\">过于片面</strong><span style=\"font-size: 11pt;\">。爱因斯坦相对论</span><strong style=\"font-size: 11pt;\">主要针对</strong><span style=\"font-size: 11pt;\">宇宙时空等领域，</span><strong style=\"font-size: 11pt;\">而</strong><span style=\"font-size: 11pt;\">气候变化涉及气象学、生态学等多学科知识体系，</span><strong style=\"font-size: 11pt;\">不能简单地认为</strong><span style=\"font-size: 11pt;\">相对论就能解决这一复杂问题，这是对科学原理的</span><strong style=\"font-size: 11pt;\">不当缩小与错误应用</strong><span style=\"font-size: 11pt;\">。</span></p><p><strong style=\"font-size: 11pt;\">其次</strong><span style=\"font-size: 11pt;\">，从宇宙万物运动的相对性直接得出观察问题应采用相对方法，</span><strong style=\"font-size: 11pt;\">存在逻辑跳跃</strong><span style=\"font-size: 11pt;\">。宇宙万物运动的相对性是物理层面的特性，</span><strong style=\"font-size: 11pt;\">而</strong><span style=\"font-size: 11pt;\">观察问题的方法涉及认识论、方法论等多个领域，</span><strong style=\"font-size: 11pt;\">二者并非简单的因果推导关系</strong><span style=\"font-size: 11pt;\">。</span><strong style=\"font-size: 11pt;\">仅仅因为</strong><span style=\"font-size: 11pt;\">事物运动相对，</span><strong style=\"font-size: 11pt;\">不能必然推出</strong><span style=\"font-size: 11pt;\">观察问题就要变换视角等相对方法。</span></p><p><strong style=\"font-size: 11pt;\">再者</strong><span style=\"font-size: 11pt;\">，对“灾害”</span><strong style=\"font-size: 11pt;\">概念的界定存在问题</strong><span style=\"font-size: 11pt;\">。论证认为从大自然视角无所谓灾害，只有损害人类利益才称灾害。但实际上，灾害对生态系统</span><strong style=\"font-size: 11pt;\">也会</strong><span style=\"font-size: 11pt;\">造成严重破坏，影响其他生物的生存与发展，</span><strong style=\"font-size: 11pt;\">并非仅</strong><span style=\"font-size: 11pt;\">以人类利益为唯一判定标准。这种对灾害概念的狭隘定义，使得后续论证缺乏坚实基础。</span></p><p><strong style=\"font-size: 11pt;\">另外</strong><span style=\"font-size: 11pt;\">，关于“人类是大自然一部分所以人类问题就是大自然问题”的推理不严谨。</span><strong style=\"font-size: 11pt;\">虽然</strong><span style=\"font-size: 11pt;\">人类属于大自然，</span><strong style=\"font-size: 11pt;\">但</strong><span style=\"font-size: 11pt;\">人类具有主观能动性，其活动对自然的影响与其他自然组成部分</span><strong style=\"font-size: 11pt;\">有本质区别</strong><span style=\"font-size: 11pt;\">。人类活动引发的气候变化等问题，</span><strong style=\"font-size: 11pt;\">若仅</strong><span style=\"font-size: 11pt;\">靠自然自身解决，</span><strong style=\"font-size: 11pt;\">可能导致</strong><span style=\"font-size: 11pt;\">生态系统遭受难以挽回的破坏，</span><strong style=\"font-size: 11pt;\">并非</strong><span style=\"font-size: 11pt;\">所有人类问题都能等同于一般自然问题而无需人类干预。</span></p><p><strong style=\"font-size: 11pt;\">综上所述，该论证在概念界定、逻辑推理等方面存在诸多漏洞，无法有力支持</strong><span style=\"font-size: 11pt;\">“人类不必过多干预气候变化问题”</span><strong style=\"font-size: 11pt;\">的结论，其论证有效性存疑。 </strong></p>",
+      "source": "2012年真题",
+      "tags": [
+        "论证有效性分析"
+      ]
+    },
+    {
+      "id": "kaoyan_guanzong_000171",
+      "type": "text",
+      "chapter": "论说文",
+      "difficulty": 3,
+      "stem": "<p><span style=\"font-size: 11pt; background-color: white;\">中国现代著名哲学家熊十力先生在《十力语要》（卷一）中说：“吾国学人，总好</span><strong style=\"font-size: 11pt; background-color: white;\">追逐风气</strong><span style=\"font-size: 11pt; background-color: white;\">，一时之所尚，则群起而趋其途，如海上逐臭之夫，莫名所以，曾无刹那，风气或变，而逐臭者复如故。此等逐臭之习，有两大病：一、个人无牢固与永久不改职业，遇事无从深入，徒养成浮动性；二、大家共趋于世所矜尚之途，则其余千途万途，一切废弃，无人过问。此二大病，都是中国学人死症。”</span></p>",
+      "options": [],
+      "answer": [],
+      "analysis": "<p class=\"ql-align-center\"><strong style=\"font-size: 11pt; background-color: white;\">坚持学术初心，拒绝追逐风气（正反递进+层次并列式）</strong></p><p><strong style=\"font-size: 11pt;\">（</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">引论</strong><strong style=\"font-size: 11pt;\">）</strong><span style=\"font-size: 11pt;\">熊十力先生在《十力语要》中，批评了我国学人好追逐风气的陋习。结合当下背景，更觉得熊老先生的话具有很强的现实意义：坚持学术初心，拒绝追逐风气。</span></p><p><strong style=\"font-size: 11pt;\">（</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">分论点：合理必要</strong><strong style=\"font-size: 11pt;\">）</strong><span style=\"font-size: 11pt;\">正如材料所说，</span><strong style=\"font-size: 11pt;\">国人的追逐风气会产生两大病</strong><span style=\"font-size: 11pt;\">：一是产生浮躁的心理状态。一旦学者产生浮躁的心理，可能就会抛弃自己所研究的领域，将多年的研究心血毁于一旦。二是导致功利化的情况。当学者都以研究的结果来判断其价值的话，难免会出现“共趋于一途”的情况，导致研究的偏向性明显。</span></p><p><strong style=\"font-size: 11pt;\">（</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">分论点：个人</strong><strong style=\"font-size: 11pt;\">）从学者个人层面看，主要是学者没有坚持学术的决心。</strong><span style=\"font-size: 11pt;\">这致使他们在物质与利益面前，无法坚持本心，容易被外界的诱惑所打动，从而出现功利化的情况。因为一旦出现研究结果以短期物质利益为衡量标准的时候，那么付出和产出的收益比较会影响学者对于研究门类的选择，这会导致易出成功的学科在短期内成为热门，而那些不易出成果，但对社会具有重大影响的学科，被束之高阁。</span></p><p><strong style=\"font-size: 11pt;\">（</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">分论点：社会</strong><strong style=\"font-size: 11pt;\">）从社会层面看，</strong><span style=\"font-size: 11pt;\">一方面是因为群体追逐学术功利化目标得以实现利益需求，而政府与社会缺乏相应的引导，社会中的个人难免会被功利化风气所裹挟，甚至做出一样的功利化行为。另一方面，学术的评价体系对社会风气具有误导作用。当对学术的评价基于短期效用时，那么浅易的学科会吸引大量学术资源，导致科学领域资源分配不均，致使“其余千途万途，一切废弃，无人过问”。</span></p><p><strong style=\"font-size: 11pt;\">（</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">分论点：措施手段</strong><strong style=\"font-size: 11pt;\">）避免学术功利化</strong><span style=\"font-size: 11pt;\">，不仅仅需要学者个人树立起追求真理的信念，更需要树立起完善而科学的学术评价体系。通过学者个人和机制的作用，让学者做出的学术成果在科学合理的衡量标准下，做出准确评估，从而引导更多学者不为短期收益所左右。</span></p><p><strong style=\"font-size: 11pt;\">（</strong><strong style=\"font-size: 11pt; color: rgb(250, 0, 0);\">结论</strong><strong style=\"font-size: 11pt;\">）</strong><span style=\"font-size: 11pt;\">避免学者的追逐风气等功利化现象，势在必行！</span></p>",
+      "source": "2012年真题",
+      "tags": [
+        "论说文"
+      ]
     }
   ],
   "Papers": [
@@ -6400,7 +6428,9 @@
         "kaoyan_guanzong_000166",
         "kaoyan_guanzong_000167",
         "kaoyan_guanzong_000168",
-        "kaoyan_guanzong_000169"
+        "kaoyan_guanzong_000169",
+        "kaoyan_guanzong_000170",
+        "kaoyan_guanzong_000171"
       ]
     }
   ]
