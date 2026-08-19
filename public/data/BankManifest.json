@@ -28,7 +28,14 @@
         "totalScore": 100,
         "passScore": 60,
         "composition": [
-          { "chapter": "单项选择题", "type": "single", "count": 100, "scoreEach": 1, "optionCount": 4 }
+          { "chapter": "金融市场与资产管理", "type": "single", "count": 8, "scoreEach": 1, "optionCount": 4 },
+          { "chapter": "基金概述", "type": "single", "count": 10, "scoreEach": 1, "optionCount": 4 },
+          { "chapter": "基金法律法规体系和监管体系", "type": "single", "count": 15, "scoreEach": 1, "optionCount": 4 },
+          { "chapter": "基金市场参与主体及其从业人员的法规要求", "type": "single", "count": 25, "scoreEach": 1, "optionCount": 4 },
+          { "chapter": "基金活动的法规要求", "type": "single", "count": 20, "scoreEach": 1, "optionCount": 4 },
+          { "chapter": "基金管理人的合规管理、风险管理和内部控制", "type": "single", "count": 12, "scoreEach": 1, "optionCount": 4 },
+          { "chapter": "基金职业道德规范", "type": "single", "count": 6, "scoreEach": 1, "optionCount": 4 },
+          { "chapter": "基金行业文化建设", "type": "single", "count": 4, "scoreEach": 1, "optionCount": 4 }
         ]
       }
     }
