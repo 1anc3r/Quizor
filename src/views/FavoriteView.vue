@@ -110,23 +110,23 @@ onMounted(async () => {
       </div>
 
       <div style="display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0">
-        <el-input v-model="keyword" placeholder="关键字查询" clearable style="width: 262px" />
-        <el-select v-model="filterChapter" placeholder="章节" clearable style="width: 140px">
-          <el-option v-for="c in bankStore.chapters" :key="c" :label="c" :value="c" />
-        </el-select>
-        <el-select v-model="filterType" placeholder="题型" clearable style="width: 110px">
-          <el-option v-for="t in TYPE_OPTIONS" :key="t.value" :label="t.label" :value="t.value" />
-        </el-select>
-        <el-select v-model="filterSource" placeholder="来源" clearable style="width: 140px">
+        <el-input v-model="keyword" placeholder="关键字查询" clearable style="width: 324px" />
+        <el-select v-model="filterSource" placeholder="来源" clearable style="width: 100px">
           <el-option v-for="s in bankStore.sources" :key="s" :label="s" :value="s" />
         </el-select>
-        <el-button type="danger" plain :disabled="!selection.length" @click="removeBatch">
+        <el-select v-model="filterChapter" placeholder="章节" clearable style="width: 100px">
+          <el-option v-for="c in bankStore.chapters" :key="c" :label="c" :value="c" />
+        </el-select>
+        <el-select v-model="filterType" placeholder="题型" clearable style="width: 100px">
+          <el-option v-for="t in TYPE_OPTIONS" :key="t.value" :label="t.label" :value="t.value" />
+        </el-select>
+        <el-button v-if="selection.length > 0" type="danger" plain :disabled="!selection.length" @click="removeBatch">
           批量移除（{{ selection.length }}）
         </el-button>
       </div>
 
-      <el-table :data="pagedRows" @selection-change="(r: FavRow[]) => (selection = r)">
-        <el-table-column type="selection" width="40" />
+      <el-table stripe :data="pagedRows" @selection-change="(r: FavRow[]) => (selection = r)">
+        <el-table-column type="selection" width="40" fixed="left" />
         <el-table-column type="expand">
           <template #default="{ row }">
             <div style="padding: 8px 16px">

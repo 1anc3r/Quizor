@@ -153,7 +153,7 @@ onBeforeUnmount(() => {
       <div class="card-title" style="margin-bottom: 8px">
         <span class="title-text">做题记录（{{ bankStore.meta?.name }}）</span>
       </div>
-      <el-table :data="pagedRecords">
+      <el-table stripe :data="pagedRecords">
         <el-table-column type="expand">
           <template #default="{ row }">
             <div style="padding: 8px 16px">

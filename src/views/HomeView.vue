@@ -159,6 +159,7 @@ onMounted(async () => {
     <el-card class="page-card" shadow="never">
       <div class="card-title">
         <span class="title-text">题库</span>
+        <el-button type="success" plain :icon="Plus" @click="goAddBank">新增题库</el-button>
       </div>
       <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap">
         <el-select :model-value="bankStore.currentId" placeholder="选择题库" style="flex: 1; min-width: 220px"
@@ -168,7 +169,6 @@ onMounted(async () => {
             <span class="muted" style="float: right">{{ b.questionCount }} 题</span>
           </el-option>
         </el-select>
-        <el-button type="primary" :icon="Plus" @click="goAddBank">新增题库</el-button>
       </div>
     </el-card>
 
@@ -221,13 +221,13 @@ onMounted(async () => {
     <!-- 题库卡片 -->
     <el-card class="page-card" shadow="never" v-loading="bankStore.loading">
       <div class="card-title">
-        <span class="title-text">{{ bankStore.meta?.name ?? '题库' }}</span>
-        <el-button :icon="Edit" @click="goEditBank">编辑题库</el-button>
+        <span class="title-text">试卷 & 题目列表</span>
+        <el-button type="primary" plain :icon="Edit" @click="goEditBank">编辑题库</el-button>
       </div>
 
       <el-divider content-position="left"><strong>试卷列表（{{ filteredPapers.length }}）</strong></el-divider>
-      <el-input v-model="paperKeyword" placeholder="关键字查询试卷" clearable style="max-width: 280px; margin-bottom: 10px" />
-      <el-table :data="filteredPapers">
+      <el-input v-model="paperKeyword" placeholder="关键字查询试卷" clearable style="width: 324px; margin-bottom: 10px" />
+      <el-table stripe :data="filteredPapers">
         <el-table-column prop="name" label="试卷名称" min-width="200" show-overflow-tooltip />
         <el-table-column label="题数" width="80">
           <template #default="{ row }">{{ row.questionIds.length }}</template>
@@ -243,14 +243,14 @@ onMounted(async () => {
       <el-divider content-position="left"><strong>题目列表（{{chapterGroups.reduce((s, g) => s + g.questions.length, 0)
           }}）</strong></el-divider>
       <el-input v-model="questionKeyword" placeholder="关键字查询题目（题干 / 章节 / 标签）" clearable
-        style="max-width: 280px; margin-bottom: 10px" />
+        style="width: 324px; margin-bottom: 10px" />
 
       <el-collapse v-model="activeChapters">
         <el-collapse-item v-for="g in chapterGroups" :key="g.chapter" :name="g.chapter">
           <template #title>{{ g.chapter }}（{{ g.questions.length }}）</template>
 
           <!-- 题目表格（分页数据） -->
-          <el-table :data="getPagedQuestions(g.chapter, g.questions)">
+          <el-table stripe :data="getPagedQuestions(g.chapter, g.questions)">
             <el-table-column label="题号" width="80">
               <template #default="{ row }">
                 <span :title="row.id">{{ row.id.slice(-6) }}</span>
