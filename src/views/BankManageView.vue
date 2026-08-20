@@ -25,6 +25,7 @@ const bankStore = useBankStore()
 const bankId = computed(() => String(route.params.id ?? 'new'))
 const isNew = computed(() => bankId.value === 'new' || !bankId.value)
 const ready = ref(false)
+const isMobile = ref(window.innerWidth <= 768)
 
 const meta = reactive<BankMeta>({
   id: '',
@@ -52,6 +53,7 @@ onMounted(async () => {
     data.Papers = d.Papers
   }
   ready.value = true
+  window.addEventListener('resize', onResize)
 })
 
 /* ---------- 基本信息 ---------- */
@@ -371,10 +373,15 @@ function confirmAddToPaper(): void {
   addToPaperVisible.value = false
   ElMessage.success(`已添加 ${added} 题到「${paper.name}」`)
 }
+
+function onResize(): void {
+  isMobile.value = window.innerWidth <= 768
+}
 </script>
 
 <template>
   <div class="app-content" v-if="ready">
+    <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · {{ isNew ? '新增题库' : `编辑题库` }}</span></div>
     <!-- 题库基本信息卡片 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title">

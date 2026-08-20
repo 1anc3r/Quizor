@@ -2,7 +2,7 @@
 /**
  * 设置页：外观偏好、练习/考试偏好记忆、滑动切题、错题阈值、导入导出。
  */
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useBankStore } from '@/stores/bank'
 import { useSettingsStore } from '@/stores/settings'
 import { createBank, defaultRule, exportBackup, exportBankFile, saveBank } from '@/services/bank'
@@ -14,6 +14,7 @@ import { fmtTime, typeLabel } from '@/utils/format'
 const bankStore = useBankStore()
 const settingsStore = useSettingsStore()
 const s = settingsStore.settings
+const isMobile = ref(window.innerWidth <= 768)
 
 const darkMode = computed({
   get: () => s.theme === 'dark',
@@ -89,10 +90,19 @@ async function onImportFile(uploadFile: { raw?: File }): Promise<void> {
     importing.value = false
   }
 }
+
+function onResize(): void {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(async () => {
+  window.addEventListener('resize', onResize)
+})
 </script>
 
 <template>
   <div class="app-content">
+    <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · 设置</span></div>
     <!-- 外观偏好 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title"><span class="title-text">外观偏好</span></div>
