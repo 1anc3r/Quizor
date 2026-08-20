@@ -8,8 +8,8 @@ import FluentEditor from '@opentiny/fluent-editor'
 import '@opentiny/fluent-editor/style.css'
 import katex from 'katex'
 
-// Fluent Editor 的 formula 模块从 window.katex 读取渲染器
-;(window as unknown as { katex: typeof katex }).katex = katex
+  // Fluent Editor 的 formula 模块从 window.katex 读取渲染器
+  ; (window as unknown as { katex: typeof katex }).katex = katex
 
 const props = withDefaults(defineProps<{ modelValue: string; placeholder?: string }>(), {
   placeholder: '请输入内容'
@@ -27,11 +27,14 @@ onMounted(() => {
     placeholder: props.placeholder,
     modules: {
       toolbar: [
+        ['undo', 'redo'],
         ['bold', 'italic', 'underline', 'strike'],
         [{ color: [] }, { background: [] }],
         [{ align: [] }],
         [{ list: 'ordered' }, { list: 'bullet' }],
-        ['image', 'formula'],
+        [{ 'indent': '-1' }, { 'indent': '+1' }],
+        [{ 'script': 'sub' }, { 'script': 'super' }],
+        ['formula', 'image', 'better-table'],
         ['clean']
       ]
     }
