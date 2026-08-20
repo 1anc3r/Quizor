@@ -209,10 +209,10 @@ onMounted(async () => {
           @click="continueSession">继续上次答题</el-button>
       </div>
       <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap">
-        <el-button type="primary" size="large" style="flex: 1; min-width: 140px" @click="goSetup('practice')">
+        <el-button type="primary" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;" @click="goSetup('practice')">
           练习模式
         </el-button>
-        <el-button type="warning" size="large" style="flex: 1; min-width: 140px" @click="goSetup('exam')">
+        <el-button type="warning" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;" @click="goSetup('exam')">
           考试模式
         </el-button>
       </div>
