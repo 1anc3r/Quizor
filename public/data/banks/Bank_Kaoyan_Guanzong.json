@@ -381,7 +381,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "<p>已知直线<span class=\"ql-formula\" data-value=\"ax−by+3=0（a&gt;0,b&gt;0）\">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>a</mi><mi>x</mi><mo>−</mo><mi>b</mi><mi>y</mi><mo>+</mo><mn>3</mn><mo>=</mo><mn>0</mn><mtext>（</mtext><mi>a</mi><mo>&gt;</mo><mn>0</mn><mo separator=\"true\">,</mo><mi>b</mi><mo>&gt;</mo><mn>0</mn><mtext>）</mtext></mrow><annotation encoding=\"application/x-tex\">ax−by+3=0（a&gt;0,b&gt;0）</annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 0.6667em; vertical-align: -0.0833em;\"></span><span class=\"mord mathnormal\">a</span><span class=\"mord mathnormal\">x</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.8889em; vertical-align: -0.1944em;\"></span><span class=\"mord mathnormal\">b</span><span class=\"mord mathnormal\" style=\"margin-right: 0.0359em;\">y</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">3</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.7224em; vertical-align: -0.0391em;\"></span><span class=\"mord\">0</span><span class=\"mord cjk_fallback\">（</span><span class=\"mord mathnormal\">a</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">&gt;</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.8889em; vertical-align: -0.1944em;\"></span><span class=\"mord\">0</span><span class=\"mpunct\">,</span><span class=\"mspace\" style=\"margin-right: 0.1667em;\"></span><span class=\"mord mathnormal\">b</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">&gt;</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6833em;\"></span><span class=\"mord\">0</span><span class=\"mord cjk_fallback\">）</span></span></span></span></span>﻿</span> 过圆<span class=\"ql-formula\" data-value=\"x^2+4x+y^2−2y+1=0\">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><mi>x</mi><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup><mo>−</mo><mn>2</mn><mi>y</mi><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding=\"application/x-tex\">x^2+4x+y^2−2y+1=0</annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 0.8974em; vertical-align: -0.0833em;\"></span><span class=\"mord\"><span class=\"mord mathnormal\">x</span><span class=\"msupsub\"><span class=\"vlist-t\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8141em;\"><span class=\"\" style=\"top: -3.063em; margin-right: 0.05em;\"><span class=\"pstrut\" style=\"height: 2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\">2</span></span></span></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.7278em; vertical-align: -0.0833em;\"></span><span class=\"mord\">4</span><span class=\"mord mathnormal\">x</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1.0085em; vertical-align: -0.1944em;\"></span><span class=\"mord\"><span class=\"mord mathnormal\" style=\"margin-right: 0.0359em;\">y</span><span class=\"msupsub\"><span class=\"vlist-t\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8141em;\"><span class=\"\" style=\"top: -3.063em; margin-right: 0.05em;\"><span class=\"pstrut\" style=\"height: 2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\">2</span></span></span></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.8389em; vertical-align: -0.1944em;\"></span><span class=\"mord\">2</span><span class=\"mord mathnormal\" style=\"margin-right: 0.0359em;\">y</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">1</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">0</span></span></span></span></span>﻿</span> 的圆心，则ab的最大值为（）</p>",
+      "stem": "<p>已知直线<span class=\"ql-formula\" data-value=\"ax−by+3=0（a&gt;0,b&gt;0）\">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>a</mi><mi>x</mi><mo>−</mo><mi>b</mi><mi>y</mi><mo>+</mo><mn>3</mn><mo>=</mo><mn>0</mn><mtext>（</mtext><mi>a</mi><mo>&gt;</mo><mn>0</mn><mo separator=\"true\">，</mo><mi>b</mi><mo>&gt;</mo><mn>0</mn><mtext>）</mtext></mrow><annotation encoding=\"application/x-tex\">ax−by+3=0（a&gt;0，b&gt;0）</annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 0.6667em; vertical-align: -0.0833em;\"></span><span class=\"mord mathnormal\">a</span><span class=\"mord mathnormal\">x</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.8889em; vertical-align: -0.1944em;\"></span><span class=\"mord mathnormal\">b</span><span class=\"mord mathnormal\" style=\"margin-right: 0.0359em;\">y</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">3</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.7224em; vertical-align: -0.0391em;\"></span><span class=\"mord\">0</span><span class=\"mord cjk_fallback\">（</span><span class=\"mord mathnormal\">a</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">&gt;</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.8889em; vertical-align: -0.1944em;\"></span><span class=\"mord\">0</span><span class=\"mpunct\">，</span><span class=\"mspace\" style=\"margin-right: 0.1667em;\"></span><span class=\"mord mathnormal\">b</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">&gt;</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6833em;\"></span><span class=\"mord\">0</span><span class=\"mord cjk_fallback\">）</span></span></span></span></span>﻿</span> 过圆<span class=\"ql-formula\" data-value=\"x^2+4x+y^2−2y+1=0\">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><mi>x</mi><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup><mo>−</mo><mn>2</mn><mi>y</mi><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding=\"application/x-tex\">x^2+4x+y^2−2y+1=0</annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 0.8974em; vertical-align: -0.0833em;\"></span><span class=\"mord\"><span class=\"mord mathnormal\">x</span><span class=\"msupsub\"><span class=\"vlist-t\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8141em;\"><span class=\"\" style=\"top: -3.063em; margin-right: 0.05em;\"><span class=\"pstrut\" style=\"height: 2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\">2</span></span></span></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.7278em; vertical-align: -0.0833em;\"></span><span class=\"mord\">4</span><span class=\"mord mathnormal\">x</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1.0085em; vertical-align: -0.1944em;\"></span><span class=\"mord\"><span class=\"mord mathnormal\" style=\"margin-right: 0.0359em;\">y</span><span class=\"msupsub\"><span class=\"vlist-t\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8141em;\"><span class=\"\" style=\"top: -3.063em; margin-right: 0.05em;\"><span class=\"pstrut\" style=\"height: 2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\">2</span></span></span></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.8389em; vertical-align: -0.1944em;\"></span><span class=\"mord\">2</span><span class=\"mord mathnormal\" style=\"margin-right: 0.0359em;\">y</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">1</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">0</span></span></span></span></span>﻿</span> 的圆心，则ab的最大值为（）</p>",
       "options": [
         {
           "key": "A",
@@ -603,7 +603,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "a|a−b|≥|a|(a−b)\n（1）实数a>0\n（2）实数a,b满足a>b",
+      "stem": "a|a−b|≥|a|(a−b)\n（1）实数a>0\n（2）实数a，b满足a>b",
       "options": [
         {
           "key": "A",
@@ -629,7 +629,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "若a>0\n|a−b|≥(a−b)\nb−a≥a−b,b≥a",
+      "analysis": "若a>0\n|a−b|≥(a−b)\nb−a≥a−b，b≥a",
       "source": "2010年真题",
       "tags": [
         "绝对值"
@@ -899,7 +899,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "设a,b为非负实数，则a+b≤5/4\n（1）ab≤1/16\n（2）a^2+b^2≤1",
+      "stem": "设a，b为非负实数，则a+b≤5/4\n（1）ab≤1/16\n（2）a^2+b^2≤1",
       "options": [
         {
           "key": "A",
@@ -1754,7 +1754,7 @@
       "options": [
         {
           "key": "A",
-          "text": "员工：我们正制定一个度假方案,你说是在本市好，还是去外地好？"
+          "text": "员工：我们正制定一个度假方案，你说是在本市好，还是去外地好？"
         },
         {
           "key": "B",
@@ -2009,27 +2009,27 @@
       "type": "single",
       "chapter": "逻辑推理",
       "difficulty": 3,
-      "stem": "对某高校本科生的某项调查统计发现：在因成绩优异被推荐免试攻读硕士研究生的文科专业生中，女生占有70%，由此可见,该校本科文科专业的女生比男生优秀。\n以下哪项如果为真，能最有力地消弱上述结论？（）",
+      "stem": "对某高校本科生的某项调查统计发现：在因成绩优异被推荐免试攻读硕士研究生的文科专业生中，女生占有70%，由此可见，该校本科文科专业的女生比男生优秀。\n以下哪项如果为真，能最有力地消弱上述结论？（）",
       "options": [
         {
           "key": "A",
-          "text": "在该校本科文科专业学生中,女生占30%以上。"
+          "text": "在该校本科文科专业学生中，女生占30%以上。"
         },
         {
           "key": "B",
-          "text": "在该校本科文科专业学生中,女生占30%以下。"
+          "text": "在该校本科文科专业学生中，女生占30%以下。"
         },
         {
           "key": "C",
-          "text": "在该校本科文科专业学生中,男生占30%以下。"
+          "text": "在该校本科文科专业学生中，男生占30%以下。"
         },
         {
           "key": "D",
-          "text": "在该校本科文科专业学生中,女生占70%以下。"
+          "text": "在该校本科文科专业学生中，女生占70%以下。"
         },
         {
           "key": "E",
-          "text": "在该校本科文科专业学生中,男生占70%以上。"
+          "text": "在该校本科文科专业学生中，男生占70%以上。"
         }
       ],
       "answer": [
@@ -2120,7 +2120,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "<p>若实数 a, b, c 满足<span class=\"ql-formula\" data-value=\"|a−3|+\\sqrt{3b+5}+(5c−4)^2=0 \">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi mathvariant=\"normal\">∣</mi><mi>a</mi><mo>−</mo><mn>3</mn><mi mathvariant=\"normal\">∣</mi><mo>+</mo><msqrt><mrow><mn>3</mn><mi>b</mi><mo>+</mo><mn>5</mn></mrow></msqrt><mo>+</mo><mo stretchy=\"false\">(</mo><mn>5</mn><mi>c</mi><mo>−</mo><mn>4</mn><msup><mo stretchy=\"false\">)</mo><mn>2</mn></msup><mo>=</mo><mn>0</mn></mrow><annotation encoding=\"application/x-tex\">|a−3|+\\sqrt{3b+5}+(5c−4)^2=0 </annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 1em; vertical-align: -0.25em;\"></span><span class=\"mord\">∣</span><span class=\"mord mathnormal\">a</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1em; vertical-align: -0.25em;\"></span><span class=\"mord\">3∣</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1.04em; vertical-align: -0.1494em;\"></span><span class=\"mord sqrt\"><span class=\"vlist-t vlist-t2\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8906em;\"><span class=\"svg-align\" style=\"top: -3em;\"><span class=\"pstrut\" style=\"height: 3em;\"></span><span class=\"mord\" style=\"padding-left: 0.833em;\"><span class=\"mord\">3</span><span class=\"mord mathnormal\">b</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mord\">5</span></span></span><span class=\"\" style=\"top: -2.8506em;\"><span class=\"pstrut\" style=\"height: 3em;\"></span><span class=\"hide-tail\" style=\"min-width: 0.853em; height: 1.08em;\"><svg width=\"400em\" height=\"1.08em\" viewBox=\"0 0 400000 1080\" preserveAspectRatio=\"xMinYMin slice\"><path d=\"M95,702\nc-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14\nc0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54\nc44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10\ns173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429\nc69,-144,104.5,-217.7,106.5,-221\nl0 -0\nc5.3,-9.3,12,-14,20,-14\nH400000v40H845.2724\ns-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7\nc-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z\nM834 80h400000v40h-400000z\"></path></svg></span></span></span><span class=\"vlist-s\">​</span></span><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.1494em;\"><span class=\"\"></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1em; vertical-align: -0.25em;\"></span><span class=\"mopen\">(</span><span class=\"mord\">5</span><span class=\"mord mathnormal\">c</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1.0641em; vertical-align: -0.25em;\"></span><span class=\"mord\">4</span><span class=\"mclose\"><span class=\"mclose\">)</span><span class=\"msupsub\"><span class=\"vlist-t\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8141em;\"><span class=\"\" style=\"top: -3.063em; margin-right: 0.05em;\"><span class=\"pstrut\" style=\"height: 2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\">2</span></span></span></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">0</span></span></span></span></span>﻿</span> ，则 <span class=\"ql-formula\" data-value=\" abc =\">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>a</mi><mi>b</mi><mi>c</mi><mo>=</mo></mrow><annotation encoding=\"application/x-tex\"> abc =</annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 0.6944em;\"></span><span class=\"mord mathnormal\">ab</span><span class=\"mord mathnormal\">c</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span></span></span></span></span>﻿</span> </p>",
+      "stem": "<p>若实数 a， b， c 满足<span class=\"ql-formula\" data-value=\"|a−3|+\\sqrt{3b+5}+(5c−4)^2=0 \">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi mathvariant=\"normal\">∣</mi><mi>a</mi><mo>−</mo><mn>3</mn><mi mathvariant=\"normal\">∣</mi><mo>+</mo><msqrt><mrow><mn>3</mn><mi>b</mi><mo>+</mo><mn>5</mn></mrow></msqrt><mo>+</mo><mo stretchy=\"false\">(</mo><mn>5</mn><mi>c</mi><mo>−</mo><mn>4</mn><msup><mo stretchy=\"false\">)</mo><mn>2</mn></msup><mo>=</mo><mn>0</mn></mrow><annotation encoding=\"application/x-tex\">|a−3|+\\sqrt{3b+5}+(5c−4)^2=0 </annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 1em; vertical-align: -0.25em;\"></span><span class=\"mord\">∣</span><span class=\"mord mathnormal\">a</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1em; vertical-align: -0.25em;\"></span><span class=\"mord\">3∣</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1.04em; vertical-align: -0.1494em;\"></span><span class=\"mord sqrt\"><span class=\"vlist-t vlist-t2\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8906em;\"><span class=\"svg-align\" style=\"top: -3em;\"><span class=\"pstrut\" style=\"height: 3em;\"></span><span class=\"mord\" style=\"padding-left: 0.833em;\"><span class=\"mord\">3</span><span class=\"mord mathnormal\">b</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mord\">5</span></span></span><span class=\"\" style=\"top: -2.8506em;\"><span class=\"pstrut\" style=\"height: 3em;\"></span><span class=\"hide-tail\" style=\"min-width: 0.853em; height: 1.08em;\"><svg width=\"400em\" height=\"1.08em\" viewBox=\"0 0 400000 1080\" preserveAspectRatio=\"xMinYMin slice\"><path d=\"M95,702\nc-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14\nc0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54\nc44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10\ns173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429\nc69,-144,104.5,-217.7,106.5,-221\nl0 -0\nc5.3,-9.3,12,-14,20,-14\nH400000v40H845.2724\ns-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7\nc-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z\nM834 80h400000v40h-400000z\"></path></svg></span></span></span><span class=\"vlist-s\">​</span></span><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.1494em;\"><span class=\"\"></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">+</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1em; vertical-align: -0.25em;\"></span><span class=\"mopen\">(</span><span class=\"mord\">5</span><span class=\"mord mathnormal\">c</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span><span class=\"mbin\">−</span><span class=\"mspace\" style=\"margin-right: 0.2222em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 1.0641em; vertical-align: -0.25em;\"></span><span class=\"mord\">4</span><span class=\"mclose\"><span class=\"mclose\">)</span><span class=\"msupsub\"><span class=\"vlist-t\"><span class=\"vlist-r\"><span class=\"vlist\" style=\"height: 0.8141em;\"><span class=\"\" style=\"top: -3.063em; margin-right: 0.05em;\"><span class=\"pstrut\" style=\"height: 2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\">2</span></span></span></span></span></span></span></span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height: 0.6444em;\"></span><span class=\"mord\">0</span></span></span></span></span>﻿</span> ，则 <span class=\"ql-formula\" data-value=\" abc =\">﻿<span contenteditable=\"false\"><span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>a</mi><mi>b</mi><mi>c</mi><mo>=</mo></mrow><annotation encoding=\"application/x-tex\"> abc =</annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height: 0.6944em;\"></span><span class=\"mord mathnormal\">ab</span><span class=\"mord mathnormal\">c</span><span class=\"mspace\" style=\"margin-right: 0.2778em;\"></span><span class=\"mrel\">=</span></span></span></span></span>﻿</span> </p>",
       "options": [
         {
           "key": "A",
@@ -2457,7 +2457,7 @@
       "options": [
         {
           "key": "A",
-          "text": "（-1,1）"
+          "text": "（-1，1）"
         },
         {
           "key": "B",
@@ -2473,13 +2473,13 @@
         },
         {
           "key": "E",
-          "text": "（1,1）"
+          "text": "（1，1）"
         }
       ],
       "answer": [
         "E"
       ],
-      "analysis": "切线斜率为-1\nP要么是（-1,-1）要么是（1,1）",
+      "analysis": "切线斜率为-1\nP要么是（-1，-1）要么是（1，1）",
       "source": "2011年真题",
       "tags": [
         "解析几何"
@@ -2490,7 +2490,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "设 a, b, c 是小于 12 的三个不同的质数（素数），且 |a-b|+|b-c|+|c-a|= 8 ，则 a+b+c=",
+      "stem": "设 a， b， c 是小于 12 的三个不同的质数（素数），且 |a-b|+|b-c|+|c-a|= 8 ，则 a+b+c=",
       "options": [
         {
           "key": "A",
@@ -2601,7 +2601,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "已知 x^2+y^2=9, xy = 4 ，则 (x+y)/(x^3+y^3+x+y)",
+      "stem": "已知 x^2+y^2=9， xy = 4 ，则 (x+y)/(x^3+y^3+x+y)",
       "options": [
         {
           "key": "A",
@@ -2638,7 +2638,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "实数a, b, c 成等差数列。\n（1） ea , eb , ec 成等比数列\n（2）lna，lnb ，lnc 成等差",
+      "stem": "实数a， b， c 成等差数列。\n（1） ea ， eb ， ec 成等比数列\n（2）lna，lnb ，lnc 成等差",
       "options": [
         {
           "key": "A",
@@ -2786,7 +2786,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知三角形 ABC 的三条边分别为 a, b, c .则三角形的 ABC 是等腰三角形\n（1） (a −b)(c^2−a^2−b^2 )= 0\n（2） c=√2 b",
+      "stem": "已知三角形 ABC 的三条边分别为 a， b， c .则三角形的 ABC 是等腰三角形\n（1） (a −b)(c^2−a^2−b^2 )= 0\n（2） c=√2 b",
       "options": [
         {
           "key": "A",
@@ -2823,7 +2823,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "直线 ax +by +3 = 0 被圆（x - 2）2 +（y-1）2 = 4 截得的线段的长度为 2、√3\n（1） a = 0, b = -1\n（2） a = -1, b = 0",
+      "stem": "直线 ax +by +3 = 0 被圆（x - 2）2 +（y-1）2 = 4 截得的线段的长度为 2、√3\n（1） a = 0， b = -1\n（2） a = -1， b = 0",
       "options": [
         {
           "key": "A",
@@ -2860,7 +2860,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知实数 a, b, c, d 满足 a2 + b2 = 1, c2 + d 2 = 1 ，则 ac + bd < 1\n（1）直线 ax + by = 1与 cx + dy = 1 仅有一个交点\n（2） a ≠ c, b ≠ d",
+      "stem": "已知实数 a， b， c， d 满足 a2 + b2 = 1， c2 + d 2 = 1 ，则 ac + bd < 1\n（1）直线 ax + by = 1与 cx + dy = 1 仅有一个交点\n（2） a ≠ c， b ≠ d",
       "options": [
         {
           "key": "A",
@@ -3250,7 +3250,7 @@
         },
         {
           "key": "E",
-          "text": "通常情况下,网络商店只有在其实体商店的支撑下才能生存。"
+          "text": "通常情况下，网络商店只有在其实体商店的支撑下才能生存。"
         }
       ],
       "answer": [
@@ -3304,7 +3304,7 @@
       "type": "single",
       "chapter": "逻辑推理",
       "difficulty": 4,
-      "stem": "某集团公司有四个部门，分别生产冰箱、彩电、电脑和手机。根据前三个季度的数据统计，四个部门 经理对 2010 年全年的赢利情况作了如下预测：\n冰箱部门经理：今年手机部门会赢利。\n彩电部门经理：如果冰箱部门今年没赢利，那么彩电部门就不会赢利。\n电脑部门经理：如果手机部门今年没赢利，那么电脑部门也没赢利。\n手机部门经理：今年冰箱和彩电部门都会赢利。\n全年数据统计完成后，发现上述四个预测只有一个符合事实。\n关于该公司各部门的全年赢利情况,以下除哪项外，均可能为真?",
+      "stem": "某集团公司有四个部门，分别生产冰箱、彩电、电脑和手机。根据前三个季度的数据统计，四个部门 经理对 2010 年全年的赢利情况作了如下预测：\n冰箱部门经理：今年手机部门会赢利。\n彩电部门经理：如果冰箱部门今年没赢利，那么彩电部门就不会赢利。\n电脑部门经理：如果手机部门今年没赢利，那么电脑部门也没赢利。\n手机部门经理：今年冰箱和彩电部门都会赢利。\n全年数据统计完成后，发现上述四个预测只有一个符合事实。\n关于该公司各部门的全年赢利情况，以下除哪项外，均可能为真?",
       "options": [
         {
           "key": "A",
@@ -4218,7 +4218,7 @@
       "answer": [
         "C"
       ],
-      "analysis": "d=20,r=10,h=20\nS_底面=πr^2=100π\nS_侧面=πdh=400π\nS_顶部=1/2∗4πr^2=200π\nP=400(100+200)π+300∗400π=2400π=7536",
+      "analysis": "d=20，r=10，h=20\nS_底面=πr^2=100π\nS_侧面=πdh=400π\nS_顶部=1/2∗4πr^2=200π\nP=400(100+200)π+300∗400π=2400π=7536",
       "source": "2012年真题",
       "tags": [
         "立体几何"
@@ -4477,7 +4477,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "设甲、乙的效率为1/x 、1/y\n{(2/y+3(1/x+1/y)=100@1/x−1/y=4， 1/x=1/y+4)┤\nx=15,y=11",
+      "analysis": "设甲、乙的效率为1/x 、1/y\n{(2/y+3(1/x+1/y)=100@1/x−1/y=4， 1/x=1/y+4)┤\nx=15，y=11",
       "source": "2012年真题",
       "tags": [
         "应用题：工程问题"
@@ -4551,7 +4551,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "x^2−3x+2=(x−2)(x−1)\nf(x)=x^3+x^2+ax+b=(x−2)(x−1)(x−m)\nf(1)=f(2)=0\n{(1+1+a+b=0@8+4+2a+b=0)┤\na=−10,b=8",
+      "analysis": "x^2−3x+2=(x−2)(x−1)\nf(x)=x^3+x^2+ax+b=(x−2)(x−1)(x−m)\nf(1)=f(2)=0\n{(1+1+a+b=0@8+4+2a+b=0)┤\na=−10，b=8",
       "source": "2012年真题",
       "tags": [
         "代数"
@@ -4662,7 +4662,7 @@
       "answer": [
         "B"
       ],
-      "analysis": "x+y=320\nx−y=80\nx=200,y=120",
+      "analysis": "x+y=320\nx−y=80\nx=200，y=120",
       "source": "2012年真题",
       "tags": [
         "应用题"
@@ -4699,7 +4699,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "b^2−4≥0\nb^2≥4\nb<−2,b>2",
+      "analysis": "b^2−4≥0\nb^2≥4\nb<−2，b>2",
       "source": "2012年真题",
       "tags": [
         "条件充分性判断"
@@ -4747,7 +4747,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "直线y=ax+b过第二象限.\n（1）a=-1,b=1.\n（2）a=1,b=-1.",
+      "stem": "直线y=ax+b过第二象限.\n（1）a=-1，b=1.\n（2）a=1，b=-1.",
       "options": [
         {
           "key": "A",
@@ -4773,7 +4773,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "k<0,b>0\nk>0,b>0",
+      "analysis": "k<0，b>0\nk>0，b>0",
       "source": "2012年真题",
       "tags": [
         "条件充分性判断"
@@ -6708,7 +6708,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知平面区域D₁={(x,y)|x²+y²≤9}，D₂={(x,y)|(x−x₀)²+(y−y₀)²≤9}.则D₁，D₂覆盖区域的边界长度为8π.\n（1）x_0^2+y_0^2=9.\n（2）x_0+y_0=3.",
+      "stem": "已知平面区域D₁={(x，y)|x²+y²≤9}，D₂={(x，y)|(x−x₀)²+(y−y₀)²≤9}.则D₁，D₂覆盖区域的边界长度为8π.\n（1）x_0^2+y_0^2=9.\n（2）x_0+y_0=3.",
       "options": [
         {
           "key": "A",
@@ -7041,7 +7041,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "设a₁=1,a₂=k,a_(n+1)=|a_n−a_(n−1) |(n≥2).则a_100+a_101+a_102=2.\n（1）k=2.\n（2）k是小于20的正整数.",
+      "stem": "设a₁=1，a₂=k，a_(n+1)=|a_n−a_(n−1) |(n≥2).则a_100+a_101+a_102=2.\n（1）k=2.\n（2）k是小于20的正整数.",
       "options": [
         {
           "key": "A",
@@ -8214,7 +8214,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "设一等奖个数为x\n400x+270(26−x)=280∗26\n130x=260,x=2",
+      "analysis": "设一等奖个数为x\n400x+270(26−x)=280∗26\n130x=260，x=2",
       "source": "2014年真题",
       "tags": [
         "平均数"
@@ -8843,7 +8843,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "（1）1−6+b+a=0,\n（2）−1−6−b+a=0,\n(a+b−5)(a−b−5)=0\na+b=5\na−b=5\na=5,b=0",
+      "analysis": "（1）1−6+b+a=0，\n（2）−1−6−b+a=0，\n(a+b−5)(a−b−5)=0\na+b=5\na−b=5\na=5，b=0",
       "source": "2014年真题",
       "tags": [
         "条件充分性判断"
@@ -10305,7 +10305,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "a:b:c=1:2:5\na+b+c=24\na=3,b=6,c=15\na^2+b^2+c^2=9+36+225=270",
+      "analysis": "a:b:c=1:2:5\na+b+c=24\na=3，b=6，c=15\na^2+b^2+c^2=9+36+225=270",
       "source": "2015年真题",
       "tags": [
         "代数"
@@ -10342,7 +10342,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "设甲部门为x人，乙部门为y人\n2(x−10)=y+10，2x−y=30\n4/5 y=x+1/5 y，3y=5x\n1/3 x=30,x=90，y=150，x+y=240",
+      "analysis": "设甲部门为x人，乙部门为y人\n2(x−10)=y+10，2x−y=30\n4/5 y=x+1/5 y，3y=5x\n1/3 x=30，x=90，y=150，x+y=240",
       "source": "2015年真题",
       "tags": [
         "应用题"
@@ -10353,7 +10353,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "设m，n是小于20的质数，满足条件|m−n|=2的{m,n}共有（）.",
+      "stem": "设m，n是小于20的质数，满足条件|m−n|=2的{m，n}共有（）.",
       "options": [
         {
           "key": "A",
@@ -10379,7 +10379,7 @@
       "answer": [
         "C"
       ],
-      "analysis": "小于20的质数：2，3，5，7，11，13，17，19\n满足条件|m−n|=2的{m,n}共有：\n{3,5},{5,7},{11,13},{17,19}",
+      "analysis": "小于20的质数：2，3，5，7，11，13，17，19\n满足条件|m−n|=2的{m，n}共有：\n{3，5}，{5，7}，{11，13}，{17，19}",
       "source": "2015年真题",
       "tags": [
         "算术"
@@ -10416,7 +10416,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "圆O半径为2，连结AO、AC=2,AB=2√3，∠AOB=120°\nS_扇形AOB=1/3 πr^2=4/3 π\nS_三角形AOB=1/2∗1/2∗2∗2√3=√3\n阴影部分的面积：4/3 π−√3",
+      "analysis": "圆O半径为2，连结AO、AC=2，AB=2√3，∠AOB=120°\nS_扇形AOB=1/3 πr^2=4/3 π\nS_三角形AOB=1/2∗1/2∗2∗2√3=√3\n阴影部分的面积：4/3 π−√3",
       "source": "2015年真题",
       "tags": [
         "平面几何"
@@ -10712,7 +10712,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "2005年末至2009年末产值的年平均增长率为q\n2009年末至2013年末产值的年平均增长率为0. 6q\n设2005年产值为A，则\nA(1+q)^4 (1+0.6q)^4=A∗〖1.95〗^4\n(1+q)(1+0.6q)=1.95\n0.6q^2+1.6q−0.95=0,q=0.5",
+      "analysis": "2005年末至2009年末产值的年平均增长率为q\n2009年末至2013年末产值的年平均增长率为0. 6q\n设2005年产值为A，则\nA(1+q)^4 (1+0.6q)^4=A∗〖1.95〗^4\n(1+q)(1+0.6q)=1.95\n0.6q^2+1.6q−0.95=0，q=0.5",
       "source": "2015年真题",
       "tags": [
         "应用题：变化率"
@@ -10974,7 +10974,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知M=(a^1+a^2+…+a_(n−1) )·(a^2+a^3+…+a_n ),N=(a₁+a₂+…+a_n)·(a₂+a₃+…+a_(n−1)). 则M>N.\n（1）a₁>0. \n（2）a_1^  a_n>0.",
+      "stem": "已知M=(a^1+a^2+…+a_(n−1) )·(a^2+a^3+…+a_n )，N=(a₁+a₂+…+a_n)·(a₂+a₃+…+a_(n−1)). 则M>N.\n（1）a₁>0. \n（2）a_1^  a_n>0.",
       "options": [
         {
           "key": "A",
@@ -11009,7 +11009,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知{a_n}是公差大于零的等差数列，S_n 是{a_n}的前n项和. 则S_n≥S₁₀，n=1,2,…\n（1）a_10=0. \n（2）a_1 a_n<0.",
+      "stem": "已知{a_n}是公差大于零的等差数列，S_n 是{a_n}的前n项和. 则S_n≥S₁₀，n=1，2，…\n（1）a_10=0. \n（2）a_1 a_n<0.",
       "options": [
         {
           "key": "A",
@@ -12357,7 +12357,7 @@
       "answer": [
         "C"
       ],
-      "analysis": "设正方形区域边长为x\nx^2+180=(x+1)^2−21\n2x=200,x=100",
+      "analysis": "设正方形区域边长为x\nx^2+180=(x+1)^2−21\n2x=200，x=100",
       "source": "2016年真题",
       "tags": [
         "代数"
@@ -12616,7 +12616,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "竖式无盖箱子需要4张长方形木板和1张正方形木板\n横式无盖箱子需要3张长方形木板和2张正方形木板\n设竖式无盖箱子x个，横式无盖箱子y个，则\n4x+3y=340\nx+2y=160\n5y=300,y=60,x=40",
+      "analysis": "竖式无盖箱子需要4张长方形木板和1张正方形木板\n横式无盖箱子需要3张长方形木板和2张正方形木板\n设竖式无盖箱子x个，横式无盖箱子y个，则\n4x+3y=340\nx+2y=160\n5y=300，y=60，x=40",
       "source": "2016年真题",
       "tags": [
         "立体几何"
@@ -12727,7 +12727,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "y=x^2+2ax+b\nx_1,x_2=(−b±√(b^2−4ac))/2a=(−2a±√(〖4a〗^2−4b))/2\nS_(△ABC)=6=1/2 ((−2a+√(〖4a〗^2−4b))/2−(−2a−√(〖4a〗^2−4b))/2)2\n(2√(〖4a〗^2−4b))/2−6,√(〖4a〗^2−4b)=6,〖4a〗^2−4b=36,a^2−b=9",
+      "analysis": "y=x^2+2ax+b\nx_1，x_2=(−b±√(b^2−4ac))/2a=(−2a±√(〖4a〗^2−4b))/2\nS_(△ABC)=6=1/2 ((−2a+√(〖4a〗^2−4b))/2−(−2a−√(〖4a〗^2−4b))/2)2\n(2√(〖4a〗^2−4b))/2−6，√(〖4a〗^2−4b)=6，〖4a〗^2−4b=36，a^2−b=9",
       "source": "2016年真题",
       "tags": [
         "解析几何"
@@ -14460,7 +14460,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "已知△ABC和△A'B'C'满足AB:A′B′=AC:A′C′=2:3,∠A+∠A′=π，则△ABC与△A'B'C′的面积之比为（）.",
+      "stem": "已知△ABC和△A'B'C'满足AB:A′B′=AC:A′C′=2:3，∠A+∠A′=π，则△ABC与△A'B'C′的面积之比为（）.",
       "options": [
         {
           "key": "A",
@@ -14671,7 +14671,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "设甲、乙、丙三种货车的载重量为a,b,c\n{█(&2a+b=95,b=95−2a@&a+3c=150,c=50−a/3)┤\n若a+c=2b，则a+50−a/3=190−4a，可得：a=30,b=35,c=40",
+      "analysis": "设甲、乙、丙三种货车的载重量为a，b，c\n{█(&2a+b=95，b=95−2a@&a+3c=150，c=50−a/3)┤\n若a+c=2b，则a+50−a/3=190−4a，可得：a=30，b=35，c=40",
       "source": "2017年真题",
       "tags": [
         "等差数列"
@@ -14891,23 +14891,23 @@
       "options": [
         {
           "key": "A",
-          "text": "(−∞,1]"
+          "text": "(−∞，1]"
         },
         {
           "key": "B",
-          "text": "(−∞,3/2]"
+          "text": "(−∞，3/2]"
         },
         {
           "key": "C",
-          "text": "[1, 3/2]"
+          "text": "[1， 3/2]"
         },
         {
           "key": "D",
-          "text": "[1,+∞)"
+          "text": "[1，+∞)"
         },
         {
           "key": "E",
-          "text": "[3/2,+∞)"
+          "text": "[3/2，+∞)"
         }
       ],
       "answer": [
@@ -15057,7 +15057,7 @@
         }
       ],
       "answer": [],
-      "analysis": "设乘动车的时间为x，乘汽车的时间为y\n220x+100y=960\n（1）x=y=3，充分\n（2）x+y=6,220x+100(6−x)=960,x=3，充分",
+      "analysis": "设乘动车的时间为x，乘汽车的时间为y\n220x+100y=960\n（1）x=y=3，充分\n（2）x+y=6，220x+100(6−x)=960，x=3，充分",
       "source": "2017年真题",
       "tags": [
         "路程问题"
@@ -15092,7 +15092,7 @@
         }
       ],
       "answer": [],
-      "analysis": "ax+b=x^2,x^2−ax−b=0\na^2+4b>0,a^2≻−4b\n（1）不充分\n（2）充分",
+      "analysis": "ax+b=x^2，x^2−ax−b=0\na^2+4b>0，a^2≻−4b\n（1）不充分\n（2）充分",
       "source": "2017年真题",
       "tags": [
         "解析几何"
@@ -15208,7 +15208,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知a，b，c为三个实数，则min{|a−b|,|b−c|,|a−c|}≤5.\n（1）|a|≤5，|b|≤5，|c|≤5. \n（2）a+b+c=15.",
+      "stem": "已知a，b，c为三个实数，则min{|a−b|，|b−c|，|a−c|}≤5.\n（1）|a|≤5，|b|≤5，|c|≤5. \n（2）a+b+c=15.",
       "options": [
         {
           "key": "A",
@@ -15232,7 +15232,7 @@
         }
       ],
       "answer": [],
-      "analysis": "（1）充分\n（2）取反例，a=−10,b=0,c=25，不充分",
+      "analysis": "（1）充分\n（2）取反例，a=−10，b=0，c=25，不充分",
       "source": "2017年真题",
       "tags": [
         "算术"
@@ -15337,7 +15337,7 @@
         }
       ],
       "answer": [],
-      "analysis": "f(x)=x²+2ax+b在−2a处有最小值(4b−〖4a〗^2)/4<0\n4a^2−4b>0,a^2>b\n（1）2a=b+1,b=2a−1\na^2−2a+1>0,(a−1)^2>0，充分\n（2）a^2=b，不充分",
+      "analysis": "f(x)=x²+2ax+b在−2a处有最小值(4b−〖4a〗^2)/4<0\n4a^2−4b>0，a^2>b\n（1）2a=b+1，b=2a−1\na^2−2a+1>0，(a−1)^2>0，充分\n（2）a^2=b，不充分",
       "source": "2017年真题",
       "tags": [
         "解析几何"
@@ -16614,7 +16614,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "S_ABC=1/2 r(AB+AC+BC)\nC_ABC=AB+AC+BC\nS_ABC:C_ABC=1:2,r=1\nS_o=πr^2=π",
+      "analysis": "S_ABC=1/2 r(AB+AC+BC)\nC_ABC=AB+AC+BC\nS_ABC:C_ABC=1:2，r=1\nS_o=πr^2=π",
       "source": "2018年真题",
       "tags": [
         "平面几何"
@@ -16651,7 +16651,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "【方法一】公式法\na^3−b^3=(a−b)(a^2+ab+b^2)\na^2+ab+b^2=13,〖2a〗^2+2ab+〖2b〗^2=26\n(a−b)^2=a^2−2ab+b^2=4\n〖3a〗^2+3b^2=30,a^2+b^2=10\n【方法二】特值法\na=3,b=1\na^2+b^2=10",
+      "analysis": "【方法一】公式法\na^3−b^3=(a−b)(a^2+ab+b^2)\na^2+ab+b^2=13，〖2a〗^2+2ab+〖2b〗^2=26\n(a−b)^2=a^2−2ab+b^2=4\n〖3a〗^2+3b^2=30，a^2+b^2=10\n【方法二】特值法\na=3，b=1\na^2+b^2=10",
       "source": "2018年真题",
       "tags": [
         "立方差"
@@ -16810,7 +16810,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "已知圆C：x²+(y−a)²=b. 若圆C在点(1,2)处的切线与y轴的交点为(0,3)，则ab=（）.",
+      "stem": "已知圆C：x²+(y−a)²=b. 若圆C在点(1，2)处的切线与y轴的交点为(0，3)，则ab=（）.",
       "options": [
         {
           "key": "A",
@@ -16836,7 +16836,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "切线过点(1,2)(0,3)：y=kx+b,k+b=2,b=3,y=−x+3\n圆C过点(1,2)：1+(2−a)^2=b,b=5−4a+a^2\n(0,3)到点(0,a)的距离为：b=√((x_1−x_2 )^2+(y_1−y_2 )^2 )=√((3−a)^2 ),b=|3−a|\na=1,b=2,ab=2",
+      "analysis": "切线过点(1，2)(0，3)：y=kx+b，k+b=2，b=3，y=−x+3\n圆C过点(1，2)：1+(2−a)^2=b，b=5−4a+a^2\n(0，3)到点(0，a)的距离为：b=√((x_1−x_2 )^2+(y_1−y_2 )^2 )=√((3−a)^2 )，b=|3−a|\na=1，b=2，ab=2",
       "source": "2018年真题",
       "tags": [
         "解析几何"
@@ -16995,7 +16995,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "函数f(x)=max{x²,−x²+8}的最小值为（）.",
+      "stem": "函数f(x)=max{x²，−x²+8}的最小值为（）.",
       "options": [
         {
           "key": "A",
@@ -17126,7 +17126,7 @@
         }
       ],
       "answer": [],
-      "analysis": "1/m+3/n=(n+3m)/mn=1,n+3m=mn,m=4,n=4\n1/m+2/n=(n+2m)/mn=1,n+2m=mn,m=3,n=3\n（1）充分（2）充分",
+      "analysis": "1/m+3/n=(n+3m)/mn=1，n+3m=mn，m=4，n=4\n1/m+2/n=(n+2m)/mn=1，n+2m=mn，m=3，n=3\n（1）充分（2）充分",
       "source": "2018年真题",
       "tags": [
         "条件充分性判断"
@@ -18566,7 +18566,7 @@
       "answer": [
         "C"
       ],
-      "analysis": "设总工作量为S，原效率为v，则S=10v\nS=3v+5v\\_0\n5v_0=7v,v_0=7/5 v,v_0=(1+2/5)v",
+      "analysis": "设总工作量为S，原效率为v，则S=10v\nS=3v+5v\\_0\n5v_0=7v，v_0=7/5 v，v_0=(1+2/5)v",
       "source": "2019年真题",
       "tags": [
         "应用题：工程问题"
@@ -18603,7 +18603,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "x_0=1\t2+a=12,a=10\nx_0=2\t4+a/4=12,a=32\nx_0=3\t6+a/9=12,a=36\nx_0=4\t8+a/16=12,a=64\nx_0=5\t10+a/25=12,a=50",
+      "analysis": "x_0=1\t2+a=12，a=10\nx_0=2\t4+a/4=12，a=32\nx_0=3\t6+a/9=12，a=36\nx_0=4\t8+a/16=12，a=64\nx_0=5\t10+a/25=12，a=50",
       "source": "2019年真题",
       "tags": [
         "函数"
@@ -18651,7 +18651,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "设实数a，b满足ab=6,|a+b|+|a−b|=6，则a²+b²=（）.",
+      "stem": "设实数a，b满足ab=6，|a+b|+|a−b|=6，则a²+b²=（）.",
       "options": [
         {
           "key": "A",
@@ -18677,7 +18677,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "特值法：a=3,b=2",
+      "analysis": "特值法：a=3，b=2",
       "source": "2019年真题",
       "tags": [
         "代数"
@@ -18788,7 +18788,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "设正方形周长为4S米，这批树苗有T棵. \n（1）每隔3米种一棵，则种下了4/3 S​棵，剩下10棵树苗，则T−4/3 S​=10\n（2）每隔2米种一棵，则种下了3/2 S+1​棵，没剩下树苗，则T=3/2 S+1\n联立（1）（2）可得3/2 S+1−4/3 S​=10,S=54,T=82",
+      "analysis": "设正方形周长为4S米，这批树苗有T棵. \n（1）每隔3米种一棵，则种下了4/3 S​棵，剩下10棵树苗，则T−4/3 S​=10\n（2）每隔2米种一棵，则种下了3/2 S+1​棵，没剩下树苗，则T=3/2 S+1\n联立（1）（2）可得3/2 S+1−4/3 S​=10，S=54，T=82",
       "source": "2019年真题",
       "tags": [
         "几何"
@@ -18862,7 +18862,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "设正方形边长为x，则\n(√2/2 x)^2+x^2=9,x^2=6\n正方体表面积：6x^2=36",
+      "analysis": "设正方形边长为x，则\n(√2/2 x)^2+x^2=9，x^2=6\n正方体表面积：6x^2=36",
       "source": "2019年真题",
       "tags": [
         "立体几何"
@@ -18971,7 +18971,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "六边形面积\na=√2,S=(3√3)/2 a^2=3√3",
+      "analysis": "六边形面积\na=√2，S=(3√3)/2 a^2=3√3",
       "source": "2019年真题",
       "tags": [
         "立体几何"
@@ -19056,7 +19056,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "设数列{a_n}满足a₁=0,a_(n+1)−2aₙ=1，则a_100=（）.",
+      "stem": "设数列{a_n}满足a₁=0，a_(n+1)−2aₙ=1，则a_100=（）.",
       "options": [
         {
           "key": "A",
@@ -19152,7 +19152,7 @@
         }
       ],
       "answer": [],
-      "analysis": "(x−2)^2+y^2=1，圆心为(2，0)，半径为1\ny=kx,kx−y=0\nd=|ax_0^ +by_0^ +c|/√(a^2+b^2 )=|2k|/√(k^2+1^2 )<1\n4k^2<k^2+1,3k^2<1,−√3/3<k<√3/3",
+      "analysis": "(x−2)^2+y^2=1，圆心为(2，0)，半径为1\ny=kx，kx−y=0\nd=|ax_0^ +by_0^ +c|/√(a^2+b^2 )=|2k|/√(k^2+1^2 )<1\n4k^2<k^2+1，3k^2<1，−√3/3<k<√3/3",
       "source": "2019年真题",
       "tags": [
         "条件充分性判断"
@@ -19257,7 +19257,7 @@
         }
       ],
       "answer": [],
-      "analysis": "b^2−4ac>0\na^2−4(b−1)≥0,a^2≥4(b−1)",
+      "analysis": "b^2−4ac>0\na^2−4(b−1)≥0，a^2≥4(b−1)",
       "source": "2019年真题",
       "tags": [
         "条件充分性判断"
@@ -19397,7 +19397,7 @@
         }
       ],
       "answer": [],
-      "analysis": "Sₙ=d/2 n^2+(a_1−d/2)n\n（1）Sₙ=n^2+2n=n(n+1),d/2=1,a_1−d/2=2,a_1=3,d=2\n（2）Sₙ=n^2+2n+1=(n+1)^2",
+      "analysis": "Sₙ=d/2 n^2+(a_1−d/2)n\n（1）Sₙ=n^2+2n=n(n+1)，d/2=1，a_1−d/2=2，a_1=3，d=2\n（2）Sₙ=n^2+2n+1=(n+1)^2",
       "source": "2019年真题",
       "tags": [
         "条件充分性判断"
@@ -19408,7 +19408,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "设三角区域D由直线x+8y−56=0，x−6y+42=0与hx−y+8−6k=0(k<0)围成，则对任意(x,y)∈D,lg(x²+y²)≤2.\n（1）k∈[−∞−1]. \n（2）k∈[−1,−1/8].",
+      "stem": "设三角区域D由直线x+8y−56=0，x−6y+42=0与hx−y+8−6k=0(k<0)围成，则对任意(x，y)∈D，lg(x²+y²)≤2.\n（1）k∈[−∞−1]. \n（2）k∈[−1，−1/8].",
       "options": [
         {
           "key": "A",
@@ -20777,7 +20777,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "−1<x−a<1→a−1<x<a+1,\n−2<x−b<2→b−2<x<b+2,\n当b−2≤a−1≤a+1≤b+2，即|a−b|≤1时A∈B",
+      "analysis": "−1<x−a<1→a−1<x<a+1，\n−2<x−b<2→b−2<x<b+2，\n当b−2≤a−1≤a+1≤b+2，即|a−b|≤1时A∈B",
       "source": "2020年真题",
       "tags": [
         "不等式"
@@ -20960,7 +20960,7 @@
       "answer": [
         "B"
       ],
-      "analysis": "其平面区域是以(0,2)，(2,0)，(4,2)，(2,4)为顶点的正方形\nx²+y²的最小取值为(1,1)，最大取值为(4,2)，(2,4)\nx²+y²的取值范围是[2，20]",
+      "analysis": "其平面区域是以(0，2)，(2，0)，(4，2)，(2，4)为顶点的正方形\nx²+y²的最小取值为(1，1)，最大取值为(4，2)，(2，4)\nx²+y²的取值范围是[2，20]",
       "source": "2020年真题",
       "tags": [
         "不等式"
@@ -21082,7 +21082,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "已知数列{an}满足a_1=1,a₂=2，且a_(n+2)=a_(n+1)−a_n (n=1，2，3，…)，则a_100=（）.",
+      "stem": "已知数列{an}满足a_1=1，a₂=2，且a_(n+2)=a_(n+1)−a_n (n=1，2，3，…)，则a_100=（）.",
       "options": [
         {
           "key": "A",
@@ -21108,7 +21108,7 @@
       "answer": [
         "B"
       ],
-      "analysis": "〖a_1=1,a₂=2,a〗_3=1,a_4=−1,a_5=−2,a_6=−1\n100/6=16……4\na_100=a_4=−1",
+      "analysis": "〖a_1=1，a₂=2，a〗_3=1，a_4=−1，a_5=−2，a_6=−1\n100/6=16……4\na_100=a_4=−1",
       "source": "2020年真题",
       "tags": [
         "数列"
@@ -22934,7 +22934,7 @@
       "answer": [
         "C"
       ],
-      "analysis": "设等差为a，则三人年龄为x、x+a、x+2a\n20a=x+a,x=19a\n则三人年龄为19a、20a、21a",
+      "analysis": "设等差为a，则三人年龄为x、x+a、x+2a\n20a=x+a，x=19a\n则三人年龄为19a、20a、21a",
       "source": "2021年真题",
       "tags": [
         "等差数列"
@@ -23045,7 +23045,7 @@
       "answer": [
         "B"
       ],
-      "analysis": "4a+2b+c=c,b=−2a\n((9a+3b+c)−(4a+2b+c))/((4a+2b+c)−(a+b+c) )=(5a+b)/(3a+b)=3a/a=3",
+      "analysis": "4a+2b+c=c，b=−2a\n((9a+3b+c)−(4a+2b+c))/((4a+2b+c)−(a+b+c) )=(5a+b)/(3a+b)=3a/a=3",
       "source": "2021年真题",
       "tags": [
         "函数"
@@ -23230,7 +23230,7 @@
       "answer": [
         "C"
       ],
-      "analysis": "r=5\nA(3,4);C(3,−4)\nS=4∗6=24",
+      "analysis": "r=5\nA(3，4);C(3，−4)\nS=4∗6=24",
       "source": "2021年真题",
       "tags": [
         "解析几何"
@@ -23378,7 +23378,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "设甲酒精浓度为a，乙酒精浓度为b\n{█(&10a+12b=22∗70%,10a+12b=15.4@&20a+8b=28∗80%,10a+4b=11.2)┤\n8b=4.2,b=0.7\na=0.91",
+      "analysis": "设甲酒精浓度为a，乙酒精浓度为b\n{█(&10a+12b=22∗70%，10a+12b=15.4@&20a+8b=28∗80%，10a+4b=11.2)┤\n8b=4.2，b=0.7\na=0.91",
       "source": "2021年真题",
       "tags": [
         "应用题：浓度问题"
@@ -23415,7 +23415,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "设甲速度为v_1，乙速度为v_2，则\n{█(&2(v_1+v_2)=330@&2.4v_1=2v_2 )┤\n4.4v_1=330,v_1=75\nv_2=1.2v_1=90",
+      "analysis": "设甲速度为v_1，乙速度为v_2，则\n{█(&2(v_1+v_2)=330@&2.4v_1=2v_2 )┤\n4.4v_1=330，v_1=75\nv_2=1.2v_1=90",
       "source": "2021年真题",
       "tags": [
         "应用题：路程问题"
@@ -25088,7 +25088,7 @@
       "type": "single",
       "chapter": "问题求解",
       "difficulty": 3,
-      "stem": "设x，y为实数，则f(x,y)=x^2+4xy+5y^2−2y+2的最小值为（）。",
+      "stem": "设x，y为实数，则f(x，y)=x^2+4xy+5y^2−2y+2的最小值为（）。",
       "options": [
         {
           "key": "A",
@@ -25114,7 +25114,7 @@
       "answer": [
         "A"
       ],
-      "analysis": "f(x,y)=(x+2y)\\^2+(y−1)\\^2+1，当x＋2y=0且y= 1 时，有最小值 1",
+      "analysis": "f(x，y)=(x+2y)\\^2+(y−1)\\^2+1，当x＋2y=0且y= 1 时，有最小值 1",
       "source": "2022年真题",
       "tags": [
         "函数。完全平方公式"
@@ -25410,7 +25410,7 @@
       "answer": [
         "D"
       ],
-      "analysis": "设A玩具为x，B玩具为y，则\n{█(&x+y=1.4@&200x+150y=250)┤\n50y=30,y=0.6,x=0.8",
+      "analysis": "设A玩具为x，B玩具为y，则\n{█(&x+y=1.4@&200x+150y=250)┤\n50y=30，y=0.6，x=0.8",
       "source": "2022年真题",
       "tags": [
         "应用题：价格问题"
@@ -25849,7 +25849,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知正数列|a_n |，则|a_n |为等差数列.\n（1）a_(n+1)^2−a_n^2=2n,n=1,2,…\n（2）a₁+a₃=2a₂",
+      "stem": "已知正数列|a_n |，则|a_n |为等差数列.\n（1）a_(n+1)^2−a_n^2=2n，n=1，2，…\n（2）a₁+a₃=2a₂",
       "options": [
         {
           "key": "A",
@@ -27812,7 +27812,7 @@
         }
       ],
       "answer": [],
-      "analysis": "（1）x^2−x−2=0→(x−2)(x+1)=0，解得：x_1=−1,x_2=2，不充分\n（2）x^2+x−6=0→(x+3)(x−2)=0，解得：x_1=−3,x_2=2，不充分。\n联合：a_1 的取值只能是2，故联合充分",
+      "analysis": "（1）x^2−x−2=0→(x−2)(x+1)=0，解得：x_1=−1，x_2=2，不充分\n（2）x^2+x−6=0→(x+3)(x−2)=0，解得：x_1=−3，x_2=2，不充分。\n联合：a_1 的取值只能是2，故联合充分",
       "source": "2023年真题",
       "tags": [
         "条件充分性判断"
@@ -27858,7 +27858,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "设集合M={├ (x,y)┤| (x−a)^2+(y−b)^2≤4}，N={├ (x,y)┤|x>0,y>0}，则M∩N≠∅∩N≠∅\n（1）a<-2\n（2）b>2",
+      "stem": "设集合M={├ (x，y)┤| (x−a)^2+(y−b)^2≤4}，N={├ (x，y)┤|x>0，y>0}，则M∩N≠∅∩N≠∅\n（1）a<-2\n（2）b>2",
       "options": [
         {
           "key": "A",
@@ -27987,7 +27987,7 @@
         }
       ],
       "answer": [],
-      "analysis": "（1）各班树棵数不同，x_1+x_2+x_3+…+x_8=195，多种情况，不充分\n（2）x_1+x_2+x_3+…+x_8=195，x_1≤x_2≤x_3≤…≤x_8≤28，多种情况，不充分\n联合：要使得x_1 最小，则x_2,x_3,…,x_8 尽可能去最大值的，那么x_2,x_3,…,x_8，应取 28，27，……，22，则最少x的最小值是20\n故联合充分",
+      "analysis": "（1）各班树棵数不同，x_1+x_2+x_3+…+x_8=195，多种情况，不充分\n（2）x_1+x_2+x_3+…+x_8=195，x_1≤x_2≤x_3≤…≤x_8≤28，多种情况，不充分\n联合：要使得x_1 最小，则x_2，x_3，…，x_8 尽可能去最大值的，那么x_2，x_3，…，x_8，应取 28，27，……，22，则最少x的最小值是20\n故联合充分",
       "source": "2023年真题",
       "tags": [
         "最值问题"
@@ -27998,7 +27998,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 4,
-      "stem": "设数列{a_n }的前n项和为S_n，则a_1,a_2,a_3,a_4,…为等比数列\n（1）S_(n+1)>S_n,n=1,2,3,…\n（2）{S_n }是等比数列",
+      "stem": "设数列{a_n }的前n项和为S_n，则a_1，a_2，a_3，a_4，…为等比数列\n（1）S_(n+1)>S_n，n=1，2，3，…\n（2）{S_n }是等比数列",
       "options": [
         {
           "key": "A",
@@ -28022,7 +28022,7 @@
         }
       ],
       "answer": [],
-      "analysis": "（1）表示S_n 是递增的，无法判断等比数列\n（2）表示{S_n }等比数列，可以使1，0，0，0……，此时有某项为 0，显然a_2,a_3,a_4 不是等比数列\n联合：设S_(n+1)=qS_n①，\n当n≥2，构造新等量：S_n=qS_(n−1)②，\n①②相减可得：a_(n+1)=(q−1) S_n③，\n构造新关系：a_n=(q−1) S_(n−1)④，\n因为数列递增，q≠1，故③和④作商，可得：a_(n+1)/a_n =S_n/S_(n−1) =q\n故联合充分",
+      "analysis": "（1）表示S_n 是递增的，无法判断等比数列\n（2）表示{S_n }等比数列，可以使1，0，0，0……，此时有某项为 0，显然a_2，a_3，a_4 不是等比数列\n联合：设S_(n+1)=qS_n①，\n当n≥2，构造新等量：S_n=qS_(n−1)②，\n①②相减可得：a_(n+1)=(q−1) S_n③，\n构造新关系：a_n=(q−1) S_(n−1)④，\n因为数列递增，q≠1，故③和④作商，可得：a_(n+1)/a_n =S_n/S_(n−1) =q\n故联合充分",
       "source": "2023年真题",
       "tags": [
         "等比数列"
@@ -29459,7 +29459,7 @@
       "answer": [
         "B"
       ],
-      "analysis": "f(x)=(x^4+5x^2+16)/x^2 =x^2+16/x^2 +5\n特值法\nx=1,f(x)=22\nx=2,f(x)=13",
+      "analysis": "f(x)=(x^4+5x^2+16)/x^2 =x^2+16/x^2 +5\n特值法\nx=1，f(x)=22\nx=2，f(x)=13",
       "source": "2024年真题",
       "tags": [
         "代数"
@@ -29496,7 +29496,7 @@
       "answer": [
         "B"
       ],
-      "analysis": "根据 OA//BC，斜率相同：(1−0)/(a−0)=(b−2)/(2−1)⇒ab−2a=1\n根据 AB//OC，斜率相同：(b−1)/(2−a)=(2−0)/(1−0)⇒b−1=4−2a\n解得：a=1,b=3，则a+b=4.",
+      "analysis": "根据 OA//BC，斜率相同：(1−0)/(a−0)=(b−2)/(2−1)⇒ab−2a=1\n根据 AB//OC，斜率相同：(b−1)/(2−a)=(2−0)/(1−0)⇒b−1=4−2a\n解得：a=1，b=3，则a+b=4.",
       "source": "2024年真题",
       "tags": [
         "解析几何"
@@ -29866,7 +29866,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "当过A点时x+2y有最大值，A点坐标(2,4)，代入可得x+2y=10",
+      "analysis": "当过A点时x+2y有最大值，A点坐标(2，4)，代入可得x+2y=10",
       "source": "2024年真题",
       "tags": [
         "解析几何"
@@ -31822,7 +31822,7 @@
       "answer": [
         "E"
       ],
-      "analysis": "x^2+y^2−16x−12y+75=0\n(x−8)^2+(y−6)^2=25\nOA=10,OB=5√3,AB=5\nS=1/2 5√3∗5=25/2 √3",
+      "analysis": "x^2+y^2−16x−12y+75=0\n(x−8)^2+(y−6)^2=25\nOA=10，OB=5√3，AB=5\nS=1/2 5√3∗5=25/2 √3",
       "source": "2025年真题",
       "tags": [
         "解析几何"
@@ -32044,7 +32044,7 @@
       "answer": [
         "C"
       ],
-      "analysis": "29/35=b/a+d/c=(bc+da)/ac\n{█(&bc+da=29@&ac=35)┤\na=5,c=7\nd=3,b=2",
+      "analysis": "29/35=b/a+d/c=(bc+da)/ac\n{█(&bc+da=29@&ac=35)┤\na=5，c=7\nd=3，b=2",
       "source": "2025年真题",
       "tags": [
         "代数。特值法"
@@ -32372,7 +32372,7 @@
       "type": "single",
       "chapter": "条件充分性判断",
       "difficulty": 3,
-      "stem": "已知a_1,a_2,a_3,a_4,a_5 为实数，则a_1,a_2,a_3,a_4,a_5 成等差数列。\n（1）a_1+a_5=a_2+a_4  ；\n（2） a_1+a_5=2a_3",
+      "stem": "已知a_1，a_2，a_3，a_4，a_5 为实数，则a_1，a_2，a_3，a_4，a_5 成等差数列。\n（1）a_1+a_5=a_2+a_4  ；\n（2） a_1+a_5=2a_3",
       "options": [
         {
           "key": "A",
