@@ -9,7 +9,7 @@ import { useBankStore } from '@/stores/bank'
 import { useUserDataStore } from '@/stores/userData'
 import type { QuizRecord } from '@/types'
 import { fmtDuration, fmtTime, fmtTimeShort, typeLabel } from '@/utils/format'
-import QuestionDetail from '@/components/QuestionDetail.vue'
+import QuizDetail from '@/components/QuizDetail.vue'
 
 const bankStore = useBankStore()
 const userStore = useUserDataStore()
@@ -169,7 +169,7 @@ onBeforeUnmount(() => {
                   </span>
                   <span class="muted">{{ d.gotScore }} / {{ d.score }} 分</span>
                 </div>
-                <QuestionDetail v-if="bankStore.questionMap.get(d.questionId)"
+                <QuizDetail v-if="bankStore.questionMap.get(d.questionId)"
                   :question="bankStore.questionMap.get(d.questionId)!" :selected="selectedKeysOf(row, d.questionId)"
                   :your-answer="d.yourAnswer" />
                 <div v-else class="muted">题目已删除。你的答案：{{ d.yourAnswer }} · 正确答案：{{ d.rightAnswer }}</div>

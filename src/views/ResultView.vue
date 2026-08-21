@@ -11,7 +11,7 @@ import { recomputeRecord } from '@/services/session'
 import { useUserDataStore } from '@/stores/userData'
 import type { Question, QuizRecord, RecordDetail } from '@/types'
 import { fmtDuration, fmtTime } from '@/utils/format'
-import QuestionDetail from '@/components/QuestionDetail.vue'
+import QuizDetail from '@/components/QuizDetail.vue'
 import RichText from '@/components/RichText.vue'
 
 const route = useRoute()
@@ -153,7 +153,7 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
         </span>
         <span class="muted">{{ d.gotScore }} / {{ d.score }} 分</span>
       </div>
-      <QuestionDetail v-if="qMap.get(d.questionId)" :question="qMap.get(d.questionId)!" :selected="selectedKeys(d)"
+      <QuizDetail v-if="qMap.get(d.questionId)" :question="qMap.get(d.questionId)!" :selected="selectedKeys(d)"
         :your-answer="d.yourAnswer" />
       <RichText v-else class="q-stem" :content="d.stem" />
       <div class="muted" style="margin-top: 8px">你的答案：{{ d.yourAnswer }} · 正确答案：{{ d.rightAnswer }}</div>

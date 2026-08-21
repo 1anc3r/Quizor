@@ -9,7 +9,7 @@ import { useBankStore } from '@/stores/bank'
 import { useUserDataStore } from '@/stores/userData'
 import type { FavoriteItem, Question, QuestionType } from '@/types'
 import { fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
-import QuestionDetail from '@/components/QuestionDetail.vue'
+import QuizDetail from '@/components/QuizDetail.vue'
 
 const router = useRouter()
 const bankStore = useBankStore()
@@ -130,7 +130,7 @@ onMounted(async () => {
         <el-table-column type="expand">
           <template #default="{ row }">
             <div style="padding: 8px 16px">
-              <QuestionDetail :question="row.question" />
+              <QuizDetail :question="row.question" />
               <div class="muted" style="margin-top: 8px">收藏时间：{{ fmtTime(row.item.time) }}</div>
             </div>
           </template>

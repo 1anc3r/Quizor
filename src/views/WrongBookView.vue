@@ -10,7 +10,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { Question, QuestionType, WrongItem } from '@/types'
 import { fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
-import QuestionDetail from '@/components/QuestionDetail.vue'
+import QuizDetail from '@/components/QuizDetail.vue'
 
 const router = useRouter()
 const bankStore = useBankStore()
@@ -139,7 +139,7 @@ onMounted(async () => {
         <el-table-column type="expand">
           <template #default="{ row }">
             <div style="padding: 8px 16px">
-              <QuestionDetail :question="row.question" />
+              <QuizDetail :question="row.question" />
               <div class="muted" style="margin-top: 8px">
                 你的答案：{{ row.item.lastAnswer || '（未作答）' }} · 正确答案：{{
                   row.question.type === 'text' ? '见解析' : [...row.question.answer].sort().join('、')

@@ -16,7 +16,7 @@ import { useBankStore } from '@/stores/bank'
 import { plainText, shortId, truncate, typeLabel } from '@/utils/format'
 import { genId } from '@/utils/id'
 import PaperFormDialog from '@/components/PaperFormDialog.vue'
-import QuestionFormDialog from '@/components/QuestionFormDialog.vue'
+import QuizFormDialog from '@/components/QuizFormDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -579,7 +579,7 @@ function onResize(): void {
         @save="onSavePaper" />
 
       <!-- 题目管理窗口 -->
-      <QuestionFormDialog v-model="qDialogVisible" :question="editingQuestion" :bank-id="meta.id"
+      <QuizFormDialog v-model="qDialogVisible" :question="editingQuestion" :bank-id="meta.id"
         :chapters="chapterOptions" :chapter-type="chapterType" :chapter-option-count="chapterOptionCount"
         :all-tags="allTags" :existing-ids="data.Questions.map((q) => q.id)" @save="onSaveQuestion" />
 
