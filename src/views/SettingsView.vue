@@ -50,40 +50,61 @@ function isBackupFile(json: unknown): json is Record<string, unknown> {
   return !!json && typeof json === 'object' && Object.keys(json as object).some((k) => k.startsWith('quizor:'))
 }
 
-async function onImportFile(uploadFile: { raw?: File }): Promise<void> {
+async function readJsonFile(file: File): Promise<unknown> {
+  const text = await file.text()
+  return JSON.parse(text)
+}
+
+/** 导入题库 JSON：{ name?, rule?, Questions, Papers? }，作为新题库加入 */
+async function onImportBankFile(uploadFile: { raw?: File }): Promise<void> {
   const file = uploadFile.raw
   if (!file) return
   importing.value = true
   try {
-    const text = await file.text()
-    const json: unknown = JSON.parse(text)
-    if (isBankFile(json)) {
-      // 题库文件：{ name?, rule?, Questions, Papers? }
-      const name = json.name || file.name.replace(/\.json$/i, '')
-      const meta = await createBank(name, json.rule ?? defaultRule())
-      const data: BankData = {
-        Questions: Array.isArray(json.Questions) ? json.Questions : [],
-        Papers: Array.isArray(json.Papers) ? json.Papers : []
-      }
-      await saveBank(meta, data)
-      await bankStore.afterBankEdited(meta.id)
-      ElMessage.success(`题库「${meta.name}」导入成功`)
-    } else if (isBackupFile(json)) {
-      try {
-        await ElMessageBox.confirm('导入备份将覆盖本浏览器内的全部题库编辑、错题、收藏、记录与设置，确定继续吗？', '导入备份', {
-          type: 'warning',
-          confirmButtonText: '覆盖导入',
-          cancelButtonText: '取消'
-        })
-      } catch {
-        return
-      }
-      storage.importAll(json)
-      ElMessage.success('备份导入成功，即将刷新页面')
-      window.setTimeout(() => window.location.reload(), 800)
-    } else {
-      ElMessage.error('无法识别的 JSON 文件格式')
+    const json = await readJsonFile(file)
+    if (!isBankFile(json)) {
+      ElMessage.error('文件格式不符：题库文件应包含 Questions 数组（{ name?, rule?, Questions, Papers? }）')
+      return
     }
+    const name = json.name || file.name.replace(/\.json$/i, '')
+    const meta = await createBank(name, json.rule ?? defaultRule())
+    const data: BankData = {
+      Questions: Array.isArray(json.Questions) ? json.Questions : [],
+      Papers: Array.isArray(json.Papers) ? json.Papers : []
+    }
+    await saveBank(meta, data)
+    await bankStore.afterBankEdited(meta.id)
+    ElMessage.success(`题库「${meta.name}」导入成功`)
+  } catch {
+    ElMessage.error('文件解析失败，请确认是合法的 JSON 文件')
+  } finally {
+    importing.value = false
+  }
+}
+
+/** 导入备份 JSON：应用全部本地数据（quizor: 前缀键值对），覆盖式恢复 */
+async function onImportBackupFile(uploadFile: { raw?: File }): Promise<void> {
+  const file = uploadFile.raw
+  if (!file) return
+  importing.value = true
+  try {
+    const json = await readJsonFile(file)
+    if (!isBackupFile(json)) {
+      ElMessage.error('文件格式不符：备份文件应为应用导出的全部本地数据（quizor: 前缀键值对）')
+      return
+    }
+    try {
+      await ElMessageBox.confirm('导入备份将覆盖本浏览器内的全部题库编辑、错题、收藏、记录与设置，确定继续吗？', '导入备份', {
+        type: 'warning',
+        confirmButtonText: '覆盖导入',
+        cancelButtonText: '取消'
+      })
+    } catch {
+      return
+    }
+    storage.importAll(json)
+    ElMessage.success('备份导入成功，即将刷新页面')
+    window.setTimeout(() => window.location.reload(), 800)
   } catch {
     ElMessage.error('文件解析失败，请确认是合法的 JSON 文件')
   } finally {
@@ -182,11 +203,15 @@ onMounted(async () => {
     <el-card class="page-card" shadow="never">
       <div class="card-title"><span class="title-text">导入导出</span></div>
       <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px">
-        <el-button @click="onExportBank" style="margin: 0px;">导出当前题库 JSON</el-button>
-        <el-button @click="onExportBackup" style="margin: 0px;">导出全部数据备份</el-button>
+        <el-button type="warning" plain @click="onExportBank" style="margin: 0px;">导出题库 JSON</el-button>
         <el-upload :show-file-list="false" accept=".json,application/json" :http-request="() => { }"
-          :on-change="onImportFile">
-          <el-button type="primary" :loading="importing">导入题库 / 备份 JSON</el-button>
+          :on-change="onImportBankFile">
+          <el-button type="success" plain :loading="importing">导入题库 JSON</el-button>
+        </el-upload>
+        <el-button type="warning" plain @click="onExportBackup" style="margin: 0px;">导出备份 JSON</el-button>
+        <el-upload :show-file-list="false" accept=".json,application/json" :http-request="() => { }"
+          :on-change="onImportBackupFile">
+          <el-button type="success" plain :loading="importing" style="margin: 0px;">导入备份 JSON</el-button>
         </el-upload>
       </div>
       <el-alert type="info" :closable="false" show-icon style="margin-top: 12px">
