@@ -55,3 +55,13 @@ export function importAll(data: Record<string, unknown>): void {
     }
   }
 }
+
+/** 清理缓存：移除 localStorage 中全部 quizor: 前缀的应用数据 */
+export function clearAll(): void {
+  const keys: string[] = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)
+    if (k && k.startsWith(PREFIX)) keys.push(k)
+  }
+  keys.forEach((k) => localStorage.removeItem(k))
+}

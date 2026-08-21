@@ -91,6 +91,23 @@ async function onImportFile(uploadFile: { raw?: File }): Promise<void> {
   }
 }
 
+/* ---------- 清理缓存 ---------- */
+
+async function onClearCache(): Promise<void> {
+  try {
+    await ElMessageBox.confirm(
+      '将清空本浏览器内的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），且不可恢复。确定清理吗？',
+      '清理缓存',
+      { type: 'error', confirmButtonText: '清空全部数据', cancelButtonText: '取消' }
+    )
+  } catch {
+    return
+  }
+  storage.clearAll()
+  ElMessage.success('缓存已清理，即将刷新页面')
+  window.setTimeout(() => window.location.reload(), 800)
+}
+
 function onResize(): void {
   isMobile.value = window.innerWidth <= 768
 }
@@ -176,6 +193,17 @@ onMounted(async () => {
         题库文件格式：{ name, rule, Questions, Papers }；备份文件为应用全部本地数据（quizor: 前缀）。当前题库 ID：{{
           bankStore.currentId || '无'
         }}<template v-if="bankStore.meta">，最近更新以浏览器本地存储为准（{{ fmtTime(Date.now()) }}）</template>。
+      </el-alert>
+    </el-card>
+
+    <!-- 清理缓存 -->
+    <el-card class="page-card" shadow="never">
+      <div class="card-title"><span class="title-text">清理缓存</span></div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px">
+        <el-button type="danger" @click="onClearCache">清理缓存</el-button>
+      </div>
+      <el-alert type="warning" :closable="false" show-icon style="margin-top: 12px">
+        将清空本浏览器 localStorage 中保存的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），清理后自动刷新页面，且不可恢复。
       </el-alert>
     </el-card>
   </div>
