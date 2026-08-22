@@ -272,9 +272,9 @@ onBeforeUnmount(() => {
       <div class="quiz-main">
         <el-card v-if="current" shadow="never" class="page-card">
           <div class="muted" style="margin-bottom: 10px">
-            第 {{ index + 1 }} 题 · {{ current.chapter }} · {{ typeLabel(current.type) }} · 难度
-            <el-rate v-model="current.difficulty" size="small" :max="5" disabled />
-            <template v-if="mode === 'exam'"> · {{ current.score }} 分</template>
+            第 {{ index + 1 }} 题 · {{ current.chapter }} · {{ typeLabel(current.type) }} · {{ current.score }} 分
+            <template v-if="mode !== 'exam'"> · 难度</template>
+            <el-rate  v-if="mode !== 'exam'" v-model="current.difficulty" size="small" :max="5" disabled />
           </div>
           <RichText class="q-stem" :content="current.stem" />
 
