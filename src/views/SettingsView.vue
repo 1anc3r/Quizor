@@ -16,7 +16,7 @@ const settingsStore = useSettingsStore()
 const s = settingsStore.settings
 const isMobile = ref(window.innerWidth <= 768)
 
-const darkMode = computed({
+const theme = computed({
   get: () => s.theme === 'dark',
   set: (v: boolean) => (s.theme = v ? 'dark' : 'light')
 })
@@ -146,7 +146,7 @@ onMounted(async () => {
       <div class="card-title"><span class="title-text">外观偏好</span></div>
       <el-form label-width="110px" style="margin-top: 12px; max-width: 560px">
         <el-form-item label="深色模式">
-          <el-switch v-model="darkMode" active-text="深色" inactive-text="浅色" />
+          <el-switch v-model="theme" active-text="深色" inactive-text="浅色" />
         </el-form-item>
         <el-form-item label="题干/选项字号">
           <el-radio-group v-model="s.fontSize">
