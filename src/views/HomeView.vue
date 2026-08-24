@@ -4,7 +4,7 @@
  */
 import { computed, onMounted, ref, watch, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { Plus, Edit } from '@element-plus/icons-vue'
+import { Plus, Edit, Search } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bank'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/services/session'
@@ -226,7 +226,13 @@ onMounted(async () => {
       </div>
 
       <el-divider content-position="left"><strong>试卷列表（{{ filteredPapers.length }}）</strong></el-divider>
-      <el-input v-model="paperKeyword" placeholder="关键字查询试卷" clearable style="width: 324px; margin-bottom: 10px" />
+      <el-input
+        v-model="paperKeyword"
+        placeholder="输入关键字实时过滤试卷"
+        clearable
+        :prefix-icon="Search"
+        style="margin: 12px 0"
+      />
       <el-table stripe :data="filteredPapers">
         <el-table-column prop="name" label="试卷名称" min-width="200" show-overflow-tooltip />
         <el-table-column label="题数" width="80">
@@ -241,10 +247,14 @@ onMounted(async () => {
       </el-table>
 
       <el-divider content-position="left"><strong>题目列表（{{chapterGroups.reduce((s, g) => s + g.questions.length, 0)
-          }}）</strong></el-divider>
-      <el-input v-model="questionKeyword" placeholder="关键字查询题目（题干 / 章节 / 标签）" clearable
-        style="width: 324px; margin-bottom: 10px" />
-
+          }}）</strong></el-divider>      
+      <el-input
+        v-model="questionKeyword"
+        placeholder="输入关键字实时过滤题目（题干 / 章节 / 标签）"
+        clearable
+        :prefix-icon="Search"
+        style="margin: 12px 0"
+      />
       <el-collapse v-model="activeChapters">
         <el-collapse-item v-for="g in chapterGroups" :key="g.chapter" :name="g.chapter">
           <template #title>{{ g.chapter }}（{{ g.questions.length }}）</template>

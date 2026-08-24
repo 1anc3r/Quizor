@@ -11,7 +11,7 @@
   --q-danger: #f56c6c;
   --q-warning: #e6a23c;
   --q-nav-height: 56px;
-  --q-radius: 10px;
+  --q-radius: 4px;
 }
 
 html.dark {

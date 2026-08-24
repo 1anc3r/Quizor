@@ -79,10 +79,10 @@ export const useBankStore = defineStore('bank', () => {
     }
   }
 
-  async function removeBank(id: string): Promise<void> {
+  async function deleteBank(id: string): Promise<void> {
     await svcDeleteBank(id)
     await afterBankEdited(id)
   }
 
-  return { manifest, currentId, bank, meta, loading, chapters, sources, questionMap, init, loadCurrent, switchBank, afterBankEdited, removeBank }
+  return { manifest, currentId, bank, meta, loading, chapters, sources, questionMap, init, loadCurrent, switchBank, afterBankEdited, removeBank: deleteBank }
 })

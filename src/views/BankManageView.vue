@@ -22,23 +22,23 @@ const route = useRoute()
 const router = useRouter()
 const bankStore = useBankStore()
 
+const isNewMode = computed(() => bankId.value === 'new' || !bankId.value)
 const bankId = computed(() => String(route.params.id ?? 'new'))
-const isNew = computed(() => bankId.value === 'new' || !bankId.value)
 const ready = ref(false)
 const isMobile = ref(window.innerWidth <= 768)
 
-const meta = reactive<BankMeta>({
+const bankMeta = reactive<BankMeta>({
   id: '',
   name: '',
   bankFile: '',
   questionCount: 0,
   rule: defaultRule()
 })
-const data = reactive<BankData>({ Questions: [], Papers: [] })
+const bankData = reactive<BankData>({ Questions: [], Papers: [] })
 
 onMounted(async () => {
-  if (isNew.value) {
-    meta.rule = defaultRule()
+  if (isNewMode.value) {
+    bankMeta.rule = defaultRule()
   } else {
     const m = await loadManifest()
     const found = m.Banks.find((b) => b.id === bankId.value)
@@ -47,10 +47,10 @@ onMounted(async () => {
       router.replace('/')
       return
     }
-    Object.assign(meta, JSON.parse(JSON.stringify(found)))
+    Object.assign(bankMeta, JSON.parse(JSON.stringify(found)))
     const d = JSON.parse(JSON.stringify(await loadBank(bankId.value))) as BankData
-    data.Questions = d.Questions
-    data.Papers = d.Papers
+    bankData.Questions = d.Questions
+    bankData.Papers = d.Papers
   }
   ready.value = true
   window.addEventListener('resize', onResize)
@@ -60,9 +60,9 @@ onMounted(async () => {
 
 // 名称自动转拼音作为题库 ID
 watch(
-  () => meta.name,
+  () => bankMeta.name,
   (name) => {
-    if (isNew.value) meta.id = nameToBankId(name)
+    if (isNewMode.value) bankMeta.id = nameToBankId(name)
   }
 )
 
@@ -70,24 +70,24 @@ let saveTimer: number | null = null
 
 /** 编辑模式：防抖自动持久化 */
 function persist(): void {
-  if (isNew.value || !ready.value) return
+  if (isNewMode.value || !ready.value) return
   if (saveTimer !== null) window.clearTimeout(saveTimer)
   saveTimer = window.setTimeout(async () => {
-    await saveBank(JSON.parse(JSON.stringify(meta)), JSON.parse(JSON.stringify(data)))
-    await bankStore.afterBankEdited(meta.id)
+    await saveBank(JSON.parse(JSON.stringify(bankMeta)), JSON.parse(JSON.stringify(bankData)))
+    await bankStore.afterBankEdited(bankMeta.id)
   }, 300)
 }
 
 async function onCreateBank(): Promise<void> {
-  if (!meta.name.trim()) {
+  if (!bankMeta.name.trim()) {
     ElMessage.warning('请填写题库名称')
     return
   }
-  if (!meta.rule.composition.length) {
+  if (!bankMeta.rule.composition.length) {
     ElMessage.warning('请至少添加一条组卷规则')
     return
   }
-  const created = await createBank(meta.name.trim(), JSON.parse(JSON.stringify(meta.rule)))
+  const created = await createBank(bankMeta.name.trim(), JSON.parse(JSON.stringify(bankMeta.rule)))
   await bankStore.afterBankEdited(created.id)
   ElMessage.success(`题库已创建，ID：${created.id}`)
   router.replace(`/bank/manage/${created.id}`)
@@ -95,7 +95,7 @@ async function onCreateBank(): Promise<void> {
 
 async function onDeleteBank(): Promise<void> {
   try {
-    await ElMessageBox.confirm(`确定删除题库「${meta.name}」吗？该操作不可恢复。`, '删除题库', {
+    await ElMessageBox.confirm(`确定删除题库「${bankMeta.name}」吗？该操作不可恢复。`, '删除题库', {
       type: 'error',
       confirmButtonText: '删除',
       cancelButtonText: '取消'
@@ -103,7 +103,7 @@ async function onDeleteBank(): Promise<void> {
   } catch {
     return
   }
-  await bankStore.removeBank(meta.id)
+  await bankStore.removeBank(bankMeta.id)
   ElMessage.success('题库已删除')
   router.replace('/')
 }
@@ -121,30 +121,30 @@ const composeSelection = ref<ComposeItem[]>([])
 
 const chapterOptions = computed<string[]>(() => {
   const set = new Set<string>()
-  meta.rule.composition.forEach((c) => c.chapter && set.add(c.chapter))
-  data.Questions.forEach((q) => q.chapter && set.add(q.chapter))
+  bankMeta.rule.composition.forEach((c) => c.chapter && set.add(c.chapter))
+  bankData.Questions.forEach((q) => q.chapter && set.add(q.chapter))
   return [...set]
 })
 
 const sourceOptions = computed<{ label: string; value: string }[]>(() => {
   const set = new Set<string>()
-  data.Questions.forEach((q) => q.source && set.add(q.source))
+  bankData.Questions.forEach((q) => q.source && set.add(q.source))
   return [...set].map((s) => ({ label: s, value: s }))
 })
 
 function addCompose(): void {
-  meta.rule.composition.push({ chapter: '', type: 'single', count: 10, scoreEach: 2, optionCount: 4 })
+  bankMeta.rule.composition.push({ chapter: '', type: 'single', count: 10, scoreEach: 2, optionCount: 4 })
   persist()
 }
 
 function removeCompose(i: number): void {
-  meta.rule.composition.splice(i, 1)
+  bankMeta.rule.composition.splice(i, 1)
   persist()
 }
 
 function removeComposeBatch(): void {
   const set = new Set(composeSelection.value)
-  meta.rule.composition = meta.rule.composition.filter((c) => !set.has(c))
+  bankMeta.rule.composition = bankMeta.rule.composition.filter((c) => !set.has(c))
   composeSelection.value = []
   persist()
 }
@@ -152,14 +152,14 @@ function removeComposeBatch(): void {
 /** 章节 → 题型 / 选项数 映射（题目管理窗口自动匹配用） */
 const chapterType = computed<Record<string, QuestionType>>(() => {
   const m: Record<string, QuestionType> = {}
-  meta.rule.composition.forEach((c) => {
+  bankMeta.rule.composition.forEach((c) => {
     if (c.chapter && !m[c.chapter]) m[c.chapter] = c.type
   })
   return m
 })
 const chapterOptionCount = computed<Record<string, number>>(() => {
   const m: Record<string, number> = {}
-  meta.rule.composition.forEach((c) => {
+  bankMeta.rule.composition.forEach((c) => {
     if (c.chapter && !m[c.chapter]) m[c.chapter] = c.optionCount ?? 4
   })
   return m
@@ -175,7 +175,7 @@ const editingPaper = ref<Paper>({ id: '', name: '', source: '', difficulty: 3, q
 
 const filteredPapers = computed(() => {
   const kw = pKeyword.value.trim().toLowerCase()
-  return data.Papers.filter((p) => {
+  return bankData.Papers.filter((p) => {
     if (pSource.value && p.source !== pSource.value) return false
     if (!kw) return true
     return p.name.toLowerCase().includes(kw) || p.source.toLowerCase().includes(kw) || p.source.toLowerCase().includes(pSource.value)
@@ -219,9 +219,9 @@ function openPaperDialog(p?: Paper): void {
 }
 
 function onSavePaper(p: Paper): void {
-  const i = data.Papers.findIndex((x) => x.id === p.id)
-  if (i >= 0) data.Papers[i] = p
-  else data.Papers.push(p)
+  const i = bankData.Papers.findIndex((x) => x.id === p.id)
+  if (i >= 0) bankData.Papers[i] = p
+  else bankData.Papers.push(p)
   persist()
   ElMessage.success('试卷已保存')
 }
@@ -232,7 +232,7 @@ async function removePaper(p: Paper): Promise<void> {
   } catch {
     return
   }
-  data.Papers = data.Papers.filter((x) => x.id !== p.id)
+  bankData.Papers = bankData.Papers.filter((x) => x.id !== p.id)
   persist()
 }
 
@@ -243,7 +243,7 @@ async function removePaperBatch(): Promise<void> {
     return
   }
   const ids = new Set(pSelection.value.map((p) => p.id))
-  data.Papers = data.Papers.filter((p) => !ids.has(p.id))
+  bankData.Papers = bankData.Papers.filter((p) => !ids.has(p.id))
   pSelection.value = []
   persist()
 }
@@ -262,7 +262,7 @@ const addToPaperTarget = ref('')
 
 const filteredQuestions = computed(() => {
   const kw = qKeyword.value.trim().toLowerCase()
-  return data.Questions.filter((q) => {
+  return bankData.Questions.filter((q) => {
     if (qChapter.value && q.chapter !== qChapter.value) return false
     if (qType.value && q.type !== qType.value) return false
     if (qSource.value && q.source !== qSource.value) return false
@@ -304,7 +304,7 @@ watch(
 
 const allTags = computed<string[]>(() => {
   const set = new Set<string>()
-  data.Questions.forEach((q) => q.tags.forEach((t) => t && set.add(t)))
+  bankData.Questions.forEach((q) => q.tags.forEach((t) => t && set.add(t)))
   return [...set]
 })
 
@@ -314,9 +314,9 @@ function openQuestionDialog(q?: Question): void {
 }
 
 function onSaveQuestion(q: Question): void {
-  const i = data.Questions.findIndex((x) => x.id === q.id)
-  if (i >= 0) data.Questions[i] = q
-  else data.Questions.push(q)
+  const i = bankData.Questions.findIndex((x) => x.id === q.id)
+  if (i >= 0) bankData.Questions[i] = q
+  else bankData.Questions.push(q)
   persist()
   ElMessage.success('题目已保存')
 }
@@ -327,8 +327,8 @@ async function removeQuestion(q: Question): Promise<void> {
   } catch {
     return
   }
-  data.Questions = data.Questions.filter((x) => x.id !== q.id)
-  data.Papers.forEach((p) => (p.questionIds = p.questionIds.filter((id) => id !== q.id)))
+  bankData.Questions = bankData.Questions.filter((x) => x.id !== q.id)
+  bankData.Papers.forEach((p) => (p.questionIds = p.questionIds.filter((id) => id !== q.id)))
   persist()
 }
 
@@ -339,8 +339,8 @@ async function removeQuestionBatch(): Promise<void> {
     return
   }
   const ids = new Set(qSelection.value.map((q) => q.id))
-  data.Questions = data.Questions.filter((q) => !ids.has(q.id))
-  data.Papers.forEach((p) => (p.questionIds = p.questionIds.filter((id) => !ids.has(id))))
+  bankData.Questions = bankData.Questions.filter((q) => !ids.has(q.id))
+  bankData.Papers.forEach((p) => (p.questionIds = p.questionIds.filter((id) => !ids.has(id))))
   qSelection.value = []
   persist()
 }
@@ -350,16 +350,16 @@ function openAddToPaper(): void {
     ElMessage.warning('请先勾选题目')
     return
   }
-  if (!data.Papers.length) {
+  if (!bankData.Papers.length) {
     ElMessage.warning('当前题库还没有试卷，请先新增试卷')
     return
   }
-  addToPaperTarget.value = data.Papers[0].id
+  addToPaperTarget.value = bankData.Papers[0].id
   addToPaperVisible.value = true
 }
 
 function confirmAddToPaper(): void {
-  const paper = data.Papers.find((p) => p.id === addToPaperTarget.value)
+  const paper = bankData.Papers.find((p) => p.id === addToPaperTarget.value)
   if (!paper) return
   const exist = new Set(paper.questionIds)
   let added = 0
@@ -381,35 +381,38 @@ function onResize(): void {
 
 <template>
   <div class="app-content" v-if="ready">
-    <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · {{ isNew ? '新增题库' : `编辑题库` }}</span></div>
+    <div v-if="isMobile" class="brand" style="margin-bottom: 16px;">Quizor<span>做题家 · {{ isNewMode ? '新增题库' : `编辑题库` }}</span></div>
     <!-- 题库基本信息卡片 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title">
-        <span class="title-text">{{ isNew ? '新增题库' : `编辑题库` }}</span>
+        <span class="title-text">{{ isNewMode ? '新增题库' : `编辑题库` }}</span>
         <div>
-          <el-button v-if="isNew" type="primary" @click="onCreateBank">创建题库</el-button>
+          <el-button v-if="isNewMode" type="primary" @click="onCreateBank">创建题库</el-button>
           <el-button v-else type="danger" plain :icon="Delete" @click="onDeleteBank">删除题库</el-button>
           <el-button @click="router.back()">返回</el-button>
         </div>
       </div>
       <el-form label-width="90px" style="margin-top: 16px;">
         <el-form-item label="题库名称" required>
-          <el-input v-model="meta.name" :disabled="!isNew" placeholder="如：199_管理类综合能力" style="max-width: 320px"
+          <el-input v-model="bankMeta.name" 
+            :disabled="!isNewMode" 
+            placeholder="如：199_管理类综合能力"
+            maxlength="100"
             @input="persist" />
         </el-form-item>
         <el-form-item label="题库 ID">
-          <el-tag>{{ meta.id || '（由名称自动生成拼音 ID）' }}</el-tag>
+          <el-tag>{{ bankMeta.id || '（由名称自动生成拼音 ID）' }}</el-tag>
           <span class="muted" style="margin-left: 8px">名称自动转拼音，用于创建题库 ID</span>
         </el-form-item>
         <el-form-item label="时长" required>
-          <el-input-number v-model="meta.rule.durationMinutes" :min="1" :max="600" @change="persist" />
+          <el-input-number v-model="bankMeta.rule.durationMinutes" :min="1" :max="600" @change="persist" />
           <span class="muted" style="margin-left: 8px">分钟</span>
         </el-form-item>
         <el-form-item label="总分" required>
-          <el-input-number v-model="meta.rule.totalScore" :min="1" :max="1000" @change="persist" />
+          <el-input-number v-model="bankMeta.rule.totalScore" :min="1" :max="1000" @change="persist" />
         </el-form-item>
         <el-form-item label="及格线">
-          <el-input-number v-model="meta.rule.passScore" :min="0" :max="1000" placeholder="可选" @change="persist" />
+          <el-input-number v-model="bankMeta.rule.passScore" :min="0" :max="1000" placeholder="可选" @change="persist" />
           <span class="muted" style="margin-left: 8px">可选</span>
         </el-form-item>
         <el-form-item label="组卷规则">
@@ -421,7 +424,7 @@ function onResize(): void {
                 批量删除（{{ composeSelection.length }}）
               </el-button>
             </div>
-            <el-table stripe :data="meta.rule.composition"
+            <el-table stripe :data="bankMeta.rule.composition"
               @selection-change="(rows: ComposeItem[]) => (composeSelection = rows)">
               <el-table-column type="selection" width="40" fixed="left" />
               <el-table-column label="章节" width="200">
@@ -466,7 +469,7 @@ function onResize(): void {
       </el-form>
     </el-card>
 
-    <template v-if="!isNew">
+    <template v-if="!isNewMode">
       <!-- 试卷列表卡片 -->
       <el-card class="page-card" shadow="never">
         <div class="card-title">
@@ -575,18 +578,18 @@ function onResize(): void {
       </el-card>
 
       <!-- 试卷管理窗口 -->
-      <PaperFormDialog v-model="pDialogVisible" :paper="editingPaper" :questions="data.Questions"
+      <PaperFormDialog v-model="pDialogVisible" :paper="editingPaper" :questions="bankData.Questions"
         @save="onSavePaper" />
 
       <!-- 题目管理窗口 -->
-      <QuizFormDialog v-model="qDialogVisible" :question="editingQuestion" :bank-id="meta.id"
+      <QuizFormDialog v-model="qDialogVisible" :question="editingQuestion" :bank-id="bankMeta.id"
         :chapters="chapterOptions" :chapter-type="chapterType" :chapter-option-count="chapterOptionCount"
-        :all-tags="allTags" :existing-ids="data.Questions.map((q) => q.id)" @save="onSaveQuestion" />
+        :all-tags="allTags" :existing-ids="bankData.Questions.map((q) => q.id)" @save="onSaveQuestion" />
 
       <!-- 添加到目标试卷 -->
       <el-dialog v-model="addToPaperVisible" title="添加到目标试卷" width="420px">
         <el-select v-model="addToPaperTarget" style="width: 100%">
-          <el-option v-for="p in data.Papers" :key="p.id" :label="`${p.name}（${p.questionIds.length} 题）`"
+          <el-option v-for="p in bankData.Papers" :key="p.id" :label="`${p.name}（${p.questionIds.length} 题）`"
             :value="p.id" />
         </el-select>
         <template #footer>
