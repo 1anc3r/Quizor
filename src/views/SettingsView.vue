@@ -3,6 +3,7 @@
  * 设置页：外观偏好、练习/考试偏好记忆、滑动切题、错题阈值、导入导出。
  */
 import { computed, ref, onMounted } from 'vue'
+import { Link } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bank'
 import { useSettingsStore } from '@/stores/settings'
 import { createBank, defaultRule, exportBackup, exportBankFile, saveBank } from '@/services/bank'
@@ -136,6 +137,12 @@ function onResize(): void {
 onMounted(async () => {
   window.addEventListener('resize', onResize)
 })
+
+/* ---------- 外链跳转 ---------- */
+
+const redirectToExternalLink = () => {
+  window.location.href = 'https://1anc3r.github.io/Flashcard-Collector/';
+};
 </script>
 
 <template>
@@ -230,6 +237,12 @@ onMounted(async () => {
       <el-alert type="warning" :closable="false" show-icon style="margin-top: 12px">
         将清空本浏览器 localStorage 中保存的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），清理后自动刷新页面，且不可恢复。
       </el-alert>
+    </el-card>
+
+    <!-- 外链跳转 -->
+    <el-card class="page-card" shadow="never">
+      <div class="card-title"><span class="title-text">外链跳转</span></div>
+      <el-button type="primary" plain :icon="Link" @click="redirectToExternalLink">跳转到 Collector · 闪卡收藏家</el-button>
     </el-card>
   </div>
 </template>
