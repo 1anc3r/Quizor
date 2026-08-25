@@ -10,6 +10,8 @@ import RichEditor from './RichEditor.vue'
 import { genId, nextQuestionId } from '@/utils/id'
 import { plainText, typeLabel } from '@/utils/format'
 
+const isMobile = ref(window.innerWidth <= 768)
+
 const props = defineProps<{
   modelValue: boolean
   /** 编辑中的题目；null 表示新增 */
@@ -193,7 +195,8 @@ void genId
 </script>
 
 <template>
-  <el-dialog v-model="visible" title="题目管理" width="92%" :close-on-click-modal="false" top="3vh" style="padding: 20px;">
+  <el-dialog v-model="visible" title="题目管理" width="92%" :close-on-click-modal="false" top="3vh" 
+    :style="{ padding: '20px', width: isMobile ? '92%' : '60vw' }">
     <el-form label-width="90px">
       <el-form-item label="章节" required>
         <el-select

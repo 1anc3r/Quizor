@@ -7,6 +7,8 @@ import { computed, ref, watch } from 'vue'
 import type { Paper, Question } from '@/types'
 import { plainText, shortId, truncate, typeLabel } from '@/utils/format'
 
+const isMobile = ref(window.innerWidth <= 768)
+
 const props = defineProps<{
   modelValue: boolean
   /** 编辑中的试卷副本（新增时为空白试卷） */
@@ -153,7 +155,8 @@ function onSave(): void {
 </script>
 
 <template>
-  <el-dialog v-model="visible" title="试卷管理" width="92%" :close-on-click-modal="false" top="3vh" style="padding: 20px;">
+  <el-dialog v-model="visible" title="试卷管理" :close-on-click-modal="false" top="3vh" 
+    :style="{ padding: '20px', width: isMobile ? '92%' : '60vw' }">
     <el-form label-width="90px">
       <el-form-item label="试卷名称" required>
         <el-input v-model="form.name" placeholder="如：2010年199管理类综合能力考试" />
