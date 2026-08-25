@@ -246,5 +246,10 @@ const redirectToExternalLink = () => {
         <el-button type="primary" plain :icon="Link" @click="redirectToExternalLink">跳转到 Collector · 闪卡收藏家</el-button>
       </div>
     </el-card>
+    
+    <!-- 外链跳转 -->
+    <el-card class="page-card" shadow="never">
+      <img src="/WechatCode.jpg" style="width: 100%"/>
+    </el-card>
   </div>
 </template>
