@@ -242,7 +242,9 @@ const redirectToExternalLink = () => {
     <!-- 外链跳转 -->
     <el-card class="page-card" shadow="never">
       <div class="card-title"><span class="title-text">外链跳转</span></div>
-      <el-button type="primary" plain :icon="Link" @click="redirectToExternalLink">跳转到 Collector · 闪卡收藏家</el-button>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px">
+        <el-button type="primary" plain :icon="Link" @click="redirectToExternalLink">跳转到 Collector · 闪卡收藏家</el-button>
+      </div>
     </el-card>
   </div>
 </template>
