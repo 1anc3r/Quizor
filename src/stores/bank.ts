@@ -8,7 +8,7 @@ const K_CURRENT = 'currentBank'
 
 export const useBankStore = defineStore('bank', () => {
   const manifest = ref<BankMeta[]>([])
-  const currentId = ref<string>(storage.get<string>(K_CURRENT, ''))
+  const currentId = ref<string>(storage.readJSON<string>(K_CURRENT, ''))
   const bank = ref<BankData | null>(null)
   const loading = ref(false)
 
@@ -61,7 +61,7 @@ export const useBankStore = defineStore('bank', () => {
   async function switchBank(id: string): Promise<void> {
     if (id === currentId.value && bank.value) return
     currentId.value = id
-    storage.set(K_CURRENT, id)
+    storage.writeJSON(K_CURRENT, id)
     await loadCurrent()
   }
 
@@ -73,7 +73,7 @@ export const useBankStore = defineStore('bank', () => {
     }
     if (currentId.value && !manifest.value.some((b) => b.id === currentId.value)) {
       currentId.value = manifest.value[0]?.id ?? ''
-      storage.set(K_CURRENT, currentId.value)
+      storage.writeJSON(K_CURRENT, currentId.value)
       bank.value = null
       if (currentId.value) await loadCurrent()
     }

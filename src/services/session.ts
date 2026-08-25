@@ -24,7 +24,7 @@ const K_UNFINISHED = 'unfinished:' // + bankId → sessionId
 
 export function saveSession(s: QuizSession): void {
   s.updatedAt = Date.now()
-  storage.set(K_SESSION + s.id, s)
+  storage.writeJSON(K_SESSION + s.id, s)
 }
 
 let debounceTimer: number | null = null
@@ -54,25 +54,25 @@ export function flushSession(): void {
 }
 
 export function loadSession(id: string): QuizSession | null {
-  return storage.get<QuizSession | null>(K_SESSION + id, null)
+  return storage.readJSON<QuizSession | null>(K_SESSION + id, null)
 }
 
 export function removeSession(id: string): void {
-  storage.remove(K_SESSION + id)
+  storage.removeKey(K_SESSION + id)
 }
 
 /** 记录/查询某题库的未完成会话（首页"继续上次答题"） */
 export function setUnfinished(bankId: string, sessionId: string | null): void {
-  if (sessionId) storage.set(K_UNFINISHED + bankId, sessionId)
-  else storage.remove(K_UNFINISHED + bankId)
+  if (sessionId) storage.writeJSON(K_UNFINISHED + bankId, sessionId)
+  else storage.removeKey(K_UNFINISHED + bankId)
 }
 
 export function getUnfinished(bankId: string): QuizSession | null {
-  const id = storage.get<string | null>(K_UNFINISHED + bankId, null)
+  const id = storage.readJSON<string | null>(K_UNFINISHED + bankId, null)
   if (!id) return null
   const s = loadSession(id)
   if (!s) {
-    storage.remove(K_UNFINISHED + bankId)
+    storage.removeKey(K_UNFINISHED + bankId)
     return null
   }
   return s

@@ -102,7 +102,7 @@ async function onImportBackupFile(uploadFile: { raw?: File }): Promise<void> {
     } catch {
       return
     }
-    storage.importAll(json)
+    storage.importBackup(json)
     ElMessage.success('备份导入成功，即将刷新页面')
     window.setTimeout(() => window.location.reload(), 800)
   } catch {

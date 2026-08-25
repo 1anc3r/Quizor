@@ -15,10 +15,10 @@ export function nameToBankId(name: string): string {
   return joined || `bank_${Date.now().toString(36)}`
 }
 
-/** 在已有 id 集合内保证唯一，冲突时追加 _2、_3… */
-export function uniqueBankId(base: string, taken: string[]): string {
-  if (!taken.includes(base)) return base
+/** 在已有 ID 集合中生成唯一 ID：基础 ID 冲突时追加 _1、_2 ... 直至唯一 */
+export function uniqueBankId(baseId: string, existingIds: string[]): string {
+  if (!existingIds.includes(baseId)) return baseId
   let i = 2
-  while (taken.includes(`${base}_${i}`)) i++
-  return `${base}_${i}`
+  while (existingIds.includes(`${baseId}_${i}`)) i++
+  return `${baseId}_${i}`
 }

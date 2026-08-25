@@ -4,7 +4,7 @@
  */
 const PREFIX = 'quizor:'
 
-export function get<T>(key: string, fallback: T): T {
+export function readJSON<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(PREFIX + key)
     if (raw == null) return fallback
@@ -14,7 +14,7 @@ export function get<T>(key: string, fallback: T): T {
   }
 }
 
-export function set(key: string, value: unknown): void {
+export function writeJSON(key: string, value: unknown): void {
   try {
     localStorage.setItem(PREFIX + key, JSON.stringify(value))
   } catch (e) {
@@ -23,12 +23,12 @@ export function set(key: string, value: unknown): void {
   }
 }
 
-export function remove(key: string): void {
+export function removeKey(key: string): void {
   localStorage.removeItem(PREFIX + key)
 }
 
 /** 导出全部应用数据（备份） */
-export function exportAll(): Record<string, unknown> {
+export function exportBackup(): Record<string, unknown> {
   const out: Record<string, unknown> = {}
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i)
@@ -44,7 +44,7 @@ export function exportAll(): Record<string, unknown> {
 }
 
 /** 导入备份（整体覆盖 quizor: 前缀的数据） */
-export function importAll(data: Record<string, unknown>): void {
+export function importBackup(data: Record<string, unknown>): void {
   for (const [k, v] of Object.entries(data)) {
     if (k.startsWith(PREFIX)) {
       try {

@@ -17,7 +17,7 @@ function defaults(): AppSettings {
 }
 
 export const useSettingsStore = defineStore('settings', () => {
-  const settings = ref<AppSettings>({ ...defaults(), ...storage.get<Partial<AppSettings>>(K_SETTINGS, {}) })
+  const settings = ref<AppSettings>({ ...defaults(), ...storage.readJSON<Partial<AppSettings>>(K_SETTINGS, {}) })
 
   const theme = computed<ThemeMode>({
     get: () => settings.value.theme,
@@ -38,7 +38,7 @@ export const useSettingsStore = defineStore('settings', () => {
   watch(
     settings,
     () => {
-      storage.set(K_SETTINGS, settings.value)
+      storage.writeJSON(K_SETTINGS, settings.value)
       apply()
     },
     { deep: true }

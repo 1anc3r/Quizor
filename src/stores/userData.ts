@@ -23,9 +23,9 @@ export const useUserDataStore = defineStore('userData', () => {
   /** 加载指定题库的用户数据（切换题库时调用） */
   function load(id: string): void {
     bankId.value = id
-    wrong.value = id ? storage.get(K_WRONG + id, {}) : {}
-    favorites.value = id ? storage.get(K_FAV + id, {}) : {}
-    records.value = id ? storage.get(K_RECORDS + id, []) : []
+    wrong.value = id ? storage.readJSON(K_WRONG + id, {}) : {}
+    favorites.value = id ? storage.readJSON(K_FAV + id, {}) : {}
+    records.value = id ? storage.readJSON(K_RECORDS + id, []) : []
   }
 
   /* ---------------- 错题本 ---------------- */
@@ -40,7 +40,7 @@ export const useUserDataStore = defineStore('userData', () => {
       lastAnswer,
       streak: 0
     }
-    storage.set(K_WRONG + bankId.value, wrong.value)
+    storage.writeJSON(K_WRONG + bankId.value, wrong.value)
   }
 
   /**
@@ -58,7 +58,7 @@ export const useUserDataStore = defineStore('userData', () => {
         } else {
           wrong.value[questionId] = { ...cur, streak, lastTime: Date.now() }
         }
-        storage.set(K_WRONG + bankId.value, wrong.value)
+        storage.writeJSON(K_WRONG + bankId.value, wrong.value)
       }
     } else {
       addWrong(questionId, lastAnswer)
@@ -67,7 +67,7 @@ export const useUserDataStore = defineStore('userData', () => {
 
   function removeWrong(ids: string[]): void {
     ids.forEach((id) => delete wrong.value[id])
-    storage.set(K_WRONG + bankId.value, wrong.value)
+    storage.writeJSON(K_WRONG + bankId.value, wrong.value)
   }
 
   /* ---------------- 收藏夹 ---------------- */
@@ -78,27 +78,27 @@ export const useUserDataStore = defineStore('userData', () => {
     } else {
       favorites.value[questionId] = { questionId, time: Date.now() }
     }
-    storage.set(K_FAV + bankId.value, favorites.value)
+    storage.writeJSON(K_FAV + bankId.value, favorites.value)
     return !!favorites.value[questionId]
   }
 
   function removeFavorites(ids: string[]): void {
     ids.forEach((id) => delete favorites.value[id])
-    storage.set(K_FAV + bankId.value, favorites.value)
+    storage.writeJSON(K_FAV + bankId.value, favorites.value)
   }
 
   /* ---------------- 做题记录 ---------------- */
 
   function addRecord(rec: QuizRecord): void {
     records.value.unshift(rec)
-    storage.set(K_RECORDS + bankId.value, records.value)
+    storage.writeJSON(K_RECORDS + bankId.value, records.value)
   }
 
   function updateRecord(rec: QuizRecord): void {
     const i = records.value.findIndex((r) => r.id === rec.id)
     if (i >= 0) {
       records.value[i] = rec
-      storage.set(K_RECORDS + bankId.value, records.value)
+      storage.writeJSON(K_RECORDS + bankId.value, records.value)
     }
   }
 

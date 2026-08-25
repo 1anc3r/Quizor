@@ -35,11 +35,11 @@ export async function loadManifest(force = false): Promise<BankManifest> {
   } catch (e) {
     console.warn('[quizor] BankManifest 加载失败：', e)
   }
-  const deleted = storage.get<string[]>(K_DELETED_BANKS, [])
-  const local = storage.get<BankMeta[]>(K_LOCAL_BANKS, [])
+  const deleted = storage.readJSON<string[]>(K_DELETED_BANKS, [])
+  const local = storage.readJSON<BankMeta[]>(K_LOCAL_BANKS, [])
   const banks = builtin
     .filter((b) => !deleted.includes(b.id))
-    .map((b) => storage.get<BankMeta | null>(K_BANK_META + b.id, null) ?? b)
+    .map((b) => storage.readJSON<BankMeta | null>(K_BANK_META + b.id, null) ?? b)
   manifestCache = { Banks: [...banks, ...local] }
   return manifestCache
 }
@@ -47,7 +47,7 @@ export async function loadManifest(force = false): Promise<BankManifest> {
 /** 加载题库数据：本地覆盖层优先，其次 fetch 静态 JSON；带内存缓存 */
 export async function loadBank(id: string, force = false): Promise<BankData> {
   if (!force && bankCache.has(id)) return bankCache.get(id) as BankData
-  const override = storage.get<BankData | null>(K_BANK_DATA + id, null)
+  const override = storage.readJSON<BankData | null>(K_BANK_DATA + id, null)
   if (override) {
     bankCache.set(id, override)
     return override
@@ -67,18 +67,18 @@ export async function loadBank(id: string, force = false): Promise<BankData> {
 /** 保存题库（元信息 + 数据），写入 localStorage 覆盖层/本地题库 */
 export async function saveBank(meta: BankMeta, data: BankData): Promise<void> {
   const finalMeta: BankMeta = { ...meta, questionCount: data.Questions.length }
-  storage.set(K_BANK_DATA + meta.id, data)
+  storage.writeJSON(K_BANK_DATA + meta.id, data)
   bankCache.set(meta.id, data)
-  const local = storage.get<BankMeta[]>(K_LOCAL_BANKS, [])
+  const local = storage.readJSON<BankMeta[]>(K_LOCAL_BANKS, [])
   const idx = local.findIndex((b) => b.id === meta.id)
   if (idx >= 0) {
     local[idx] = finalMeta
-    storage.set(K_LOCAL_BANKS, local)
+    storage.writeJSON(K_LOCAL_BANKS, local)
   } else if (finalMeta.local) {
     local.push(finalMeta)
-    storage.set(K_LOCAL_BANKS, local)
+    storage.writeJSON(K_LOCAL_BANKS, local)
   } else {
-    storage.set(K_BANK_META + meta.id, finalMeta)
+    storage.writeJSON(K_BANK_META + meta.id, finalMeta)
   }
   manifestCache = null
 }
@@ -113,15 +113,15 @@ export async function createBank(name: string, rule: BankRule): Promise<BankMeta
 export async function deleteBank(id: string): Promise<void> {
   const manifest = await loadManifest()
   const meta = manifest.Banks.find((b) => b.id === id)
-  storage.remove(K_BANK_DATA + id)
-  storage.remove(K_BANK_META + id)
+  storage.removeKey(K_BANK_DATA + id)
+  storage.removeKey(K_BANK_META + id)
   if (meta?.local) {
-    const local = storage.get<BankMeta[]>(K_LOCAL_BANKS, []).filter((b) => b.id !== id)
-    storage.set(K_LOCAL_BANKS, local)
+    const local = storage.readJSON<BankMeta[]>(K_LOCAL_BANKS, []).filter((b) => b.id !== id)
+    storage.writeJSON(K_LOCAL_BANKS, local)
   } else if (meta) {
-    const deleted = storage.get<string[]>(K_DELETED_BANKS, [])
+    const deleted = storage.readJSON<string[]>(K_DELETED_BANKS, [])
     if (!deleted.includes(id)) deleted.push(id)
-    storage.set(K_DELETED_BANKS, deleted)
+    storage.writeJSON(K_DELETED_BANKS, deleted)
   }
   bankCache.delete(id)
   manifestCache = null
@@ -140,7 +140,7 @@ export function exportBankFile(meta: BankMeta, data: BankData): void {
 
 /** 导出整包备份（localStorage 中全部 quizor: 数据） */
 export function exportBackup(): void {
-  const payload = storage.exportAll()
+  const payload = storage.exportBackup()
   const d = new Date()
   const p = (n: number) => String(n).padStart(2, '0')
   downloadJson(payload, `quizor-backup-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}.json`)
