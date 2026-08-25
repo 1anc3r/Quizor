@@ -141,7 +141,7 @@ onMounted(async () => {
 /* ---------- 外链跳转 ---------- */
 
 const redirectToExternalLink = () => {
-  window.location.href = 'https://1anc3r.github.io/Flashcard-Collector/';
+  window.location.href = 'https://1anc3r.github.io/Flashcard-Collector/#/';
 };
 </script>
 
