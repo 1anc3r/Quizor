@@ -12,19 +12,6 @@ const props = defineProps<{ content: string }>()
 
 const el = ref<HTMLElement>()
 
-function isHtml(s: string): boolean {
-  return /<\w+[^>]*>/.test(s)
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
 async function render(): Promise<void> {
   await nextTick()
   const root = el.value
