@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { BankData, BankMeta } from '@/types'
 import * as storage from '@/services/storage'
-import { deleteBank as svcDeleteBank, loadBank, loadManifest } from '@/services/bank'
+import { deleteBank as svcDeleteBank, loadBank, loadManifest } from '@/services/bankService'
 
 const K_CURRENT = 'currentBank'
 

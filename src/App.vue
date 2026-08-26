@@ -3,7 +3,7 @@ import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import AppNav from '@/components/AppNav.vue'
-import { useBankStore } from '@/stores/bank'
+import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 

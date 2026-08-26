@@ -6,7 +6,7 @@
  */
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { loadBank } from '@/services/bank'
+import { loadBank } from '@/services/bankService'
 import { recomputeRecord } from '@/stores/session'
 import { useUserDataStore } from '@/stores/userData'
 import type { Question, QuizRecord, RecordDetail } from '@/types'

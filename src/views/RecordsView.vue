@@ -5,7 +5,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { ECharts } from 'echarts/core'
-import { useBankStore } from '@/stores/bank'
+import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import type { QuizRecord } from '@/types'
 import { fmtDuration, fmtTime, fmtTimeShort, typeLabel } from '@/utils/format'

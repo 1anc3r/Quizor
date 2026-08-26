@@ -4,10 +4,10 @@
  */
 import { computed, ref, onMounted } from 'vue'
 import { Link } from '@element-plus/icons-vue'
-import { useBankStore } from '@/stores/bank'
+import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
-import { createBank, defaultRule, exportBackup, exportBankFile, saveBank } from '@/services/bank'
-import { loadBank } from '@/services/bank'
+import { createBank, defaultRule, exportBackup, exportBankFile, saveBank } from '@/services/bankService'
+import { loadBank } from '@/services/bankService'
 import * as storage from '@/services/storage'
 import type { BankData, BankRule } from '@/types'
 import { fmtTime, typeLabel } from '@/utils/format'

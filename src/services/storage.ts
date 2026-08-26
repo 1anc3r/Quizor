@@ -2,7 +2,7 @@
  * localStorage 统一封装，所有 key 带 quizor: 前缀。
  * 用户数据（答题记录、错题、收藏、设置、会话、本地题库）全部经由此模块读写。
  */
-const PREFIX = 'quizor:'
+export const PREFIX = 'quizor:'
 
 export function readJSON<T>(key: string, fallback: T): T {
   try {
@@ -27,23 +27,23 @@ export function removeKey(key: string): void {
   localStorage.removeItem(PREFIX + key)
 }
 
-/** 导出全部应用数据（备份） */
+/** 导出全站应用数据（备份） */
 export function exportBackup(): Record<string, unknown> {
-  const out: Record<string, unknown> = {}
+  const data: Record<string, unknown> = {}
   for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i)
-    if (k && k.startsWith(PREFIX)) {
+    const fullKey = localStorage.key(i)
+    if (fullKey && fullKey.startsWith(PREFIX)) {
       try {
-        out[k] = JSON.parse(localStorage.getItem(k) as string)
+        data[fullKey] = JSON.parse(localStorage.getItem(fullKey) as string)
       } catch {
         /* 跳过损坏项 */
       }
     }
   }
-  return out
+  return data
 }
 
-/** 导入备份（整体覆盖 quizor: 前缀的数据） */
+/** 恢复全站备份（整体覆盖 quizor: 前缀的数据） */
 export function importBackup(data: Record<string, unknown>): void {
   for (const [k, v] of Object.entries(data)) {
     if (k.startsWith(PREFIX)) {

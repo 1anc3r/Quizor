@@ -4,8 +4,8 @@
  */
 import { computed, onMounted, ref, watch, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { Plus, Edit, Search } from '@element-plus/icons-vue'
-import { useBankStore } from '@/stores/bank'
+import { Edit, Plus, Search } from '@element-plus/icons-vue'
+import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/stores/session'
 import type { Question, QuizSession } from '@/types'

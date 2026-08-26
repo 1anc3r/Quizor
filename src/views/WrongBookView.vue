@@ -5,7 +5,7 @@
  */
 import { computed, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useBankStore } from '@/stores/bank'
+import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { Question, QuestionType, WrongItem } from '@/types'

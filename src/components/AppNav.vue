@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 应用导航栏：桌面端固定顶部；移动端固定页面最下端（图标 + 文字标签栏）。
+ * 5 个入口：首页、错题本、收藏夹、记录、设置。
+ */
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Failed, HomeFilled, List, Setting, StarFilled, Tools } from '@element-plus/icons-vue'
@@ -16,7 +20,13 @@ const items = [
 const currentPath = computed(() => route.path)
 
 function isActive(path: string): boolean {
-  if (path === '/') return currentPath.value === '/' || currentPath.value.startsWith('/bank') || currentPath.value.startsWith('/setup') || currentPath.value.startsWith('/result')
+  if (path === '/') 
+    return (
+      currentPath.value === '/' ||
+      currentPath.value.startsWith('/bank') || 
+      currentPath.value.startsWith('/setup') || 
+      currentPath.value.startsWith('/result')
+    )
   return currentPath.value.startsWith(path)
 }
 </script>

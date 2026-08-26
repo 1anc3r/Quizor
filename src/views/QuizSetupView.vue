@@ -5,7 +5,7 @@
  */
 import { computed, onMounted, ref, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useBankStore } from '@/stores/bank'
+import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { ExamConfig, PracticeConfig, PracticeScope, QuestionType } from '@/types'

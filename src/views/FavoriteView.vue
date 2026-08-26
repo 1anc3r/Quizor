@@ -5,7 +5,7 @@
  */
 import { computed, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useBankStore } from '@/stores/bank'
+import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import type { FavoriteItem, Question, QuestionType } from '@/types'
 import { fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
