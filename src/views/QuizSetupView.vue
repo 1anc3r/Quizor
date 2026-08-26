@@ -9,7 +9,7 @@ import { useBankStore } from '@/stores/bank'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { ExamConfig, PracticeConfig, PracticeScope, QuestionType } from '@/types'
-import { buildExamQuestions, buildPracticeQuestions, makeSession, saveSession, setUnfinished } from '@/services/session'
+import { buildExamQuestions, buildPracticeQuestions, makeSession, saveSession, setUnfinished } from '@/stores/session'
 
 const route = useRoute()
 const router = useRouter()

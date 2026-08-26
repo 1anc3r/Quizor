@@ -10,7 +10,7 @@
  */
 import type { BankData, BankManifest, BankMeta, BankRule } from '@/types'
 import * as storage from './storage'
-import { nameToBankId, uniqueBankId } from './pinyin'
+import { nameToBankId, uniqueBankId } from '../utils/pinyin'
 
 const K_LOCAL_BANKS = 'localbanks' // BankMeta[] 用户本地新增的题库
 const K_DELETED_BANKS = 'deletedbanks' // string[] 被删除的内置题库 id
@@ -95,8 +95,7 @@ export function defaultRule(): BankRule {
 /** 新建题库（名称自动转拼音生成唯一 id），数据初始为空 */
 export async function createBank(name: string, rule: BankRule): Promise<BankMeta> {
   const manifest = await loadManifest()
-  const taken = manifest.Banks.map((b) => b.id)
-  const id = uniqueBankId(nameToBankId(name), taken)
+  const id = uniqueBankId(nameToBankId(name), manifest.Banks.map((b) => b.id))
   const meta: BankMeta = {
     id,
     name,

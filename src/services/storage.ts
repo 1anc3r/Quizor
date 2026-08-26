@@ -7,7 +7,7 @@ const PREFIX = 'quizor:'
 export function readJSON<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(PREFIX + key)
-    if (raw == null) return fallback
+    if (raw === null) return fallback
     return JSON.parse(raw) as T
   } catch {
     return fallback
@@ -19,7 +19,7 @@ export function writeJSON(key: string, value: unknown): void {
     localStorage.setItem(PREFIX + key, JSON.stringify(value))
   } catch (e) {
     // 容量溢出等场景：控制台告警，避免应用崩溃
-    console.warn('[quizor] localStorage 写入失败：', e)
+    console.error('[quizor] localStorage 写入失败:', key, e)
   }
 }
 

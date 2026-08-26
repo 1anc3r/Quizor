@@ -1,9 +1,8 @@
-import { pinyin } from 'pinyin-pro'
-
 /**
  * 将题库名称转换为拼音 id，用于创建题库 ID。
  * 例：「199_管理类综合能力」→「199_guan_li_lei_zong_he_neng_li」
  */
+import { pinyin } from 'pinyin-pro'
 export function nameToBankId(name: string): string {
   const arr = pinyin(name, { toneType: 'none', type: 'array' })
   const joined = arr

@@ -7,7 +7,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { loadBank } from '@/services/bank'
-import { recomputeRecord } from '@/services/session'
+import { recomputeRecord } from '@/stores/session'
 import { useUserDataStore } from '@/stores/userData'
 import type { Question, QuizRecord, RecordDetail } from '@/types'
 import { fmtDuration, fmtTime } from '@/utils/format'

@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 import { Plus, Edit, Search } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bank'
 import { useUserDataStore } from '@/stores/userData'
-import { getUnfinished } from '@/services/session'
+import { getUnfinished } from '@/stores/session'
 import type { Question, QuizSession } from '@/types'
 import { plainText, truncate } from '@/utils/format'
 

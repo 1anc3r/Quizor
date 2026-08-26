@@ -14,7 +14,7 @@ import type {
   RecordDetail,
   SessionQuestion
 } from '@/types'
-import * as storage from './storage'
+import * as storage from '../services/storage'
 import { genId } from '@/utils/id'
 
 const K_SESSION = 'session:' // + sessionId → QuizSession

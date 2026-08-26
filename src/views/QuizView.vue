@@ -22,7 +22,7 @@ import {
   removeSession,
   saveSession,
   setUnfinished
-} from '@/services/session'
+} from '@/stores/session'
 import type { QuizSession, SessionQuestion } from '@/types'
 import { fmtDuration, typeLabel } from '@/utils/format'
 import AnswerSheet from '@/components/AnswerSheet.vue'

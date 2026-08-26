@@ -46,11 +46,11 @@ body {
 
 /* 主区域：桌面端为顶部导航让位 */
 .app-main {
-  /* max-width: 1100px; */
   margin: 0 auto;
   padding: calc(var(--q-nav-height) + 16px) 16px 0px;
 }
 
+/* 沉浸式页面：全屏、无导航让位 */
 .app-main.immersive {
   max-width: none;
   padding: 0;
@@ -109,7 +109,8 @@ body {
 
 /* ========== 字号偏好（题干 / 选项） ========== */
 
-.font-small .q-stem {
+.font-small .q-stem
+.font-small .rich-text {
   font-size: 14px;
 }
 
@@ -117,7 +118,8 @@ body {
   font-size: 13px;
 }
 
-.font-standard .q-stem {
+.font-standard .q-stem
+.font-standard .rich-text {
   font-size: 16px;
 }
 
@@ -125,7 +127,8 @@ body {
   font-size: 15px;
 }
 
-.font-large .q-stem {
+.font-large .q-stem
+.font-large .rich-text  {
   font-size: 19px;
 }
 
@@ -137,6 +140,7 @@ body {
 
 .app-content {
   width: 60vw;
+  min-width: 720px;
   margin: 0 auto;
 }
 
@@ -466,10 +470,19 @@ body {
   font-size: 14px;
   min-height: 120px;
   background: var(--q-card);
+  color: var(--q-text);
 }
 
 .rich-editor .ql-editor {
   min-height: 120px;
+}
+
+.rich-editor .ql-editor.ql-blank::before {
+  color: var(--c-text-secondary);
+}
+
+html.dark .rich-editor .ql-toolbar {
+  background: #262727;
 }
 
 html.dark .rich-editor .ql-toolbar .ql-stroke {
@@ -489,6 +502,10 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
 @media (max-width: 768px) {
   .app-main {
     padding: 16px 16px calc(var(--q-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .app-main.immersive {
+    padding: 0;
   }
 
   /* 导航栏固定在页面最下端 */
@@ -523,6 +540,7 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
 
   .app-content {
     width: 100%;
+    min-width: 0;
   }
 
   .stat-grid {
