@@ -25,7 +25,7 @@ const router = createRouter({
     { path: '/quiz/:sessionId', name: 'quiz', component: () => QuizView, meta: { title: '做题' } },
     { path: '/result/:bankId/:recordId', name: 'result', component: () => ResultView, meta: { title: '结算' } },
     { path: '/wrong', name: 'wrong', component: () => WrongBookView, meta: { title: '错题本' } },
-    { path: '/favorite', name: 'favorite', component: () => FavoriteView meta: { title: '收藏夹' } },
+    { path: '/favorite', name: 'favorite', component: () => FavoriteView, meta: { title: '收藏夹' } },
     { path: '/:pathMatch(.*)*', redirect: '/' }
   ]
 })
