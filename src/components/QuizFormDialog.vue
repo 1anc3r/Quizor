@@ -54,6 +54,8 @@ const form = ref({
   tags: [] as string[]
 })
 const options = ref<OptionForm[]>([])
+/** 选项是否使用富文本编辑（默认不勾选，使用纯文本输入框） */
+const optionRichText = ref(false)
 /** 单选/判断：正确选项 key；多选：正确选项 key 数组 */
 const correctSingle = ref('')
 const correctMulti = ref<string[]>([])
@@ -86,6 +88,8 @@ watch(visible, (v) => {
     options.value = q.options.map((o) => ({ ...o }))
     correctSingle.value = q.answer[0] ?? ''
     correctMulti.value = [...q.answer]
+    // 编辑时若任一选项内容为 HTML，自动开启富文本模式，避免富文本内容被当成纯文本编辑
+    optionRichText.value = q.options.some((o) => /<\w+[^>]*>/.test(o.text))
   } else {
     form.value = {
       id: '',
@@ -109,6 +113,7 @@ watch(visible, (v) => {
     }
     correctSingle.value = ''
     correctMulti.value = []
+    optionRichText.value = false
   }
 })
 
@@ -163,7 +168,8 @@ function onSave(): void {
   let answer: string[] = []
   let finalOptions: OptionItem[] = []
   if (type !== 'text') {
-    if (options.value.some((o) => !o.text.trim())) {
+    // 富文本模式下空内容可能是 <p><br></p>，统一按纯文本判空
+    if (options.value.some((o) => !plainText(o.text))) {
       ElMessage.warning('请补全所有选项内容')
       return
     }
@@ -249,7 +255,14 @@ void genId
                 style="margin-right: 0px;"
               />
               <el-tag effect="plain" style="flex: none">{{ opt.key }}</el-tag>
-              <el-input v-model="opt.text" placeholder="选项内容" :disabled="questionType === 'judge'" />
+              <RichEditor
+                v-if="optionRichText && questionType !== 'judge'"
+                v-model="opt.text"
+                class="option-rich-editor"
+                placeholder="选项内容，支持富文本 / 图片 / LaTeX 公式"
+                style="flex: 1; min-width: 0"
+              />
+              <el-input v-else v-model="opt.text" placeholder="选项内容" :disabled="questionType === 'judge'" />
               <el-button
                 v-if="questionType !== 'judge'"
                 link
@@ -260,6 +273,9 @@ void genId
               >
             </div>
             <el-button v-if="questionType !== 'judge'" size="small" @click="addOption">添加选项</el-button>
+            <el-checkbox v-if="questionType !== 'judge'" v-model="optionRichText" style="margin-left: 12px">
+              富文本
+            </el-checkbox>
             <span class="muted" style="margin-left: 10px">勾选左侧圆圈 / 方框标记正确答案</span>
           </div>
         </el-form-item>
@@ -292,3 +308,13 @@ void genId
     </template>
   </el-dialog>
 </template>
+
+<style scoped>
+/* 选项内的富文本编辑器收敛高度，避免每个选项都占 120px */
+.option-rich-editor :deep(.ql-container) {
+  min-height: 60px;
+}
+.option-rich-editor :deep(.ql-editor) {
+  min-height: 60px;
+}
+</style>
