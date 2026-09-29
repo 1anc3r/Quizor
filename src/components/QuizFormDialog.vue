@@ -259,7 +259,8 @@ void genId
                 v-if="optionRichText && questionType !== 'judge'"
                 v-model="opt.text"
                 class="option-rich-editor"
-                placeholder="选项内容，支持富文本 / 图片 / LaTeX 公式"
+                compact
+                placeholder="选项内容，支持富文本 / LaTeX 公式"
                 style="flex: 1; min-width: 0"
               />
               <el-input v-else v-model="opt.text" placeholder="选项内容" :disabled="questionType === 'judge'" />

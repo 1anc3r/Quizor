@@ -13,8 +13,9 @@ import katex from 'katex'
   // Fluent Editor 的 formula 模块从 window.katex 读取渲染器
   ; (window as unknown as { katex: typeof katex }).katex = katex
 
-const props = withDefaults(defineProps<{ modelValue: string; placeholder?: string }>(), {
-  placeholder: '请输入内容'
+const props = withDefaults(defineProps<{ modelValue: string; placeholder?: string; compact?: boolean }>(), {
+  placeholder: '请输入内容',
+  compact: false
 })
 const emit = defineEmits<{ (e: 'update:modelValue', v: string): void }>()
 
@@ -76,17 +77,20 @@ onMounted(() => {
     placeholder: props.placeholder,
     modules: {
       toolbar: {
-        container: [
-          ['undo', 'redo'],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ color: [] }, { background: [] }],
-          [{ align: [] }],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [{ indent: '-1' }, { indent: '+1' }],
-          [{ script: 'sub' }, { script: 'super' }],
-          ['formula', 'image', 'better-table'],
-          ['clean']
-        ],
+        // compact：精简工具栏（选项等轻量场景），只保留基础格式与公式，去掉图片/表格等重按钮
+        container: props.compact
+          ? [['bold', 'italic', 'underline', 'strike'], [{ script: 'sub' }, { script: 'super' }], ['formula'], ['clean']]
+          : [
+              ['undo', 'redo'],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ color: [] }, { background: [] }],
+              [{ align: [] }],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              [{ indent: '-1' }, { indent: '+1' }],
+              [{ script: 'sub' }, { script: 'super' }],
+              ['formula', 'image', 'better-table'],
+              ['clean']
+            ],
         handlers: {
           image: pickImage
         }
