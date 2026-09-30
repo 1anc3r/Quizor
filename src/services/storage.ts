@@ -14,12 +14,14 @@ export function readJSON<T>(key: string, fallback: T): T {
   }
 }
 
-export function writeJSON(key: string, value: unknown): void {
+export function writeJSON(key: string, value: unknown): boolean {
   try {
     localStorage.setItem(PREFIX + key, JSON.stringify(value))
+    return true
   } catch (e) {
-    // 容量溢出等场景：控制台告警，避免应用崩溃
+    // 容量溢出等场景：控制台告警，避免应用崩溃；返回 false 供调用方兜底
     console.error('[quizor] localStorage 写入失败:', key, e)
+    return false
   }
 }
 

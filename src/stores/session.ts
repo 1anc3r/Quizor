@@ -61,15 +61,9 @@ export function removeSession(id: string): void {
   storage.removeKey(K_SESSION + id)
 }
 
-/** 记录/查询某题库的未完成会话（首页"继续上次答题"） */
-export function setUnfinished(bankId: string, sessionId: string | null): void {
-  if (sessionId) storage.writeJSON(K_UNFINISHED + bankId, sessionId)
-  else storage.removeKey(K_UNFINISHED + bankId)
-}
-
-export function getUnfinished(bankId: string): QuizSession | null {
+/** 读取未完成会话指针（兼容历史双重 JSON 编码数据） */
+function readUnfinishedId(bankId: string): string | null {
   let id = storage.readJSON<string | null>(K_UNFINISHED + bankId, null)
-  // 兼容历史数据：早期版本曾双重 JSON 编码，读出后仍带引号，再解析一次
   if (typeof id === 'string' && id.startsWith('"')) {
     try {
       id = JSON.parse(id) as string
@@ -77,6 +71,50 @@ export function getUnfinished(bankId: string): QuizSession | null {
       /* 保持原值 */
     }
   }
+  return id
+}
+
+/** 记录/查询某题库的未完成会话（首页"继续上次答题"） */
+export function setUnfinished(bankId: string, sessionId: string | null): void {
+  if (sessionId) storage.writeJSON(K_UNFINISHED + bankId, sessionId)
+  else storage.removeKey(K_UNFINISHED + bankId)
+}
+
+/**
+ * 用新会话替换未完成会话指针：同时删除被替换的旧会话数据，
+ * 避免 orphan session 在 localStorage 中越积越多撑爆配额。
+ */
+export function replaceUnfinished(bankId: string, sessionId: string): void {
+  const prev = readUnfinishedId(bankId)
+  if (prev && prev !== sessionId) removeSession(prev)
+  setUnfinished(bankId, sessionId)
+}
+
+/** 清理孤儿会话：删除所有未被任何 unfinished 指针引用的 session:* 数据，返回释放的条数 */
+export function pruneOrphanSessions(): number {
+  const referenced = new Set<string>()
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)
+    if (k && k.startsWith(storage.PREFIX + K_UNFINISHED)) {
+      const bankId = k.slice((storage.PREFIX + K_UNFINISHED).length)
+      const id = readUnfinishedId(bankId)
+      if (id) referenced.add(id)
+    }
+  }
+  const orphans: string[] = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)
+    if (k && k.startsWith(storage.PREFIX + K_SESSION)) {
+      const id = k.slice((storage.PREFIX + K_SESSION).length)
+      if (!referenced.has(id)) orphans.push(id)
+    }
+  }
+  orphans.forEach(removeSession)
+  return orphans.length
+}
+
+export function getUnfinished(bankId: string): QuizSession | null {
+  const id = readUnfinishedId(bankId)
   if (!id) return null
   const s = loadSession(id)
   if (!s) {
