@@ -199,6 +199,10 @@ const redirectToExternalLink = () => {
           <el-switch v-model="s.swipe" active-text="开" inactive-text="关" />
           <span class="muted" style="margin-left: 10px">左滑下一题、右滑上一题</span>
         </el-form-item>
+        <el-form-item label="开发模式">
+          <el-switch v-model="s.devMode" active-text="开" inactive-text="关" />
+          <span class="muted" style="margin-left: 10px">开启后答题页显示「编辑」按钮，可就地编辑当前题目</span>
+        </el-form-item>
         <el-form-item label="错题移出阈值">
           <el-input-number v-model="s.wrongThreshold" :min="1" :max="10" />
           <span class="muted" style="margin-left: 10px">练习中连续答对达到该次数后自动移出错题本</span>

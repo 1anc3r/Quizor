@@ -68,7 +68,15 @@ export function setUnfinished(bankId: string, sessionId: string | null): void {
 }
 
 export function getUnfinished(bankId: string): QuizSession | null {
-  const id = storage.readJSON<string | null>(K_UNFINISHED + bankId, null)
+  let id = storage.readJSON<string | null>(K_UNFINISHED + bankId, null)
+  // 兼容历史数据：早期版本曾双重 JSON 编码，读出后仍带引号，再解析一次
+  if (typeof id === 'string' && id.startsWith('"')) {
+    try {
+      id = JSON.parse(id) as string
+    } catch {
+      /* 保持原值 */
+    }
+  }
   if (!id) return null
   const s = loadSession(id)
   if (!s) {

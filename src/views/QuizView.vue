@@ -8,7 +8,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Close, Star, StarFilled, Timer, Grid } from '@element-plus/icons-vue'
+import { Close, Edit, Star, StarFilled, Timer, Grid } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
@@ -23,10 +23,12 @@ import {
   saveSession,
   setUnfinished
 } from '@/stores/session'
-import type { QuizSession, SessionQuestion } from '@/types'
+import { saveBank } from '@/services/bankService'
+import type { Question, QuestionType, QuizSession, SessionQuestion } from '@/types'
 import { fmtDuration, typeLabel } from '@/utils/format'
 import AnswerSheet from '@/components/AnswerSheet.vue'
 import OptionGroup from '@/components/OptionGroup.vue'
+import QuizFormDialog from '@/components/QuizFormDialog.vue'
 import RichText from '@/components/RichText.vue'
 
 const route = useRoute()
@@ -121,6 +123,69 @@ function next(): void {
 
 function toggleFav(): void {
   if (current.value) userStore.toggleFavorite(current.value.id)
+}
+
+/* ---------- 开发模式：就地编辑当前题目 ---------- */
+
+const editDialogVisible = ref(false)
+const editingQuestion = ref<Question | null>(null)
+
+/** 题目编辑窗口所需的章节/映射/标签（来自当前题库与组卷规则） */
+const editChapters = computed<string[]>(() => bankStore.chapters)
+const editChapterType = computed<Record<string, QuestionType>>(() => {
+  const m: Record<string, QuestionType> = {}
+  bankStore.meta?.rule.composition.forEach((c) => {
+    if (c.chapter && !m[c.chapter]) m[c.chapter] = c.type
+  })
+  return m
+})
+const editChapterOptionCount = computed<Record<string, number>>(() => {
+  const m: Record<string, number> = {}
+  bankStore.meta?.rule.composition.forEach((c) => {
+    if (c.chapter && !m[c.chapter]) m[c.chapter] = c.optionCount ?? 4
+  })
+  return m
+})
+const editAllTags = computed<string[]>(() => {
+  const set = new Set<string>()
+  bankStore.bank?.Questions.forEach((q) => q.tags.forEach((t) => t && set.add(t)))
+  return [...set]
+})
+const editExistingIds = computed<string[]>(() => (bankStore.bank?.Questions ?? []).map((q) => q.id))
+
+function openEdit(): void {
+  if (!current.value) return
+  editingQuestion.value = current.value
+  editDialogVisible.value = true
+}
+
+/** 保存编辑：实时更新会话内题目快照与判分状态，并写回题库持久化 */
+async function onSaveQuestion(q: Question): Promise<void> {
+  const s = session.value
+  if (!s) return
+  const i = s.questions.findIndex((x) => x.id === q.id)
+  if (i >= 0) {
+    const score = s.questions[i].score
+    s.questions[i] = { ...q, score }
+    // 若该题已判分（练习即时反馈），按新答案重算正误
+    const ans = s.answers[q.id]
+    if (ans?.revealed && q.type !== 'text') {
+      ans.correct = isChoiceCorrect(q, ans.keys)
+    }
+    persistSessionDebounced(s)
+  }
+  // 写回题库数据（localStorage 覆盖层），保证下次组卷/浏览同步
+  const meta = bankStore.meta
+  const bank = bankStore.bank
+  if (meta && bank && meta.id === s.bankId) {
+    const qi = bank.Questions.findIndex((x) => x.id === q.id)
+    if (qi >= 0) {
+      bank.Questions[qi] = q
+      await saveBank(JSON.parse(JSON.stringify(meta)), JSON.parse(JSON.stringify(bank)))
+      await bankStore.afterBankEdited(meta.id)
+    }
+  }
+  ElMessage.success('题目已更新')
 }
 
 /* ---------- 计时（截止时间 - 当前时间 重算） ---------- */
@@ -256,7 +321,15 @@ onBeforeUnmount(() => {
       </span>
       <span v-if="!isMobile" class="progress">{{ index + 1 }}/{{ total }}</span>
       <span class="spacer"></span>
-      <el-button text @click="toggleFav">
+      <el-button
+        v-if="settingsStore.settings.devMode"
+        text
+        :icon="Edit"
+        title="编辑当前题目（开发模式）"
+        @click="openEdit"
+        >编辑</el-button
+      >
+      <el-button text @click="toggleFav" style="margin-left: 0px;">
         <el-icon :color="isFaved ? '#e6a23c' : undefined">
           <StarFilled v-if="isFaved" />
           <Star v-else />
@@ -340,6 +413,20 @@ onBeforeUnmount(() => {
       <AnswerSheet :questions="questions" :answers="session.answers" :marks="session.marks" :current="index"
         :mode="mode" @jump="jump" />
     </el-drawer>
+
+    <!-- 开发模式：题目编辑窗口 -->
+    <QuizFormDialog
+      v-if="settingsStore.settings.devMode"
+      v-model="editDialogVisible"
+      :question="editingQuestion"
+      :bank-id="session.bankId"
+      :chapters="editChapters"
+      :chapter-type="editChapterType"
+      :chapter-option-count="editChapterOptionCount"
+      :all-tags="editAllTags"
+      :existing-ids="editExistingIds"
+      @save="onSaveQuestion"
+    />
   </div>
 </template>
 

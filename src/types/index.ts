@@ -194,6 +194,8 @@ export interface AppSettings {
   fontSize: FontSize
   /** 滑动切题开关 */
   swipe: boolean
+  /** 开发模式：答题页显示编辑按钮，可就地编辑当前题目 */
+  devMode: boolean
   /** 错题连续答对移出阈值 */
   wrongThreshold: number
   /** 记住的练习模式偏好 */
