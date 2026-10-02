@@ -2,20 +2,20 @@
 /**
  * 设置页：外观偏好、练习/考试偏好记忆、滑动切题、错题阈值、导入导出。
  */
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { Link } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
-import { createBank, defaultRule, exportBackup, exportBankFile, saveBank } from '@/services/bankService'
-import { loadBank } from '@/services/bankService'
+import { createBank, defaultRule, exportBackup, exportBankFile, loadBank, normalizeQuestions, saveBank } from '@/services/bankService'
+import { useIsMobile } from '@/composables/useIsMobile'
 import * as storage from '@/services/storage'
-import type { BankData, BankRule } from '@/types'
+import type { BankData, BankRule, Paper } from '@/types'
 import { fmtTime, typeLabel } from '@/utils/format'
 
 const bankStore = useBankStore()
 const settingsStore = useSettingsStore()
 const s = settingsStore.settings
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 
 const theme = computed({
   get: () => s.theme === 'dark',
@@ -62,22 +62,38 @@ async function onImportBankFile(uploadFile: { raw?: File }): Promise<void> {
   if (!file) return
   importing.value = true
   try {
-    const json = await readJsonFile(file)
+    let json: unknown
+    try {
+      json = await readJsonFile(file)
+    } catch {
+      ElMessage.error('文件解析失败，请确认是合法的 JSON 文件')
+      return
+    }
     if (!isBankFile(json)) {
       ElMessage.error('文件格式不符：题库文件应包含 Questions 数组（{ name?, rule?, Questions, Papers? }）')
+      return
+    }
+    // 逐题补默认值并剔除无效条目：外部文件不可信，脏数据会在渲染与判分时抛异常
+    const questions = normalizeQuestions(json.Questions)
+    if (!questions.length) {
+      ElMessage.error('该题库文件中没有可用的题目（题干为空或格式不正确）')
       return
     }
     const name = json.name || file.name.replace(/\.json$/i, '')
     const meta = await createBank(name, json.rule ?? defaultRule())
     const data: BankData = {
-      Questions: Array.isArray(json.Questions) ? json.Questions : [],
-      Papers: Array.isArray(json.Papers) ? json.Papers : []
+      Questions: questions,
+      Papers: Array.isArray(json.Papers) ? (json.Papers as Paper[]) : []
     }
-    await saveBank(meta, data)
+    try {
+      await saveBank(meta, data)
+    } catch (e) {
+      // 配额溢出等写入失败要给出准确原因，不能笼统地报"解析失败"
+      ElMessage.error(e instanceof Error ? e.message : '题库保存失败')
+      return
+    }
     await bankStore.afterBankEdited(meta.id)
     ElMessage.success(`题库「${meta.name}」导入成功`)
-  } catch {
-    ElMessage.error('文件解析失败，请确认是合法的 JSON 文件')
   } finally {
     importing.value = false
   }
@@ -129,14 +145,6 @@ async function onClearCache(): Promise<void> {
   ElMessage.success('缓存已清理，即将刷新页面')
   window.setTimeout(() => window.location.reload(), 800)
 }
-
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
-}
-
-onMounted(async () => {
-  window.addEventListener('resize', onResize)
-})
 
 /* ---------- 外链跳转 ---------- */
 

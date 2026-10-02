@@ -76,7 +76,13 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
   d.correct = correct
   recomputeRecord(record.value)
   userStore.updateRecord(record.value)
-  if (!correct) userStore.addWrong(d.questionId, d.yourAnswer)
+  // 改判必须双向同步错题本：只加不减会让"先点答错、又改答对"的题永久留在错题本里，
+  // 而且 addWrong 每次都自增 count 并清零 streak，反复点击会不断累加。
+  if (correct) {
+    if (userStore.wrongIds.has(d.questionId)) userStore.removeWrong([d.questionId])
+  } else if (!userStore.wrongIds.has(d.questionId)) {
+    userStore.addWrong(d.questionId, d.yourAnswer)
+  }
 }
 </script>
 

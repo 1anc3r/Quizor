@@ -237,12 +237,17 @@ export function gradeSession(s: QuizSession, bankName: string): QuizRecord {
   const now = Date.now()
   const details: RecordDetail[] = s.questions.map((q) => {
     const ans = s.answers[q.id]
-    const answered = q.type === 'text' ? !!ans?.text.trim() : (ans?.keys.length ?? 0) > 0
     let correct: boolean | null
     if (s.mode === 'practice') {
       correct = ans?.revealed ? ans.correct : null
+    } else if (q.type === 'text') {
+      correct = null
     } else {
-      correct = q.type === 'text' ? null : answered && isChoiceCorrect(q, ans?.keys ?? [])
+      // 未作答的选择题必须是 null（约定见 RecordDetail.correct：null = 未作答或待自评）。
+      // 之前写成 `answered && isChoiceCorrect(...)`，未作答时短路得到 false，
+      // 于是跳过的题被当成"答错"计入 wrong/accuracy，还会被收藏进错题本。
+      const picked = ans?.keys ?? []
+      correct = picked.length > 0 ? isChoiceCorrect(q, picked) : null
     }
     const gotScore = correct === true ? q.score : 0
     return {
@@ -258,7 +263,9 @@ export function gradeSession(s: QuizSession, bankName: string): QuizRecord {
       gotScore
     }
   })
-  const answered = details.filter((d) => d.correct !== null || d.yourAnswer !== '（未作答）').length
+  // 已作答 = 答题卡上有作答痕迹；不能再用 `d.correct !== null` 判断，
+  // 因为考试模式下未作答的选择题也是 null，而自评前的简答题同样为 null。
+  const answered = details.filter((d) => d.yourAnswer !== '（未作答）').length
   const correct = details.filter((d) => d.correct === true).length
   const wrong = details.filter((d) => d.correct === false).length
   const judged = correct + wrong
@@ -285,6 +292,7 @@ export function gradeSession(s: QuizSession, bankName: string): QuizRecord {
 
 /** 简答题自评后重算记录统计 */
 export function recomputeRecord(rec: QuizRecord): void {
+  rec.answered = rec.details.filter((d) => d.yourAnswer !== '（未作答）').length
   rec.correct = rec.details.filter((d) => d.correct === true).length
   rec.wrong = rec.details.filter((d) => d.correct === false).length
   const judged = rec.correct + rec.wrong

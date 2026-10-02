@@ -3,7 +3,8 @@
  * 收藏夹（当前题库）：关键字查询、章节/题型/来源筛选、按时间排序、
  * 明细展开、练习入口、单条/批量移除。
  */
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useIsMobile } from '@/composables/useIsMobile'
 import { useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
@@ -20,7 +21,7 @@ const filterChapter = ref('')
 const filterType = ref<'' | QuestionType>('')
 const filterSource = ref('')
 const selection = ref<FavRow[]>([])
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 
 // ---------- 分页 ----------
 const pageSize = ref(20)
@@ -90,14 +91,6 @@ async function removeBatch(): Promise<void> {
   userStore.removeFavorites(selection.value.map((r) => r.item.questionId))
   selection.value = []
 }
-
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
-}
-
-onMounted(async () => {
-  window.addEventListener('resize', onResize)
-})
 </script>
 
 <template>

@@ -24,6 +24,7 @@ import {
   setUnfinished
 } from '@/stores/session'
 import { saveBank } from '@/services/bankService'
+import { useIsMobile } from '@/composables/useIsMobile'
 import type { Question, QuestionType, QuizSession, SessionQuestion } from '@/types'
 import { fmtDuration, typeLabel } from '@/utils/format'
 import AnswerSheet from '@/components/AnswerSheet.vue'
@@ -49,7 +50,7 @@ const answer = computed(() => (current.value && session.value ? session.value.an
 const revealed = computed(() => !!answer.value?.revealed)
 const marked = computed(() => (current.value && session.value ? session.value.marks.includes(current.value.id) : false))
 const isFaved = computed(() => (current.value ? userStore.favoriteIds.has(current.value.id) : false))
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 const sheetOpen = ref(window.innerWidth > 768)
 
 function persist(): void {
@@ -180,8 +181,17 @@ async function onSaveQuestion(q: Question): Promise<void> {
   if (meta && bank && meta.id === s.bankId) {
     const qi = bank.Questions.findIndex((x) => x.id === q.id)
     if (qi >= 0) {
+      const prev = bank.Questions[qi]
       bank.Questions[qi] = q
-      await saveBank(JSON.parse(JSON.stringify(meta)), JSON.parse(JSON.stringify(bank)))
+      try {
+        await saveBank(JSON.parse(JSON.stringify(meta)), JSON.parse(JSON.stringify(bank)))
+      } catch (e) {
+        // 写盘失败（多为 localStorage 配额溢出）时回滚内存改动，
+        // 否则界面显示已更新、刷新后却丢失，用户无从察觉
+        bank.Questions[qi] = prev
+        ElMessage.error(e instanceof Error ? e.message : '题库保存失败')
+        return
+      }
       await bankStore.afterBankEdited(meta.id)
     }
   }
@@ -279,10 +289,6 @@ function onTouchEnd(e: TouchEvent): void {
 
 /* ---------- 生命周期 ---------- */
 
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
-}
-
 onMounted(async () => {
   if (!session.value) {
     ElMessage.error('会话不存在或已完成')
@@ -298,13 +304,11 @@ onMounted(async () => {
     now.value = Date.now()
   }, 500)
   window.addEventListener('beforeunload', flushSession)
-  window.addEventListener('resize', onResize)
 })
 
 onBeforeUnmount(() => {
   if (timer !== null) window.clearInterval(timer)
   window.removeEventListener('beforeunload', flushSession)
-  window.removeEventListener('resize', onResize)
   flushSession()
 })
 </script>

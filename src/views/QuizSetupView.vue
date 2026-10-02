@@ -4,6 +4,7 @@
  * 进入时自动恢复对应模式的上次设置（设置页记忆）；支持从错题本/收藏夹带范围跳入。
  */
 import { computed, onMounted, ref, reactive } from 'vue'
+import { useIsMobile } from '@/composables/useIsMobile'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
@@ -16,7 +17,7 @@ const router = useRouter()
 const bankStore = useBankStore()
 const settingsStore = useSettingsStore()
 const userStore = useUserDataStore()
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 
 const mode = computed<'practice' | 'exam'>(() => (route.params.mode === 'exam' ? 'exam' : 'practice'))
 
@@ -37,10 +38,6 @@ const SCOPE_OPTIONS: { label: string; value: PracticeScope }[] = [
   { label: '仅收藏', value: 'favorite' }
 ]
 
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
-}
-
 onMounted(() => {
   // 恢复上次对应模式的设置
   if (mode.value === 'practice') {
@@ -55,7 +52,6 @@ onMounted(() => {
     Object.assign(exam, JSON.parse(JSON.stringify(settingsStore.settings.exam)))
     if (!exam.paperId) exam.paperId = bankStore.bank?.Papers[0]?.id ?? ''
   }
-  window.addEventListener('resize', onResize)
 })
 
 const papers = computed(() => bankStore.bank?.Papers ?? [])

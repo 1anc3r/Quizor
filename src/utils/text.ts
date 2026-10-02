@@ -7,9 +7,9 @@ export function htmlToText(html: string): string {
   if (!html) return ''
   // 公式节点保留其 LaTeX 源码作为可读文本
   const replaced = html.replace(/<span class="ql-formula"[^>]*data-value="([^"]*)"[^>]*>[\s\S]*?<\/span>/g, ' $1 ')
-  const div = document.createElement('div')
-  div.innerHTML = replaced
-  const text = div.textContent || ''
+  // 用 DOMParser 而不是 div.innerHTML：解析出的文档是惰性的，不会执行脚本，也不会触发图片加载
+  const doc = new DOMParser().parseFromString(replaced, 'text/html')
+  const text = doc.body.textContent || ''
   return text.replace(/\s+/g, ' ').trim()
 }
 

@@ -109,7 +109,7 @@ body {
 
 /* ========== 字号偏好（题干 / 选项） ========== */
 
-.font-small .q-stem
+.font-small .q-stem,
 .font-small .rich-text {
   font-size: 14px;
 }
@@ -118,7 +118,7 @@ body {
   font-size: 13px;
 }
 
-.font-standard .q-stem
+.font-standard .q-stem,
 .font-standard .rich-text {
   font-size: 16px;
 }
@@ -127,8 +127,8 @@ body {
   font-size: 15px;
 }
 
-.font-large .q-stem
-.font-large .rich-text  {
+.font-large .q-stem,
+.font-large .rich-text {
   font-size: 19px;
 }
 

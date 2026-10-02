@@ -7,6 +7,7 @@
 import { nextTick, onMounted, ref, watch } from 'vue'
 import katex from 'katex'
 import { escapeHtml, isHtml } from '@/utils/text'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 const props = defineProps<{ content: string }>()
 
@@ -17,7 +18,8 @@ async function render(): Promise<void> {
   const root = el.value
   if (!root) return
   const content = props.content ?? ''
-  root.innerHTML = isHtml(content) ? content : escapeHtml(content).replace(/\n/g, '<br>')
+  // 题库 HTML 可能来自外部导入文件，写入 innerHTML 前必须过白名单净化
+  root.innerHTML = isHtml(content) ? sanitizeHtml(content) : escapeHtml(content).replace(/\n/g, '<br>')
   // 表格横向滚动包裹：移动端窄屏下表格宽度超过容器时，可左右滑动查看，而不是被截断
   root.querySelectorAll('table').forEach((table) => {
     if (table.parentElement?.classList.contains('table-scroll')) return
@@ -29,7 +31,7 @@ async function render(): Promise<void> {
   root.querySelectorAll('span.ql-formula').forEach((node) => {
     const value = node.getAttribute('data-value') ?? ''
     try {
-      katex.render(value, node as HTMLElement, { throwOnError: false })
+      katex.render(value, node as HTMLElement, { throwOnError: false, trust: false })
     } catch {
       node.textContent = value
     }

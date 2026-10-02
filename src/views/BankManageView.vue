@@ -6,13 +6,14 @@
  * - 题目列表卡片：查询、章节/题型筛选、新增、编辑、删除、批量删除、添加到目标试卷
  * 编辑模式下所有变更防抖自动持久化到 localStorage 覆盖层。
  */
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { BankData, BankMeta, ComposeItem, Paper, Question, QuestionType } from '@/types'
 import { createBank, defaultRule, loadBank, loadManifest, saveBank } from '@/services/bankService'
 import { nameToBankId } from '@/utils/pinyin'
 import { useBankStore } from '@/stores/bankStore'
+import { useIsMobile } from '@/composables/useIsMobile'
 import { plainText, shortId, truncate, typeLabel } from '@/utils/format'
 import { genId } from '@/utils/id'
 import PaperFormDialog from '@/components/PaperFormDialog.vue'
@@ -25,7 +26,7 @@ const bankStore = useBankStore()
 const isNewMode = computed(() => bankId.value === 'new' || !bankId.value)
 const bankId = computed(() => String(route.params.id ?? 'new'))
 const ready = ref(false)
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 
 const bankMeta = reactive<BankMeta>({
   id: '',
@@ -36,10 +37,23 @@ const bankMeta = reactive<BankMeta>({
 })
 const bankData = reactive<BankData>({ Questions: [], Papers: [] })
 
-onMounted(async () => {
+/**
+ * 按当前路由参数装载页面数据。
+ * 必须用 watch(bankId) 而不是 onMounted：/bank/manage/new 与 /bank/manage/:id 是同一条
+ * 路由记录，且 App.vue 的 <router-view> 没有 :key，组件实例会被复用，
+ * onMounted 不会再执行（新建后 router.replace 到编辑 URL 就是这种情况）。
+ */
+async function loadInto(): Promise<void> {
+  ready.value = false
   if (isNewMode.value) {
-    bankMeta.rule = defaultRule()
-  } else {
+    // 实例可能刚被复用过来，必须清空上一次的数据
+    Object.assign(bankMeta, { id: '', name: '', bankFile: '', questionCount: 0, rule: defaultRule() })
+    bankData.Questions = []
+    bankData.Papers = []
+    ready.value = true
+    return
+  }
+  try {
     const m = await loadManifest()
     const found = m.Banks.find((b) => b.id === bankId.value)
     if (!found) {
@@ -51,9 +65,18 @@ onMounted(async () => {
     const d = JSON.parse(JSON.stringify(await loadBank(bankId.value))) as BankData
     bankData.Questions = d.Questions
     bankData.Papers = d.Papers
+    ready.value = true
+  } catch (e) {
+    ElMessage.error(e instanceof Error ? e.message : '题库加载失败')
+    router.replace('/')
   }
-  ready.value = true
-  window.addEventListener('resize', onResize)
+}
+
+watch(bankId, loadInto, { immediate: true })
+
+onBeforeUnmount(() => {
+  // 防抖保存的定时器必须取消，否则离开页面后仍会写盘
+  if (saveTimer !== null) window.clearTimeout(saveTimer)
 })
 
 /* ---------- 基本信息 ---------- */
@@ -72,9 +95,19 @@ let saveTimer: number | null = null
 function persist(): void {
   if (isNewMode.value || !ready.value) return
   if (saveTimer !== null) window.clearTimeout(saveTimer)
+  // 在编辑当刻取快照，避免异步回调读取到已经变化的 bankMeta / bankData
+  const id = bankMeta.id
+  const metaSnapshot = JSON.parse(JSON.stringify(bankMeta)) as BankMeta
+  const dataSnapshot = JSON.parse(JSON.stringify(bankData)) as BankData
   saveTimer = window.setTimeout(async () => {
-    await saveBank(JSON.parse(JSON.stringify(bankMeta)), JSON.parse(JSON.stringify(bankData)))
-    await bankStore.afterBankEdited(bankMeta.id)
+    // 防抖窗口内可能已切换到别的题库，此时丢弃这次落盘，否则会串库覆盖
+    if (id !== bankId.value) return
+    try {
+      await saveBank(metaSnapshot, dataSnapshot)
+      await bankStore.afterBankEdited(id)
+    } catch (e) {
+      ElMessage.error(e instanceof Error ? e.message : '题库保存失败')
+    }
   }, 300)
 }
 
@@ -87,10 +120,15 @@ async function onCreateBank(): Promise<void> {
     ElMessage.warning('请至少添加一条组卷规则')
     return
   }
-  const created = await createBank(bankMeta.name.trim(), JSON.parse(JSON.stringify(bankMeta.rule)))
-  await bankStore.afterBankEdited(created.id)
-  ElMessage.success(`题库已创建，ID：${created.id}`)
-  router.replace(`/bank/manage/${created.id}`)
+  try {
+    const created = await createBank(bankMeta.name.trim(), JSON.parse(JSON.stringify(bankMeta.rule)))
+    await bankStore.afterBankEdited(created.id)
+    ElMessage.success(`题库已创建，ID：${created.id}`)
+    router.replace(`/bank/manage/${created.id}`)
+  } catch (e) {
+    // createBank 内部的 saveBank 会因配额溢出抛错，必须让用户看到真实原因
+    ElMessage.error(e instanceof Error ? e.message : '题库创建失败')
+  }
 }
 
 async function onDeleteBank(): Promise<void> {
@@ -178,9 +216,8 @@ const filteredPapers = computed(() => {
   return bankData.Papers.filter((p) => {
     if (pSource.value && p.source !== pSource.value) return false
     if (!kw) return true
-    return p.name.toLowerCase().includes(kw) || p.source.toLowerCase().includes(kw) || p.source.toLowerCase().includes(pSource.value)
-  }
-  )
+    return p.name.toLowerCase().includes(kw) || p.source.toLowerCase().includes(kw)
+  })
 })
 
 // 分页相关
@@ -372,10 +409,6 @@ function confirmAddToPaper(): void {
   persist()
   addToPaperVisible.value = false
   ElMessage.success(`已添加 ${added} 题到「${paper.name}」`)
-}
-
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
 }
 </script>
 

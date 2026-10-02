@@ -3,6 +3,7 @@
  * 首页：题库切换 + 统计卡片 + 做题入口（含断点续答）+ 题库浏览卡片。
  */
 import { computed, onMounted, ref, watch, reactive } from 'vue'
+import { useIsMobile } from '@/composables/useIsMobile'
 import { useRouter } from 'vue-router'
 import { Edit, Plus, Search } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bankStore'
@@ -66,7 +67,7 @@ function goSetup(mode: 'practice' | 'exam'): void {
 const paperKeyword = ref('')
 const questionKeyword = ref('')
 const activeChapters = ref<string[]>([])
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 
 const filteredPapers = computed(() => {
   const kw = paperKeyword.value.trim().toLowerCase()
@@ -142,13 +143,8 @@ function getPagedQuestions(chapter: string, allQuestions: Question[]): Question[
   return allQuestions.slice(start, end)
 }
 
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
-}
-
 onMounted(async () => {
   refreshUnfinished()
-  window.addEventListener('resize', onResize)
 })
 </script>
 

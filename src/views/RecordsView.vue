@@ -4,6 +4,7 @@
  * ECharts 仅在本页动态导入、按需注册，不进入首屏 bundle。
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useIsMobile } from '@/composables/useIsMobile'
 import type { ECharts } from 'echarts/core'
 import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
@@ -34,7 +35,7 @@ watch(pageSize, () => {
   currentPage.value = 1
 })
 
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 
 function selectedKeysOf(rec: QuizRecord, qid: string): string[] {
   const d = rec.details.find((x) => x.questionId === qid)
@@ -114,10 +115,10 @@ async function renderCharts(): Promise<void> {
   }
 }
 
+/** 窗口尺寸变化时重排图表（移动端判断由 useIsMobile 自行处理） */
 function onResize(): void {
   trendChart?.resize()
   chapterChart?.resize()
-  isMobile.value = window.innerWidth <= 768
 }
 
 onMounted(() => {

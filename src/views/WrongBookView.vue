@@ -3,7 +3,8 @@
  * 错题本（当前题库）：答错自动收录（同题更新），支持关键字查询、
  * 章节/题型/来源筛选、按错误次数/时间排序、明细展开、练习入口、单条/批量移除。
  */
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useIsMobile } from '@/composables/useIsMobile'
 import { useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
@@ -23,7 +24,7 @@ const filterType = ref<'' | QuestionType>('')
 const filterSource = ref('')
 const sortBy = ref<'count' | 'time'>('time')
 const selection = ref<WrongRow[]>([])
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = useIsMobile()
 
 // ---------- 分页 ----------
 const pageSize = ref(20)
@@ -93,14 +94,6 @@ async function removeBatch(): Promise<void> {
   userStore.removeWrong(selection.value.map((r) => r.item.questionId))
   selection.value = []
 }
-
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
-}
-
-onMounted(async () => {
-  window.addEventListener('resize', onResize)
-})
 </script>
 
 <template>
