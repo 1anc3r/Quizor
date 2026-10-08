@@ -9,7 +9,7 @@ import { Edit, Plus, Search } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/stores/session'
-import type { Question, QuizSession } from '@/types'
+import type { Question, StoredQuizSession } from '@/types'
 import { plainText, truncate } from '@/utils/format'
 
 const router = useRouter()
@@ -46,7 +46,11 @@ const stats = computed(() => {
 
 /* ---------- 断点续答 ---------- */
 
-const unfinished = ref<QuizSession | null>(null)
+/**
+ * 断点续答卡片。这里拿到的会话是落盘形态（只有题号，没有题干），
+ * 但卡片只展示题量与时间，点"继续"后由答题页按 id 从题库回填题干。
+ */
+const unfinished = ref<StoredQuizSession | null>(null)
 
 function refreshUnfinished(): void {
   unfinished.value = bankStore.currentId ? getUnfinished(bankStore.currentId) : null

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 /**
- * 做题页：凭路由参数 sessionId 从 localStorage 恢复完整会话（不通过路由传配置）。
+ * 做题页：凭路由参数 sessionId 从 localStorage 恢复会话（不通过路由传配置）。
  * - 顶部栏：退出 / 计时器 / 进度 / 收藏 / 答题卡 / 交卷
  * - 练习模式：每答一题即时反馈（单选/判断点击即判，多选确认后判，简答提交后自评）
  * - 考试模式：倒计时（截止时间 - 当前时间重算）、答题卡、标记，交卷或超时自动交卷统一判分
- * - 断点续答：作答变更防抖 300ms 落盘 + beforeunload 强制落盘
+ * - 断点续答：localStorage 只存题号，挂载时先加载题库再回填题干（hydrateSession），
+ *   作答变更防抖 300ms 落盘 + beforeunload 强制落盘
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -16,8 +17,9 @@ import {
   answerToText,
   flushSession,
   gradeSession,
+  hydrateSession,
   isChoiceCorrect,
-  loadSession,
+  loadStoredSession,
   persistSessionDebounced,
   removeSession,
   saveSession,
@@ -38,7 +40,12 @@ const bankStore = useBankStore()
 const settingsStore = useSettingsStore()
 const userStore = useUserDataStore()
 
-const session = ref<QuizSession | null>(loadSession(String(route.params.sessionId)))
+/**
+ * 会话在挂载时异步恢复（要先 await 题库），期间 restoring 为 true 显示加载态。
+ * 不能像以前那样在 setup 里同步 loadSession：那时只有题号，题干还没回填。
+ */
+const session = ref<QuizSession | null>(null)
+const restoring = ref(true)
 const submitted = ref(false)
 
 const mode = computed(() => session.value?.mode ?? 'practice')
@@ -290,20 +297,47 @@ function onTouchEnd(e: TouchEvent): void {
 /* ---------- 生命周期 ---------- */
 
 onMounted(async () => {
-  if (!session.value) {
-    ElMessage.error('会话不存在或已完成')
-    router.replace('/')
-    return
+  try {
+    const stored = loadStoredSession(String(route.params.sessionId))
+    if (!stored) {
+      ElMessage.error('会话不存在或已完成')
+      router.replace('/')
+      return
+    }
+    // 题干要按 id 从题库回填，所以必须先把会话所属题库加载好
+    if (stored.bankId !== bankStore.currentId || !bankStore.bank) {
+      await bankStore.switchBank(stored.bankId)
+    }
+    // 题库没加载出来（被删除/加载失败）时不能用空题目去 hydrate：
+    // 那会把所有题判成"已从题库删除"从而清掉会话数据。此时保留会话，让用户先恢复题库。
+    if (!bankStore.bank || bankStore.currentId !== stored.bankId) {
+      ElMessage.error('题库加载失败，无法恢复本次会话')
+      router.replace('/')
+      return
+    }
+    const { session: full, missing } = hydrateSession(stored, bankStore.bank.Questions)
+    if (!full.questions.length) {
+      ElMessage.error('本次会话的题目已不在题库中，会话已失效')
+      removeSession(stored.id)
+      setUnfinished(stored.bankId, null)
+      router.replace('/')
+      return
+    }
+    session.value = full
+    if (missing.length) {
+      ElMessage.warning(`有 ${missing.length} 道题已不在题库中，已从本次会话移除`)
+    }
+    // 旧版本的会话里存着整题快照（单条可达 3MB 以上，写不进 localStorage），
+    // 恢复成功就按轻量形态回写一次，把历史数据顺势瘦身
+    saveSession(full)
+    userStore.load(stored.bankId)
+    timer = window.setInterval(() => {
+      now.value = Date.now()
+    }, 500)
+    window.addEventListener('beforeunload', flushSession)
+  } finally {
+    restoring.value = false
   }
-  // 确保用户数据（错题/收藏/记录）与会话所属题库对齐
-  if (session.value.bankId !== bankStore.currentId) {
-    await bankStore.switchBank(session.value.bankId)
-  }
-  userStore.load(session.value.bankId)
-  timer = window.setInterval(() => {
-    now.value = Date.now()
-  }, 500)
-  window.addEventListener('beforeunload', flushSession)
 })
 
 onBeforeUnmount(() => {
@@ -314,7 +348,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div v-if="session" class="quiz-page" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
+  <!-- 恢复中：题干要从题库按 id 回填后再渲染，避免先闪一屏空题 -->
+  <div v-if="restoring" class="quiz-page">
+    <div class="quiz-main">
+      <el-card v-loading="true" element-loading-text="正在恢复会话…" shadow="never" class="page-card"
+        style="min-height: 180px" />
+    </div>
+  </div>
+  <div v-else-if="session" class="quiz-page" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
     <!-- 顶部栏 -->
     <header class="quiz-top">
       <el-button text :icon="Close" @click="exit">退出</el-button>

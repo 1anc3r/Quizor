@@ -92,9 +92,28 @@ export interface ExamConfig {
   paperId: string
 }
 
-/** 会话内的题目快照（含本题分值），保证断点续答与会话期间数据一致 */
+/** 会话内的题目（含本题分值），运行时形态，题干等内容完整 */
 export interface SessionQuestion extends Question {
   score: number
+}
+
+/**
+ * 落盘形态的会话题目：只存回填所需的轻量字段，题干等内容按 id 从题库取。
+ *
+ * 会话曾把整题（含富文本题干、解析，甚至内嵌 base64 图片）复制进 localStorage，
+ * 于是"880 题 · 练习全部"的会话 JSON 实测 3,186,709 字符（≈6.4MB）——
+ * 单条就超过 SOFT_BUDGET_CHARS（2_000_000），更超过 localStorage 约 5MB 的硬配额，
+ * 这类会话永远写不进去，断点续答直接失效。只留 id/分值后同一会话为 149,454 字符。
+ *
+ * 保留 type/chapter/difficulty 是为了让"继续上次答题"等列表页不必先加载题库。
+ * 历史版本落盘的多余字段（stem/options/…）读入时会被忽略，下次落盘即被丢弃。
+ */
+export interface StoredSessionQuestion {
+  id: string
+  score: number
+  type: QuestionType
+  chapter: string
+  difficulty: number
 }
 
 export interface AnswerState {
@@ -126,6 +145,9 @@ export interface QuizSession {
   createdAt: number
   updatedAt: number
 }
+
+/** 落盘形态的会话（localStorage 中 session:* 的结构，题目内容需回填） */
+export type StoredQuizSession = Omit<QuizSession, 'questions'> & { questions: StoredSessionQuestion[] }
 
 /* ---------------- 做题记录 ---------------- */
 

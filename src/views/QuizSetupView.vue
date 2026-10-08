@@ -10,7 +10,7 @@ import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { ExamConfig, PracticeConfig, PracticeScope, QuestionType } from '@/types'
-import { buildExamQuestions, buildPracticeQuestions, loadSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
+import { buildExamQuestions, buildPracticeQuestions, loadStoredSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
 
 const route = useRoute()
 const router = useRouter()
@@ -100,17 +100,19 @@ function start(): void {
 /**
  * 发起新会话：取消并删除同题库的旧未完成会话，落盘成功后进入答题页。
  * 落盘失败（配额不足）时清理孤儿会话后重试一次。
+ * 校验用的是落盘结果（loadStoredSession），它不含题干——会话只存题号，
+ * 题干由答题页按 id 回填，因此"存得上"与"题量"无关。
  */
 function launch(session: import('@/types').QuizSession): void {
   pruneOrphanSessions()
   replaceUnfinished(session.bankId, session.id)
   saveSession(session)
-  if (!loadSession(session.id)) {
+  if (!loadStoredSession(session.id)) {
     // 写入失败：再清理一次并重试
     pruneOrphanSessions()
     saveSession(session)
   }
-  if (!loadSession(session.id)) {
+  if (!loadStoredSession(session.id)) {
     // 会话确实没存上：删除旧会话并撤掉指针，避免首页出现无法恢复的"继续上次答题"
     replaceUnfinished(session.bankId, '')
     ElMessage.error('本地存储空间不足，会话保存失败。请在设置页导出备份后清理缓存。')

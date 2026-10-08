@@ -272,9 +272,9 @@ const redirectToExternalLink = () => {
           <el-switch v-model="s.swipe" active-text="开" inactive-text="关" />
           <span class="muted" style="margin-left: 10px">左滑下一题、右滑上一题</span>
         </el-form-item>
-        <el-form-item label="修改模式">
+        <el-form-item label="编辑模式">
           <el-switch v-model="s.devMode" active-text="开" inactive-text="关" />
-          <span class="muted" style="margin-left: 10px">开启后答题页显示「编辑」按钮，可就地编辑当前题目</span>
+          <span class="muted" style="margin-left: 10px">开启后答题页显示「编辑」按钮，可编辑当前题目</span>
         </el-form-item>
         <el-form-item label="错题移出阈值">
           <el-input-number v-model="s.wrongThreshold" :min="1" :max="10" />
@@ -313,14 +313,9 @@ const redirectToExternalLink = () => {
       </div>
 
       <div style="margin-top: 12px; max-width: 100%">
-        <el-progress :percentage="budgetPercent" :status="budgetStatus" :stroke-width="14" />
+        <el-progress :percentage="budgetPercent" :text-inside="true" :status="budgetStatus" :stroke-width="14" />
         <div class="muted" style="margin-top: 8px">
-          已用 {{ fmtSize(usageInfo.bytes) }} / 软预算 {{ fmtSize(BUDGET_BYTES) }}（{{ usageInfo.chars.toLocaleString() }} 字符）。
-          浏览器对本域名 localStorage 的硬配额通常为 5MB 量级；达到软预算后会跳过写入并在控制台告警，不再静默丢数据。
-        </div>
-        <div class="muted" style="margin-top: 6px">
-          做题记录只保存题干纯文本摘要（最多 120 字），完整题干按 questionId 从题库回查；
-          题目已删除时记录里只能看到摘要。
+          已用 {{ fmtSize(usageInfo.bytes) }} / 预算 {{ fmtSize(BUDGET_BYTES) }}
         </div>
       </div>
 
@@ -343,10 +338,6 @@ const redirectToExternalLink = () => {
         <div v-else class="usage-row muted">
           {{ idbInfo === null ? '读取中…' : '不可用（浏览器禁用或隐私模式），题库存档已退回 localStorage' }}
         </div>
-      </div>
-      <div class="muted" style="margin-top: 6px">
-        题库的编辑与导入数据存放在 IndexedDB（配额通常为可用磁盘的很大一部分，不受 5MB 限制）；
-        一个 880 题的题库约 3.3MB，存 localStorage 需要 6.6MB —— 这正是必须搬走的原因。
       </div>
 
       <div class="usage-groups">
