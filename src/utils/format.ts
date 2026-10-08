@@ -53,6 +53,13 @@ export function truncate(text: string, len: number): string {
   return text.length > len ? `${text.slice(0, len)}…` : text
 }
 
+/** 字节数 → 可读体积（B / KB / MB） */
+export function fmtBytes(bytes: number): string {
+  if (bytes < 1024) return `${Math.max(0, Math.round(bytes))} B`
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
 /** 题号短显：取 id 末 6 位 */
 export function shortId(id: string): string {
   return id.length > 8 ? id.slice(-6) : id

@@ -348,7 +348,7 @@ const redirectToExternalLink = () => {
           清理废弃会话（{{ staleSessions.length }}）
         </el-button>
         <el-alert type="info" :closable="false" show-icon>
-          废弃会话＝已无法从「继续上次答题」进入、或超过 7 天未更新的答题草稿；应用启动时也会自动回收。
+          废弃会话＝已无法从「继续上次答题」进入或超过 7 天未更新的会话；应用启动时也会自动回收。
         </el-alert>
       </div>
 
