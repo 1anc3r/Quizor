@@ -161,7 +161,11 @@ function selfGrade(d: RecordDetail, correct: boolean): void {
       </div>
       <QuizDetail v-if="qMap.get(d.questionId)" :question="qMap.get(d.questionId)!" :selected="selectedKeys(d)"
         :your-answer="d.yourAnswer" />
-      <RichText v-else class="q-stem" :content="d.stem" />
+      <template v-else>
+        <!-- 记录只保存题干摘要，题目已删除/题库不可用时只能展示摘要 -->
+        <div class="muted" style="margin-bottom: 6px">原题已不在题库中，以下为保存的题干摘要</div>
+        <RichText class="q-stem" :content="d.stem" />
+      </template>
       <div class="muted" style="margin-top: 8px">你的答案：{{ d.yourAnswer }} · 正确答案：{{ d.rightAnswer }}</div>
       <div v-if="d.type === 'text' && isExam" style="margin-top: 10px">
         <span class="muted" style="margin-right: 8px">自评：</span>

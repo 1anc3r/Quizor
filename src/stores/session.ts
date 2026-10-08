@@ -16,6 +16,7 @@ import type {
 } from '@/types'
 import * as storage from '../services/storage'
 import { genId } from '@/utils/id'
+import { stemSummary } from '@/utils/text'
 
 const K_SESSION = 'session:' // + sessionId → QuizSession
 const K_UNFINISHED = 'unfinished:' // + bankId → sessionId
@@ -95,7 +96,9 @@ export const SESSION_MAX_AGE_DAYS = 7
 export function findStaleSessions(maxAgeDays = SESSION_MAX_AGE_DAYS): string[] {
   const alive = new Set<string>()
   for (const key of storage.keysWithPrefix(K_UNFINISHED)) {
-    const id = storage.readJSON<string | null>(key, null)
+    // 必须与 getUnfinished 走同一套解析（readUnfinishedId 兼容历史双重 JSON 编码），
+    // 否则双重编码的指针匹配不上任何会话，会把正在使用的会话误判为孤儿并删除
+    const id = readUnfinishedId(key.slice(K_UNFINISHED.length))
     if (id) alive.add(id)
   }
   const cutoff = Date.now() - maxAgeDays * 86_400_000
@@ -291,7 +294,9 @@ export function gradeSession(s: QuizSession, bankName: string): QuizRecord {
       questionId: q.id,
       chapter: q.chapter,
       type: q.type,
-      stem: q.stem,
+      // 只存纯文本摘要：完整题干可从题库按 questionId 回查，
+      // 历史记录曾把富文本题干整份落盘（一份 100 题记录约 300KB）
+      stem: stemSummary(q.stem),
       difficulty: q.difficulty,
       yourAnswer: answerToText(q, ans),
       rightAnswer: correctToText(q),

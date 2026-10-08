@@ -133,6 +133,12 @@ export interface RecordDetail {
   questionId: string
   chapter: string
   type: QuestionType
+  /**
+   * 题干摘要（纯文本，最多 STEM_SUMMARY_LEN 字）。
+   * 记录不再保存全量富文本题干：一份 100 题的记录约 300KB，瘦身后约 27KB。
+   * 渲染时优先按 questionId 回查题库里的完整题干，仅当题目已删除时才展示该摘要。
+   * 历史记录里仍可能是旧的全量 HTML，RichText 会按 isHtml 自动区分渲染。
+   */
   stem: string
   difficulty: number
   yourAnswer: string

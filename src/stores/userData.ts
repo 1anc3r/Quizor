@@ -6,10 +6,31 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { FavoriteItem, QuizRecord, WrongItem } from '@/types'
 import * as storage from '@/services/storage'
+import { stemSummary } from '@/utils/text'
 
 const K_WRONG = 'wrong:' // + bankId → Record<questionId, WrongItem>
 const K_FAV = 'fav:' // + bankId → Record<questionId, FavoriteItem>
 const K_RECORDS = 'records:' // + bankId → QuizRecord[]
+
+/**
+ * 历史记录瘦身：旧版本把完整富文本题干写进 details[].stem，这里一次性压缩为纯文本摘要。
+ * stemSummary 对已够短的题干原样返回，因此可安全重复执行（幂等）。
+ * @returns 是否有字段被改写（需要回写）
+ */
+function compactRecords(recs: QuizRecord[]): boolean {
+  let changed = false
+  for (const r of recs) {
+    if (!r || !Array.isArray(r.details)) continue
+    for (const d of r.details) {
+      const slim = stemSummary(d.stem)
+      if (slim !== d.stem) {
+        d.stem = slim
+        changed = true
+      }
+    }
+  }
+  return changed
+}
 
 export const useUserDataStore = defineStore('userData', () => {
   const bankId = ref('')
@@ -26,6 +47,10 @@ export const useUserDataStore = defineStore('userData', () => {
     wrong.value = id ? storage.readJSON(K_WRONG + id, {}) : {}
     favorites.value = id ? storage.readJSON(K_FAV + id, {}) : {}
     records.value = id ? storage.readJSON(K_RECORDS + id, []) : []
+    // 压缩历史记录里的全量题干后立刻回写；写失败也不影响使用，下次加载会再试
+    if (id && Array.isArray(records.value) && records.value.length && compactRecords(records.value)) {
+      storage.writeJSON(K_RECORDS + id, records.value)
+    }
   }
 
   /* ---------------- 错题本 ---------------- */

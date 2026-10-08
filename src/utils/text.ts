@@ -13,11 +13,28 @@ export function htmlToText(html: string): string {
   return text.replace(/\s+/g, ' ').trim()
 }
 
-/** 富文本转纯文本后截取前 n 字（默认 30 字），超出追加省略号 */
-export function summarize(html: string, n = 30): string {
-  const text = htmlToText(html)
-  if (text.length <= n) return text
-  return text.slice(0, n) + '…'
+/** 做题记录中保存的题干摘要长度上限（记录不保存全量富文本题干） */
+export const STEM_SUMMARY_LEN = 120
+
+/**
+ * 富文本 / 纯文本 → 纯文本后截取前 n 字，超出追加省略号。
+ * 只有确实是富文本才走 HTML 解析：纯文本题干可能含 < > 等数学符号，
+ * 当 HTML 剥离会把内容一起吃掉。
+ */
+export function summarize(content: string, n = STEM_SUMMARY_LEN): string {
+  if (!content) return ''
+  const text = isHtml(content) ? htmlToText(content) : content.replace(/\s+/g, ' ').trim()
+  return text.length > n ? text.slice(0, n) + '…' : text
+}
+
+/**
+ * 生成落盘用的题干摘要。
+ * 已短于上限时原样返回，因此"是否与入参相同"可用来判断是否需要改写，
+ * 对历史记录的一次性压缩是幂等的。
+ */
+export function stemSummary(stem: string, n = STEM_SUMMARY_LEN): string {
+  if (!stem || stem.length <= n) return stem
+  return summarize(stem, n)
 }
 
 /** 判断字符串是否包含 HTML 标签 */

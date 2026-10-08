@@ -315,6 +315,10 @@ const redirectToExternalLink = () => {
           已用 {{ fmtSize(usageInfo.bytes) }} / 软预算 {{ fmtSize(BUDGET_BYTES) }}（{{ usageInfo.chars.toLocaleString() }} 字符）。
           浏览器对本域名 localStorage 的硬配额通常为 5MB 量级；达到软预算后会跳过写入并在控制台告警，不再静默丢数据。
         </div>
+        <div class="muted" style="margin-top: 6px">
+          做题记录只保存题干纯文本摘要（最多 120 字），完整题干按 questionId 从题库回查；
+          题目已删除时记录里只能看到摘要。
+        </div>
       </div>
 
       <div class="usage-groups">

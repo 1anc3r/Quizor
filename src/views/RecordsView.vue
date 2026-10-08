@@ -11,6 +11,7 @@ import { useUserDataStore } from '@/stores/userData'
 import type { QuizRecord } from '@/types'
 import { fmtDuration, fmtTime, fmtTimeShort, typeLabel } from '@/utils/format'
 import QuizDetail from '@/components/QuizDetail.vue'
+import RichText from '@/components/RichText.vue'
 
 const bankStore = useBankStore()
 const userStore = useUserDataStore()
@@ -173,7 +174,14 @@ onBeforeUnmount(() => {
                 <QuizDetail v-if="bankStore.questionMap.get(d.questionId)"
                   :question="bankStore.questionMap.get(d.questionId)!" :selected="selectedKeysOf(row, d.questionId)"
                   :your-answer="d.yourAnswer" />
-                <div v-else class="muted">题目已删除。你的答案：{{ d.yourAnswer }} · 正确答案：{{ d.rightAnswer }}</div>
+                <template v-else>
+                  <!-- 记录只保存题干摘要，题目已删除时只能展示摘要 -->
+                  <div class="muted" style="margin-bottom: 6px">题目已从题库移除，以下为保存的题干摘要</div>
+                  <RichText class="q-stem" :content="d.stem" />
+                  <div class="muted" style="margin-top: 6px">
+                    你的答案：{{ d.yourAnswer }} · 正确答案：{{ d.rightAnswer }}
+                  </div>
+                </template>
               </el-card>
             </div>
           </template>
