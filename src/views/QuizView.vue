@@ -329,9 +329,8 @@ onBeforeUnmount(() => {
         v-if="settingsStore.settings.devMode"
         text
         :icon="Edit"
-        title="编辑当前题目（开发模式）"
         @click="openEdit"
-        >编辑</el-button
+        ></el-button
       >
       <el-button text @click="toggleFav" style="margin-left: 0px;">
         <el-icon :color="isFaved ? '#e6a23c' : undefined">

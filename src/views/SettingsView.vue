@@ -2,7 +2,7 @@
 /**
  * 设置页：外观偏好、练习/考试偏好记忆、滑动切题、错题阈值、导入导出。
  */
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { Link } from '@element-plus/icons-vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
@@ -10,6 +10,7 @@ import { createBank, defaultRule, exportBackup, exportBankFile, loadBank, normal
 import { useIsMobile } from '@/composables/useIsMobile'
 import * as storage from '@/services/storage'
 import type { BankData, BankRule, Paper } from '@/types'
+import { findStaleSessions, gcSessions } from '@/stores/session'
 import { fmtTime, typeLabel } from '@/utils/format'
 
 const bankStore = useBankStore()
@@ -62,38 +63,22 @@ async function onImportBankFile(uploadFile: { raw?: File }): Promise<void> {
   if (!file) return
   importing.value = true
   try {
-    let json: unknown
-    try {
-      json = await readJsonFile(file)
-    } catch {
-      ElMessage.error('文件解析失败，请确认是合法的 JSON 文件')
-      return
-    }
+    const json = await readJsonFile(file)
     if (!isBankFile(json)) {
       ElMessage.error('文件格式不符：题库文件应包含 Questions 数组（{ name?, rule?, Questions, Papers? }）')
-      return
-    }
-    // 逐题补默认值并剔除无效条目：外部文件不可信，脏数据会在渲染与判分时抛异常
-    const questions = normalizeQuestions(json.Questions)
-    if (!questions.length) {
-      ElMessage.error('该题库文件中没有可用的题目（题干为空或格式不正确）')
       return
     }
     const name = json.name || file.name.replace(/\.json$/i, '')
     const meta = await createBank(name, json.rule ?? defaultRule())
     const data: BankData = {
-      Questions: questions,
-      Papers: Array.isArray(json.Papers) ? (json.Papers as Paper[]) : []
+      Questions: Array.isArray(json.Questions) ? json.Questions : [],
+      Papers: Array.isArray(json.Papers) ? json.Papers : []
     }
-    try {
-      await saveBank(meta, data)
-    } catch (e) {
-      // 配额溢出等写入失败要给出准确原因，不能笼统地报"解析失败"
-      ElMessage.error(e instanceof Error ? e.message : '题库保存失败')
-      return
-    }
+    await saveBank(meta, data)
     await bankStore.afterBankEdited(meta.id)
     ElMessage.success(`题库「${meta.name}」导入成功`)
+  } catch {
+    ElMessage.error('文件解析失败，请确认是合法的 JSON 文件')
   } finally {
     importing.value = false
   }
@@ -129,6 +114,74 @@ async function onImportBackupFile(uploadFile: { raw?: File }): Promise<void> {
   }
 }
 
+/* ---------- 存储占用 ---------- */
+
+const usageInfo = ref(storage.usage())
+const staleSessions = ref<string[]>([])
+
+/** localStorage 按 UTF-16 计，字符数 × 2 ≈ 字节数 */
+const BUDGET_BYTES = storage.SOFT_BUDGET_CHARS * 2
+
+const budgetPercent = computed(() =>
+  Math.min(100, Math.round((usageInfo.value.chars / storage.SOFT_BUDGET_CHARS) * 100))
+)
+const budgetStatus = computed(() =>
+  budgetPercent.value >= 90 ? 'exception' : budgetPercent.value >= 70 ? 'warning' : 'success'
+)
+
+/** 数据 key → 可读分类名 */
+function kindOf(fullKey: string): string {
+  const name = fullKey.slice(storage.PREFIX.length)
+  if (name.startsWith('bankdata:')) return '题库数据'
+  if (name.startsWith('bankmeta:')) return '题库信息'
+  if (name.startsWith('records:')) return '做题记录'
+  if (name.startsWith('session:')) return '答题会话'
+  if (name.startsWith('wrong:')) return '错题本'
+  if (name.startsWith('fav:')) return '收藏夹'
+  if (name.startsWith('unfinished:')) return '续答指针'
+  if (name.startsWith('localbanks')) return '本地题库清单'
+  if (name.startsWith('deletedbanks')) return '已删题库名单'
+  if (name.startsWith('settings')) return '应用设置'
+  if (name.startsWith('currentBank')) return '当前题库'
+  return '其他'
+}
+
+const groups = computed(() => {
+  const m = new Map<string, number>()
+  for (const e of usageInfo.value.keys) {
+    const label = kindOf(e.key)
+    m.set(label, (m.get(label) ?? 0) + e.chars)
+  }
+  return [...m.entries()]
+    .map(([label, chars]) => ({ label, chars }))
+    .sort((a, b) => b.chars - a.chars)
+})
+
+const topKeys = computed(() => usageInfo.value.keys.slice(0, 5))
+
+function fmtSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`
+}
+
+function shortKey(fullKey: string): string {
+  const name = fullKey.slice(storage.PREFIX.length)
+  return name.length > 42 ? `${name.slice(0, 42)}…` : name
+}
+
+function refreshUsage(): void {
+  usageInfo.value = storage.usage()
+  staleSessions.value = findStaleSessions()
+}
+
+function onGcSessions(): void {
+  const n = gcSessions()
+  refreshUsage()
+  if (n > 0) ElMessage.success(`已回收 ${n} 个废弃会话`)
+  else ElMessage.info('没有需要回收的废弃会话')
+}
+
 /* ---------- 清理缓存 ---------- */
 
 async function onClearCache(): Promise<void> {
@@ -145,6 +198,15 @@ async function onClearCache(): Promise<void> {
   ElMessage.success('缓存已清理，即将刷新页面')
   window.setTimeout(() => window.location.reload(), 800)
 }
+
+function onResize(): void {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(async () => {
+  window.addEventListener('resize', onResize)
+  refreshUsage()
+})
 
 /* ---------- 外链跳转 ---------- */
 
@@ -207,7 +269,7 @@ const redirectToExternalLink = () => {
           <el-switch v-model="s.swipe" active-text="开" inactive-text="关" />
           <span class="muted" style="margin-left: 10px">左滑下一题、右滑上一题</span>
         </el-form-item>
-        <el-form-item label="开发模式">
+        <el-form-item label="修改模式">
           <el-switch v-model="s.devMode" active-text="开" inactive-text="关" />
           <span class="muted" style="margin-left: 10px">开启后答题页显示「编辑」按钮，可就地编辑当前题目</span>
         </el-form-item>
@@ -240,9 +302,56 @@ const redirectToExternalLink = () => {
       </el-alert>
     </el-card>
 
-    <!-- 清理缓存 -->
+    <!-- 存储管理 -->
     <el-card class="page-card" shadow="never">
-      <div class="card-title"><span class="title-text">清理缓存</span></div>
+      <div class="card-title">
+        <span class="title-text">存储管理</span>
+        <el-button size="small" @click="refreshUsage">刷新</el-button>
+      </div>
+
+      <div style="margin-top: 12px; max-width: 100%">
+        <el-progress :percentage="budgetPercent" :status="budgetStatus" :stroke-width="14" />
+        <div class="muted" style="margin-top: 8px">
+          已用 {{ fmtSize(usageInfo.bytes) }} / 软预算 {{ fmtSize(BUDGET_BYTES) }}（{{ usageInfo.chars.toLocaleString() }} 字符）。
+          浏览器对本域名 localStorage 的硬配额通常为 5MB 量级；达到软预算后会跳过写入并在控制台告警，不再静默丢数据。
+        </div>
+      </div>
+
+      <div class="usage-groups">
+        <el-tag v-for="g in groups" :key="g.label" type="info" effect="plain">
+          {{ g.label }} · {{ fmtSize(g.chars * 2) }}
+        </el-tag>
+        <span v-if="!groups.length" class="muted">暂无本地数据</span>
+      </div>
+
+      <div class="usage-list">
+        <div class="usage-row usage-head">
+          <span>占用最大的数据项</span>
+          <span>占用</span>
+        </div>
+        <div v-for="e in topKeys" :key="e.key" class="usage-row">
+          <span class="usage-key">
+            <el-tag size="small" effect="plain">{{ kindOf(e.key) }}</el-tag>
+            <span class="muted mono">{{ shortKey(e.key) }}</span>
+          </span>
+          <span class="usage-size">{{ fmtSize(e.chars * 2) }}</span>
+        </div>
+        <div v-if="!topKeys.length" class="usage-row muted">暂无本地数据</div>
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px">
+        <el-button type="warning" plain :disabled="!staleSessions.length" @click="onGcSessions">
+          清理废弃会话（{{ staleSessions.length }}）
+        </el-button>
+        <el-alert type="info" :closable="false" show-icon>
+          废弃会话＝已无法从「继续上次答题」进入、或超过 7 天未更新的答题草稿；应用启动时也会自动回收。
+        </el-alert>
+      </div>
+
+      <el-alert v-if="budgetPercent >= 80" type="warning" :closable="false" show-icon style="margin-top: 12px">
+        本地存储占用偏高：建议先「导出备份 JSON」，再清理做题记录，或把大图改为外链以减小题库体积。
+      </el-alert>
+
       <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px">
         <el-button type="danger" @click="onClearCache">清理缓存</el-button>
       </div>
@@ -265,3 +374,57 @@ const redirectToExternalLink = () => {
     </el-card>
   </div>
 </template>
+
+<style scoped>
+.usage-groups {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.usage-list {
+  margin-top: 14px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.usage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.usage-row + .usage-row {
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+
+.usage-head {
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+}
+
+.usage-key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.usage-key .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-size {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+</style>

@@ -76,8 +76,44 @@ function readUnfinishedId(bankId: string): string | null {
 
 /** 记录/查询某题库的未完成会话（首页"继续上次答题"） */
 export function setUnfinished(bankId: string, sessionId: string | null): void {
+  const prev = storage.readJSON<string | null>(K_UNFINISHED + bankId, null)
+  // 换新会话时顺手回收被替换的旧会话，避免它变成永远无人引用的孤儿数据
+  if (prev && prev !== sessionId) removeSession(prev)
   if (sessionId) storage.writeJSON(K_UNFINISHED + bankId, sessionId)
   else storage.removeKey(K_UNFINISHED + bankId)
+}
+
+/* ---------------- 会话垃圾回收 ---------------- */
+
+/** 超过该天数未更新的会话视为超龄 */
+export const SESSION_MAX_AGE_DAYS = 7
+
+/**
+ * 找出可回收的会话 key：不被任何题库的"继续上次答题"指针引用（无主），
+ * 或最后更新时间超过 maxAgeDays（超龄）。返回的 key 不含 PREFIX，可直接传给 removeKey。
+ */
+export function findStaleSessions(maxAgeDays = SESSION_MAX_AGE_DAYS): string[] {
+  const alive = new Set<string>()
+  for (const key of storage.keysWithPrefix(K_UNFINISHED)) {
+    const id = storage.readJSON<string | null>(key, null)
+    if (id) alive.add(id)
+  }
+  const cutoff = Date.now() - maxAgeDays * 86_400_000
+  const stale: string[] = []
+  for (const key of storage.keysWithPrefix(K_SESSION)) {
+    const s = storage.readJSON<QuizSession | null>(key, null)
+    // 损坏/字段缺失（时间戳非法）的会话一并回收
+    const updated = s ? Number(s.updatedAt ?? s.createdAt) || 0 : 0
+    if (!s || !updated || !alive.has(s.id) || updated < cutoff) stale.push(key)
+  }
+  return stale
+}
+
+/** 回收无主/超龄会话，返回清理条数 */
+export function gcSessions(maxAgeDays = SESSION_MAX_AGE_DAYS): number {
+  const stale = findStaleSessions(maxAgeDays)
+  stale.forEach((key) => storage.removeKey(key))
+  return stale.length
 }
 
 /**
@@ -237,6 +273,7 @@ export function gradeSession(s: QuizSession, bankName: string): QuizRecord {
   const now = Date.now()
   const details: RecordDetail[] = s.questions.map((q) => {
     const ans = s.answers[q.id]
+    const answered = q.type === 'text' ? !!ans?.text.trim() : (ans?.keys.length ?? 0) > 0
     let correct: boolean | null
     if (s.mode === 'practice') {
       correct = ans?.revealed ? ans.correct : null
