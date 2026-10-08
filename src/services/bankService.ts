@@ -2,14 +2,19 @@
  * 题库数据服务。
  *
  * 题库与应用代码分离：内置题库 JSON 放在 public/data/ 下，运行时 fetch 加载；
- * 用户在浏览器内对题库的编辑、以及新增的题库，全部以 localStorage 覆盖层/本地题库
- * 的形式保存，从而实现"纯静态 + 可编辑"。
+ * 用户在浏览器内对题库的编辑、以及新增的题库，全部以"本地覆盖层/本地题库"的形式保存，
+ * 从而实现"纯静态 + 可编辑"。
+ *
+ * 存储位置：题库存档（bankdata:）放在 **IndexedDB**，其余小数据留在 localStorage。
+ * 原因：一个 880 题的题库 JSON 约 3.3MB，存进 localStorage 要占 6.6MB（UTF-16），
+ * 直接超出 5MB 配额 —— 也就是"编辑内置大题库"根本无法保存。
  *
  * 加载顺序：BankManifest 先加载（并与本地新增/删除记录合并），科目题库懒加载 + 内存缓存。
  * 新增科目只需向 public/data/banks/ 添加文件并在 BankManifest.json 登记，无需改代码。
  */
 import type { BankData, BankManifest, BankMeta, BankRule, OptionItem, Paper, Question, QuestionType } from '@/types'
 import * as storage from './storage'
+import { idbDelete, idbGetRaw, idbKeys, idbSetRaw } from './idb'
 import { nameToBankId, uniqueBankId } from '../utils/pinyin'
 
 const K_LOCAL_BANKS = 'localbanks' // BankMeta[] 用户本地新增的题库
@@ -123,10 +128,87 @@ export async function loadManifest(force = false): Promise<BankManifest> {
   return manifestCache
 }
 
+/* ---------------- 题库存档的读写（IndexedDB 优先） ---------------- */
+
+/**
+ * 读取题库存档：IndexedDB 优先，其次 localStorage 里的历史覆盖层。
+ * 命中历史数据时顺手迁进 IDB（读回校验通过才删除源数据）。
+ */
+async function readBankData(id: string): Promise<BankData | null> {
+  const key = storage.fullKey(K_BANK_DATA + id)
+  const fromIdb = await idbGetRaw(key)
+  if (fromIdb !== null) {
+    try {
+      return JSON.parse(fromIdb) as BankData
+    } catch {
+      console.warn('[quizor] IndexedDB 中的题库数据损坏，回退 localStorage：', key)
+    }
+  }
+  const legacy = storage.readRaw(K_BANK_DATA + id)
+  if (legacy === null) return null
+  if ((await idbSetRaw(key, legacy)) && (await idbGetRaw(key)) === legacy) {
+    storage.removeKey(K_BANK_DATA + id)
+  }
+  try {
+    return JSON.parse(legacy) as BankData
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 写入题库存档：优先 IndexedDB；IDB 不可用时退回 localStorage（受软预算限制）。
+ * @returns 是否写入成功
+ */
+async function writeBankData(id: string, data: BankData): Promise<boolean> {
+  const key = storage.fullKey(K_BANK_DATA + id)
+  if (await idbSetRaw(key, JSON.stringify(data))) {
+    // 清掉可能残留的 localStorage 覆盖层，否则两处内容会不一致
+    storage.removeKey(K_BANK_DATA + id)
+    return true
+  }
+  return storage.writeJSON(K_BANK_DATA + id, data)
+}
+
+/**
+ * 一次性把 localStorage 里的题库存档搬进 IndexedDB。
+ *
+ * 这是最不能出错的一步，约束：
+ * 1. IDB 已存在同 key 时**不覆盖**（只补缺失项），避免与正在进行的保存互相覆盖；
+ * 2. 写入后必须读回、并逐字符与源数据比对，完全一致才删除 localStorage 副本；
+ * 3. 任何一步失败都保留 localStorage 副本 —— 宁可继续占空间，也不能丢数据。
+ * 幂等：重复执行只会剩 0 条可迁移项。
+ * @returns 成功迁移的条数
+ */
+export async function migrateBankDataToIdb(): Promise<number> {
+  const prefix = storage.fullKey(K_BANK_DATA)
+  const pending: { key: string; raw: string }[] = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (!key || !key.startsWith(prefix)) continue
+    const raw = localStorage.getItem(key)
+    if (raw !== null) pending.push({ key, raw })
+  }
+  if (!pending.length) return 0
+  const existing = new Set((await idbKeys()) ?? [])
+  let moved = 0
+  for (const { key, raw } of pending) {
+    if (existing.has(key)) {
+      console.warn('[quizor] 题库存档已在 IndexedDB 中，跳过迁移并保留 localStorage 副本：', key)
+      continue
+    }
+    if (!(await idbSetRaw(key, raw))) continue
+    if ((await idbGetRaw(key)) !== raw) continue
+    localStorage.removeItem(key)
+    moved++
+  }
+  return moved
+}
+
 /** 加载题库数据：本地覆盖层优先，其次 fetch 静态 JSON；带内存缓存 */
 export async function loadBank(id: string, force = false): Promise<BankData> {
   if (!force && bankCache.has(id)) return bankCache.get(id) as BankData
-  const override = storage.readJSON<BankData | null>(K_BANK_DATA + id, null)
+  const override = await readBankData(id)
   if (override) {
     const data = normalizeBankData(override)
     bankCache.set(id, data)
@@ -144,18 +226,18 @@ export async function loadBank(id: string, force = false): Promise<BankData> {
 }
 
 /**
- * 保存题库（元信息 + 数据），写入 localStorage 覆盖层/本地题库。
+ * 保存题库（元信息 + 数据），题库存档写入 IndexedDB。
  *
- * 写失败（典型原因：localStorage 配额溢出）时**必须抛出**：
- * `storage.writeJSON` 只返回 boolean，此前所有调用方都忽略了它，
- * 导致配额爆掉时界面照常提示"已保存"，用户以为成功却在刷新后丢失全部编辑。
+ * 写失败（IDB 不可用且 localStorage 配额也溢出）时**必须抛出**：
+ * 调用方此前都忽略写入结果，导致存不下时界面照常提示"已保存"，
+ * 用户以为成功却在刷新后丢失全部编辑。
  */
 export async function saveBank(meta: BankMeta, data: BankData): Promise<void> {
   const finalMeta: BankMeta = { ...meta, questionCount: data.Questions.length }
   const fail = (): never => {
-    throw new Error('本地存储空间不足，题库未保存。请先在「设置」导出备份，再清理缓存。')
+    throw new Error('题库未保存：本地数据库不可用且浏览器存储空间不足。请先在「设置」导出备份，再清理缓存。')
   }
-  if (!storage.writeJSON(K_BANK_DATA + meta.id, data)) fail()
+  if (!(await writeBankData(meta.id, data))) fail()
   bankCache.set(meta.id, data)
   const local = storage.readJSON<BankMeta[]>(K_LOCAL_BANKS, [])
   const idx = local.findIndex((b) => b.id === meta.id)
@@ -200,6 +282,7 @@ export async function createBank(name: string, rule: BankRule): Promise<BankMeta
 export async function deleteBank(id: string): Promise<void> {
   const manifest = await loadManifest()
   const meta = manifest.Banks.find((b) => b.id === id)
+  await idbDelete(storage.fullKey(K_BANK_DATA + id))
   storage.removeKey(K_BANK_DATA + id)
   storage.removeKey(K_BANK_META + id)
   if (meta?.local) {
@@ -225,9 +308,9 @@ export function exportBankFile(meta: BankMeta, data: BankData): void {
   downloadJson(payload, `${meta.name || meta.id}.json`)
 }
 
-/** 导出整包备份（localStorage 中全部 quizor: 数据） */
-export function exportBackup(): void {
-  const payload = storage.exportBackup()
+/** 导出整包备份（localStorage + IndexedDB 中的全部 quizor: 数据） */
+export async function exportBackup(): Promise<void> {
+  const payload = await storage.exportBackup()
   const d = new Date()
   const p = (n: number) => String(n).padStart(2, '0')
   downloadJson(payload, `quizor-backup-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}.json`)

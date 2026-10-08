@@ -39,8 +39,8 @@ function onExportBank(): void {
   })
 }
 
-function onExportBackup(): void {
-  exportBackup()
+async function onExportBackup(): Promise<void> {
+  await exportBackup()
   ElMessage.success('备份已导出')
 }
 
@@ -104,7 +104,7 @@ async function onImportBackupFile(uploadFile: { raw?: File }): Promise<void> {
     } catch {
       return
     }
-    storage.importBackup(json)
+    await storage.importBackup(json)
     ElMessage.success('备份导入成功，即将刷新页面')
     window.setTimeout(() => window.location.reload(), 800)
   } catch {
@@ -118,6 +118,8 @@ async function onImportBackupFile(uploadFile: { raw?: File }): Promise<void> {
 
 const usageInfo = ref(storage.usage())
 const staleSessions = ref<string[]>([])
+/** IndexedDB（题库存档）占用，需异步读取 */
+const idbInfo = ref<storage.IdbUsage | null>(null)
 
 /** localStorage 按 UTF-16 计，字符数 × 2 ≈ 字节数 */
 const BUDGET_BYTES = storage.SOFT_BUDGET_CHARS * 2
@@ -170,14 +172,15 @@ function shortKey(fullKey: string): string {
   return name.length > 42 ? `${name.slice(0, 42)}…` : name
 }
 
-function refreshUsage(): void {
+async function refreshUsage(): Promise<void> {
   usageInfo.value = storage.usage()
   staleSessions.value = findStaleSessions()
+  idbInfo.value = await storage.idbUsage()
 }
 
 function onGcSessions(): void {
   const n = gcSessions()
-  refreshUsage()
+  void refreshUsage()
   if (n > 0) ElMessage.success(`已回收 ${n} 个废弃会话`)
   else ElMessage.info('没有需要回收的废弃会话')
 }
@@ -194,7 +197,7 @@ async function onClearCache(): Promise<void> {
   } catch {
     return
   }
-  storage.clearAll()
+  await storage.clearAll()
   ElMessage.success('缓存已清理，即将刷新页面')
   window.setTimeout(() => window.location.reload(), 800)
 }
@@ -205,7 +208,7 @@ function onResize(): void {
 
 onMounted(async () => {
   window.addEventListener('resize', onResize)
-  refreshUsage()
+  void refreshUsage()
 })
 
 /* ---------- 外链跳转 ---------- */
@@ -321,6 +324,31 @@ const redirectToExternalLink = () => {
         </div>
       </div>
 
+      <!-- 题库存档在 IndexedDB：不受上面的 5MB 限制 -->
+      <div class="usage-list" style="margin-top: 14px">
+        <div class="usage-row usage-head">
+          <span>题库存档（IndexedDB）</span>
+          <span>占用</span>
+        </div>
+        <template v-if="idbInfo?.available">
+          <div v-for="e in idbInfo.entries.slice(0, 5)" :key="e.key" class="usage-row">
+            <span class="usage-key">
+              <el-tag size="small" effect="plain">{{ kindOf(e.key) }}</el-tag>
+              <span class="muted mono">{{ shortKey(e.key) }}</span>
+            </span>
+            <span class="usage-size">{{ fmtSize(e.chars * 2) }}</span>
+          </div>
+          <div v-if="!idbInfo.entries.length" class="usage-row muted">暂无题库编辑/导入数据</div>
+        </template>
+        <div v-else class="usage-row muted">
+          {{ idbInfo === null ? '读取中…' : '不可用（浏览器禁用或隐私模式），题库存档已退回 localStorage' }}
+        </div>
+      </div>
+      <div class="muted" style="margin-top: 6px">
+        题库的编辑与导入数据存放在 IndexedDB（配额通常为可用磁盘的很大一部分，不受 5MB 限制）；
+        一个 880 题的题库约 3.3MB，存 localStorage 需要 6.6MB —— 这正是必须搬走的原因。
+      </div>
+
       <div class="usage-groups">
         <el-tag v-for="g in groups" :key="g.label" type="info" effect="plain">
           {{ g.label }} · {{ fmtSize(g.chars * 2) }}
@@ -360,7 +388,8 @@ const redirectToExternalLink = () => {
         <el-button type="danger" @click="onClearCache">清理缓存</el-button>
       </div>
       <el-alert type="warning" :closable="false" show-icon style="margin-top: 12px">
-        将清空本浏览器 localStorage 中保存的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），清理后自动刷新页面，且不可恢复。
+        将清空本浏览器中保存的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），
+        包括 IndexedDB 中的题库存档；清理后自动刷新页面，且不可恢复。
       </el-alert>
     </el-card>
 
