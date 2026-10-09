@@ -313,7 +313,7 @@ const redirectToExternalLink = () => {
       </div>
 
       <div style="margin-top: 12px; max-width: 100%">
-        <el-progress :percentage="budgetPercent" :text-inside="true" :status="budgetStatus" :stroke-width="14" />
+        <el-progress :percentage="budgetPercent" :status="budgetStatus" :stroke-width="14" />
         <div class="muted" style="margin-top: 8px">
           已用 {{ fmtSize(usageInfo.bytes) }} / 预算 {{ fmtSize(BUDGET_BYTES) }}
         </div>
