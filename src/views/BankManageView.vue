@@ -8,7 +8,7 @@
  */
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Plus, Trash2 as Delete } from '@lucide/vue'
 import type { BankData, BankMeta, ComposeItem, Paper, Question, QuestionType } from '@/types'
 import { createBank, defaultRule, loadBank, loadManifest, saveBank } from '@/services/bankService'
 import { nameToBankId } from '@/utils/pinyin'

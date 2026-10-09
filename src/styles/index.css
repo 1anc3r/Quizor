@@ -128,19 +128,23 @@ body {
   box-shadow: var(--q-shadow-sm);
   transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out;
 }
+
 .cc-btn:hover {
   background: var(--q-primary-hover);
   transform: translateY(-1px);
   box-shadow: var(--q-shadow-md);
 }
+
 .cc-btn:active {
   transform: translateY(0) scale(0.98);
   box-shadow: var(--q-shadow-sm);
 }
+
 .cc-btn:focus-visible {
   outline: none;
   box-shadow: var(--q-shadow-sm), 0 0 0 2px #fff, 0 0 0 4px #3b82f6;
 }
+
 .cc-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -154,15 +158,18 @@ body {
   color: #374151;
   border-color: var(--q-border-strong);
 }
+
 .cc-btn-secondary:hover {
   background: #f9fafb;
   color: #111827;
   border-color: #9ca3af;
 }
+
 html.dark .cc-btn-secondary {
   background: transparent;
   color: #e5eaf3;
 }
+
 html.dark .cc-btn-secondary:hover {
   background: #0f172a;
 }
@@ -172,19 +179,23 @@ html.dark .cc-btn-secondary:hover {
   background: var(--q-danger);
   color: #fff;
 }
+
 .cc-btn-danger:hover {
   background: #b91c1c;
 }
+
 .cc-btn-danger-plain {
   background: #fff;
   color: var(--q-danger);
   border-color: #fca5a5;
 }
+
 .cc-btn-danger-plain:hover {
   background: var(--q-danger-soft);
   color: var(--q-danger);
   border-color: #f87171;
 }
+
 html.dark .cc-btn-danger-plain {
   background: transparent;
 }
@@ -197,11 +208,13 @@ html.dark .cc-btn-danger-plain {
   box-shadow: var(--q-shadow-sm);
   padding: 24px;
 }
+
 a.cc-card,
 button.cc-card {
   cursor: pointer;
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
+
 a.cc-card:hover,
 button.cc-card:hover {
   transform: translateY(-2px);
@@ -215,6 +228,7 @@ button.cc-card:hover {
   gap: 12px;
   flex-wrap: wrap;
 }
+
 .cc-card-title .title-text {
   font-size: 16px;
   font-weight: 600;
@@ -232,14 +246,17 @@ button.cc-card:hover {
   font-size: 14px;
   transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
 }
+
 .cc-input:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(59, 130, 246, 0.35);
 }
+
 html.dark .cc-input:focus {
   box-shadow: 0 0 0 2px var(--q-card), 0 0 0 4px rgba(59, 130, 246, 0.45);
 }
+
 .cc-input::placeholder {
   color: var(--q-text-placeholder);
 }
@@ -311,6 +328,10 @@ button:focus-visible,
 }
 
 .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 16px 4px;
   border-radius: var(--q-radius);
@@ -319,12 +340,20 @@ button:focus-visible,
 }
 
 .stat-item .num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 24px;
   font-weight: 700;
   color: var(--q-primary);
 }
 
 .stat-item .label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   margin-top: 4px;
   font-size: 13px;
   color: var(--q-text-secondary);
@@ -390,6 +419,17 @@ button:focus-visible,
 .app-nav .nav-item.active {
   color: var(--q-primary);
   border-bottom-color: var(--q-primary);
+}
+
+/* ========== Lucide 图标（@lucide/vue） ========== */
+/* Lucide 的 SVG 默认渲染成 24×24 的正方形。作为行内图标嵌入文字或 el-button
+   的 :icon 时，24px 会撑高行盒并挤乱基线，所以统一收敛为 1em，让图标跟随所在
+   上下文的字号（el-button 默认 14px、el-icon 的 :size 通过 font-size 传递）。
+   需要精确尺寸时，给组件显式传 :size（它会覆盖 CSS 的 width / height）。 */
+.lucide {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
 }
 
 /* ========== 字号偏好（题干 / 选项） ========== */
@@ -767,6 +807,7 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
 
 /* 减少动态偏好：尊重系统设置 */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

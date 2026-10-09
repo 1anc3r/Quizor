@@ -9,7 +9,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Close, Edit, Star, StarFilled, Timer, Grid } from '@element-plus/icons-vue'
+import { LayoutGrid, SquarePen, Star, Timer, X, Send } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
@@ -358,7 +358,7 @@ onBeforeUnmount(() => {
   <div v-else-if="session" class="quiz-page" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
     <!-- 顶部栏 -->
     <header class="quiz-top">
-      <el-button size="large" text :icon="Close" @click="exit"
+      <el-button size="large" text :icon="X" @click="exit"
         style="margin-left: 0px; display: inline-flex; align-items: center;">
         <span v-if="!isMobile">退出</span>
       </el-button>
@@ -369,22 +369,21 @@ onBeforeUnmount(() => {
       </span>
       <span v-if="!isMobile" class="progress">{{ index + 1 }}/{{ total }}</span>
       <span class="spacer"></span>
-      <el-button v-if="settingsStore.settings.devMode" text :icon="Edit" @click="openEdit"
+      <el-button v-if="settingsStore.settings.devMode" text :icon="SquarePen" @click="openEdit"
         style="margin-left: 0px; display: inline-flex; align-items: center;">
         <span v-if="!isMobile">编辑</span>
       </el-button>
       <el-button text @click="toggleFav" style="margin-left: 0px; display: inline-flex; align-items: center;">
         <el-icon :color="isFaved ? '#e6a23c' : undefined">
-          <StarFilled v-if="isFaved" />
-          <Star v-else />
+          <Star :fill="isFaved ? 'currentColor' : 'none'" />
         </el-icon>
         <span v-if="!isMobile">收藏</span>
       </el-button>
-      <el-button text :icon="Grid" @click="sheetOpen = !sheetOpen"
+      <el-button text :icon="LayoutGrid" @click="sheetOpen = !sheetOpen"
         style="margin-left: 0px; display: inline-flex; align-items: center;">
         <span v-if="!isMobile">答题卡</span>
       </el-button>
-      <el-button type="primary" size="small" @click="submit(false)"
+      <el-button :icon="Send" type="primary" @click="submit(false)"
         style="margin-left: 0px; margin-right: 15px;">交卷</el-button>
     </header>
 

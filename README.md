@@ -7,8 +7,18 @@
 - Vue 3（Composition API + `<script setup>`）+ TypeScript + Vite
 - Pinia（状态管理）+ Vue Router（`createWebHashHistory`，避免 GitHub Pages 刷新 404）
 - Element Plus（unplugin 按需引入）+ ECharts（仅记录页动态导入、按需注册）
+- Lucide 图标（`@lucide/vue`，逐图标具名导入，Tree-shaking 只打进用到的图标）
 - Fluent Editor（富文本题干/解析，支持图文并排与 LaTeX 公式）+ KaTeX
 - pinyin-pro（题库名称自动转拼音 ID）
+
+### 图标约定
+
+全部图标来自 `@lucide/vue`，按需具名导入（`import { Plus, Search } from '@lucide/vue'`），不使用自动导入：
+
+- 作为 `el-button` / `el-input` 的 `:icon` 时直接传组件（`<el-button :icon="Plus" />`）。
+- 需要与文字同一基线的行内图标，外包一层 `<el-icon :size="14">`；`.lucide` 在 `src/styles/index.css` 中被收敛为 `1em`，因此宽度跟随 `el-icon` 的 `font-size`。
+- 需要精确像素尺寸时，给图标组件显式传 `:size`（会覆盖 CSS 的 `width`/`height`）。
+- lucide 没有「实心」变体：实心态用 `fill` 表达，例如收藏按钮 `<Star :fill="isFaved ? 'currentColor' : 'none'" />`。
 
 ## 本地启动
 

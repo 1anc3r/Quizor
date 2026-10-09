@@ -5,16 +5,16 @@
  */
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Failed, HomeFilled, List, Setting, StarFilled, Tools } from '@element-plus/icons-vue'
+import { CircleX, House, List, Settings, Star, Wrench } from '@lucide/vue'
 
 const route = useRoute()
 
 const items = [
-  { path: '/', label: '首页', icon: HomeFilled },
-  { path: '/wrong', label: '错题本', icon: Failed },
-  { path: '/favorite', label: '收藏夹', icon: StarFilled },
+  { path: '/', label: '首页', icon: House },
+  { path: '/wrong', label: '错题本', icon: CircleX },
+  { path: '/favorite', label: '收藏夹', icon: Star },
   { path: '/records', label: '记录', icon: List },
-  { path: '/settings', label: '设置', icon: Tools },
+  { path: '/settings', label: '设置', icon: Settings },
 ]
 
 const currentPath = computed(() => route.path)

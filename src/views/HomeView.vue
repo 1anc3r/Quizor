@@ -5,7 +5,7 @@
 import { computed, onMounted, ref, watch, reactive } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { useRouter } from 'vue-router'
-import { Edit, Plus, Search } from '@element-plus/icons-vue'
+import { Plus, Search, SquarePen, Trophy, Sprout, Puzzle, BookText, BookCheck, BookX, BookHeart } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/stores/session'
@@ -177,19 +177,19 @@ onMounted(async () => {
       <div class="stat-grid">
         <div class="stat-item">
           <div class="num">{{ stats.answered }}</div>
-          <div class="label">答题量</div>
+          <div class="label"><BookText /> 答题量</div>
         </div>
         <div class="stat-item">
           <div class="num">{{ stats.accuracy }}%</div>
-          <div class="label">正确率</div>
+          <div class="label"><BookCheck /> 正确率</div>
         </div>
         <div class="stat-item">
           <div class="num">{{ stats.wrong }}</div>
-          <div class="label">错题数</div>
+          <div class="label"><BookX /> 错题数</div>
         </div>
         <div class="stat-item">
           <div class="num">{{ stats.favorite }}</div>
-          <div class="label">收藏数</div>
+          <div class="label"><BookHeart /> 收藏数</div>
         </div>
       </div>
     </el-card>
@@ -205,15 +205,15 @@ onMounted(async () => {
             检测到未完成的{{ unfinished.mode === 'exam' ? '考试' : '练习' }}会话（{{ unfinished.questions.length }} 题）
           </template>
         </el-alert>
-        <el-button type="success" size="large" style="flex: 1; width: 100%; margin-top: 12px"
+        <el-button :icon="Puzzle" type="success" size="large" style="flex: 1; width: 100%; margin-top: 12px"
           @click="continueSession">继续上次答题</el-button>
       </div>
       <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap">
-        <el-button type="primary" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;"
+        <el-button type="primary" :icon="Sprout" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;"
           @click="goSetup('practice')">
           练习模式
         </el-button>
-        <el-button type="warning" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;"
+        <el-button :icon="Trophy" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;"
           @click="goSetup('exam')">
           考试模式
         </el-button>
@@ -224,7 +224,7 @@ onMounted(async () => {
     <el-card class="page-card" shadow="never" v-loading="bankStore.loading">
       <div class="card-title">
         <span class="title-text">试卷 & 题目列表</span>
-        <el-button type="primary" plain :icon="Edit" @click="goEditBank">编辑题库</el-button>
+        <el-button type="primary" plain :icon="SquarePen" @click="goEditBank">编辑题库</el-button>
       </div>
 
       <el-divider content-position="left"><strong>试卷列表（{{ filteredPapers.length }}）</strong></el-divider>

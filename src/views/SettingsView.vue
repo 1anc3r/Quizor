@@ -4,7 +4,7 @@
  * Corporate Clean（企业简洁风）：统一的设置行结构 + 一致的按钮层级。
  */
 import { computed, ref, onMounted } from 'vue'
-import { Link, Moon, Sunny, Refresh, Delete, Download, Upload, TopRight } from '@element-plus/icons-vue'
+import { Download, Moon, RefreshCw, SquareArrowOutUpRight, Sun, Trash2, Upload } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { createBank, defaultRule, exportBackup, exportBankFile, loadBank, saveBank } from '@/services/bankService'
@@ -22,7 +22,7 @@ const isMobile = useIsMobile()
 /* ---------- 外观偏好 ---------- */
 
 const themeOptions = [
-  { value: 'light', label: '浅色', icon: Sunny },
+  { value: 'light', label: '浅色', icon: Sun },
   { value: 'dark', label: '深色', icon: Moon }
 ] as const
 
@@ -231,12 +231,6 @@ const redirectToExternalLink = () => {
   <div class="app-content settings-page">
     <div v-if="isMobile" class="brand" style="margin-bottom: 16px">Quizor<span>做题家 · 设置</span></div>
 
-    <!-- 页头 -->
-    <header class="page-header">
-      <h1 class="page-title">设置</h1>
-      <p class="page-desc">管理外观、做题偏好与本地数据。</p>
-    </header>
-
     <!-- 外观偏好 -->
     <section class="cc-card settings-card">
       <div class="cc-card-title">
@@ -386,7 +380,7 @@ const redirectToExternalLink = () => {
         <span class="title-text">存储管理</span>
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="refreshUsage">
           <el-icon :size="14">
-            <Refresh />
+            <RefreshCw />
           </el-icon>刷新
         </button>
       </div>
@@ -458,7 +452,7 @@ const redirectToExternalLink = () => {
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" :disabled="!staleSessions.length"
           @click="onGcSessions">
           <el-icon :size="14">
-            <Delete />
+            <Trash2 />
           </el-icon>清理废弃会话（{{ staleSessions.length }}）
         </button>
       </div>
@@ -469,7 +463,7 @@ const redirectToExternalLink = () => {
       <div style="margin-top: 16px">
         <button type="button" class="cc-btn cc-btn-danger btn-sm" @click="onClearCache">
           <el-icon :size="14">
-            <Delete />
+            <Trash2 />
           </el-icon>清理缓存
         </button>
       </div>
@@ -494,7 +488,7 @@ const redirectToExternalLink = () => {
         </div>
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="redirectToExternalLink">
           <el-icon :size="14">
-            <TopRight />
+            <SquareArrowOutUpRight />
           </el-icon>前往
         </button>
       </div>
