@@ -230,7 +230,7 @@ function onSave(): void {
           <el-select v-model="outSource" placeholder="来源" clearable style="width: 100px;">
             <el-option v-for="t in sourceOptions" :key="t.value" :label="t.label" :value="t.value" />
           </el-select>
-          <el-button type="success" plain :disabled="!outSelection.length" @click="addBatch">
+          <el-button type="primary" plain :disabled="!outSelection.length" @click="addBatch">
             批量添加（{{ outSelection.length }}）
           </el-button>
         </div>

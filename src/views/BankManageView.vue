@@ -451,7 +451,7 @@ function confirmAddToPaper(): void {
         <el-form-item label="组卷规则">
           <div style="width: 100%">
             <div style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 12px;">
-              <el-button type="success" plain :icon="Plus" @click="addCompose">新增规则</el-button>
+              <el-button type="primary" plain :icon="Plus" @click="addCompose">新增规则</el-button>
               <el-button v-if="composeSelection.length > 0" type="danger" plain :disabled="!composeSelection.length" @click="removeComposeBatch"
                 style="margin-left: 0px;">
                 批量删除（{{ composeSelection.length }}）
@@ -508,7 +508,7 @@ function confirmAddToPaper(): void {
         <div class="card-title">
           <span class="title-text">试卷列表（{{ filteredPapers.length }}）</span>
           <div>
-            <el-button type="success" plain :icon="Plus" @click="openPaperDialog()"
+            <el-button type="primary" plain :icon="Plus" @click="openPaperDialog()"
               style="margin-left: 0px;">新增试卷</el-button>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px; width: 100%;">
@@ -553,7 +553,7 @@ function confirmAddToPaper(): void {
         <div class="card-title">
           <span class="title-text">题目列表（{{ filteredQuestions.length }}）</span>
           <div>
-            <el-button type="success" plain :icon="Plus" @click="openQuestionDialog()"
+            <el-button type="primary" plain :icon="Plus" @click="openQuestionDialog()"
               style="margin-left: 0px;">新增题目</el-button>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px; width: 100%;">

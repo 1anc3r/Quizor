@@ -33,7 +33,7 @@ function isActive(path: string): boolean {
 
 <template>
   <nav class="app-nav">
-    <div class="brand">Quizor<span>做题家</span></div>
+    <div class="brand"><em>Quizor</em><span>做题家</span></div>
     <router-link
       v-for="item in items"
       :key="item.path"

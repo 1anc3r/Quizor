@@ -159,7 +159,7 @@ onMounted(async () => {
     <el-card class="page-card" shadow="never">
       <div class="card-title">
         <span class="title-text">题库</span>
-        <el-button type="success" plain :icon="Plus" @click="goAddBank">新增题库</el-button>
+        <el-button type="primary" plain :icon="Plus" @click="goAddBank">新增题库</el-button>
       </div>
       <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap">
         <el-select :model-value="bankStore.currentId" placeholder="选择题库" style="flex: 1; min-width: 220px"
@@ -205,14 +205,14 @@ onMounted(async () => {
             检测到未完成的{{ unfinished.mode === 'exam' ? '考试' : '练习' }}会话（{{ unfinished.questions.length }} 题）
           </template>
         </el-alert>
-        <el-button type="success" size="large" style="flex: 1; width: 100%; margin-top: 12px"
+        <el-button type="danger" size="large" style="flex: 1; width: 100%; margin-top: 12px"
           @click="continueSession">继续上次答题</el-button>
       </div>
       <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap">
         <el-button type="primary" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;" @click="goSetup('practice')">
           练习模式
         </el-button>
-        <el-button type="warning" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;" @click="goSetup('exam')">
+        <el-button type="success" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;" @click="goSetup('exam')">
           考试模式
         </el-button>
       </div>
