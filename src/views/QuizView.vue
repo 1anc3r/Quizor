@@ -358,7 +358,10 @@ onBeforeUnmount(() => {
   <div v-else-if="session" class="quiz-page" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
     <!-- 顶部栏 -->
     <header class="quiz-top">
-      <el-button text :icon="Close" @click="exit">退出</el-button>
+      <el-button size="large" text :icon="Close" @click="exit"
+        style="margin-left: 0px; display: inline-flex; align-items: center;">
+        <span v-if="!isMobile">退出</span>
+      </el-button>
       <span class="timer" :class="{ danger: timeDanger }">
         <el-icon>
           <Timer />
@@ -366,20 +369,21 @@ onBeforeUnmount(() => {
       </span>
       <span v-if="!isMobile" class="progress">{{ index + 1 }}/{{ total }}</span>
       <span class="spacer"></span>
-      <el-button
-        v-if="settingsStore.settings.devMode"
-        text
-        :icon="Edit"
-        @click="openEdit"
-        ></el-button
-      >
-      <el-button text @click="toggleFav" style="margin-left: 0px;">
+      <el-button v-if="settingsStore.settings.devMode" text :icon="Edit" @click="openEdit"
+        style="margin-left: 0px; display: inline-flex; align-items: center;">
+        <span v-if="!isMobile">编辑</span>
+      </el-button>
+      <el-button text @click="toggleFav" style="margin-left: 0px; display: inline-flex; align-items: center;">
         <el-icon :color="isFaved ? '#e6a23c' : undefined">
           <StarFilled v-if="isFaved" />
           <Star v-else />
         </el-icon>
+        <span v-if="!isMobile">收藏</span>
       </el-button>
-      <el-button text :icon="Grid" @click="sheetOpen = !sheetOpen" style="margin-left: 0px;">答题卡</el-button>
+      <el-button text :icon="Grid" @click="sheetOpen = !sheetOpen"
+        style="margin-left: 0px; display: inline-flex; align-items: center;">
+        <span v-if="!isMobile">答题卡</span>
+      </el-button>
       <el-button type="primary" size="small" @click="submit(false)"
         style="margin-left: 0px; margin-right: 15px;">交卷</el-button>
     </header>
@@ -391,7 +395,7 @@ onBeforeUnmount(() => {
           <div class="muted" style="margin-bottom: 10px">
             第 {{ index + 1 }} 题 · {{ current.chapter }} · {{ typeLabel(current.type) }} · {{ current.score }} 分
             <template v-if="mode !== 'exam'"> · 难度</template>
-            <el-rate  v-if="mode !== 'exam'" v-model="current.difficulty" size="small" :max="5" disabled />
+            <el-rate v-if="mode !== 'exam'" v-model="current.difficulty" size="small" :max="5" disabled />
           </div>
           <RichText class="q-stem" :content="current.stem" />
 
@@ -459,18 +463,10 @@ onBeforeUnmount(() => {
     </el-drawer>
 
     <!-- 开发模式：题目编辑窗口 -->
-    <QuizFormDialog
-      v-if="settingsStore.settings.devMode"
-      v-model="editDialogVisible"
-      :question="editingQuestion"
-      :bank-id="session.bankId"
-      :chapters="editChapters"
-      :chapter-type="editChapterType"
-      :chapter-option-count="editChapterOptionCount"
-      :all-tags="editAllTags"
-      :existing-ids="editExistingIds"
-      @save="onSaveQuestion"
-    />
+    <QuizFormDialog v-if="settingsStore.settings.devMode" v-model="editDialogVisible" :question="editingQuestion"
+      :bank-id="session.bankId" :chapters="editChapters" :chapter-type="editChapterType"
+      :chapter-option-count="editChapterOptionCount" :all-tags="editAllTags" :existing-ids="editExistingIds"
+      @save="onSaveQuestion" />
   </div>
 </template>
 

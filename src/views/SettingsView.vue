@@ -234,7 +234,7 @@ const redirectToExternalLink = () => {
     <!-- 页头 -->
     <header class="page-header">
       <h1 class="page-title">设置</h1>
-      <p class="page-desc">管理外观、做题偏好与本地数据。所有设置自动保存在浏览器中。</p>
+      <p class="page-desc">管理外观、做题偏好与本地数据。</p>
     </header>
 
     <!-- 外观偏好 -->
@@ -249,17 +249,12 @@ const redirectToExternalLink = () => {
             <div class="set-desc">深色模式适合弱光环境，切换后即时生效。</div>
           </div>
           <div class="seg" role="radiogroup" aria-label="外观模式">
-            <button
-              v-for="opt in themeOptions"
-              :key="opt.value"
-              type="button"
-              class="seg-item"
-              :class="{ 'is-active': s.theme === opt.value }"
-              :aria-checked="s.theme === opt.value"
-              role="radio"
-              @click="s.theme = opt.value"
-            >
-              <el-icon :size="14"><component :is="opt.icon" /></el-icon>
+            <button v-for="opt in themeOptions" :key="opt.value" type="button" class="seg-item"
+              :class="{ 'is-active': s.theme === opt.value }" :aria-checked="s.theme === opt.value" role="radio"
+              @click="s.theme = opt.value">
+              <el-icon :size="14">
+                <component :is="opt.icon" />
+              </el-icon>
               {{ opt.label }}
             </button>
           </div>
@@ -270,16 +265,9 @@ const redirectToExternalLink = () => {
             <div class="set-desc">调整做题时题目与选项的文字大小。</div>
           </div>
           <div class="seg" role="radiogroup" aria-label="字号">
-            <button
-              v-for="opt in fontOptions"
-              :key="opt.value"
-              type="button"
-              class="seg-item"
-              :class="{ 'is-active': s.fontSize === opt.value }"
-              :aria-checked="s.fontSize === opt.value"
-              role="radio"
-              @click="s.fontSize = opt.value"
-            >
+            <button v-for="opt in fontOptions" :key="opt.value" type="button" class="seg-item"
+              :class="{ 'is-active': s.fontSize === opt.value }" :aria-checked="s.fontSize === opt.value" role="radio"
+              @click="s.fontSize = opt.value">
               {{ opt.label }}
             </button>
           </div>
@@ -303,7 +291,8 @@ const redirectToExternalLink = () => {
               }}」
             </div>
           </div>
-          <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="settingsStore.resetPractice()">重置</button>
+          <button type="button" class="cc-btn cc-btn-secondary btn-sm"
+            @click="settingsStore.resetPractice()">重置</button>
         </div>
         <div class="set-row">
           <div class="set-info">
@@ -317,14 +306,14 @@ const redirectToExternalLink = () => {
         <div class="set-row">
           <div class="set-info">
             <div class="set-label">滑动切题</div>
-            <div class="set-desc">移动端左滑下一题、右滑上一题。</div>
+            <div class="set-desc">开启后，支持左滑下一题、右滑上一题。</div>
           </div>
           <el-switch v-model="s.swipe" />
         </div>
         <div class="set-row">
           <div class="set-info">
             <div class="set-label">编辑模式</div>
-            <div class="set-desc">开启后答题页显示「编辑」按钮，可编辑当前题目。</div>
+            <div class="set-desc">开启后，答题页显示「编辑」按钮，可直接编辑当前题目。</div>
           </div>
           <el-switch v-model="s.devMode" />
         </div>
@@ -350,12 +339,16 @@ const redirectToExternalLink = () => {
         </div>
         <div class="btn-group">
           <button type="button" class="cc-btn btn-sm" @click="onExportBank">
-            <el-icon :size="14"><Download /></el-icon>导出题库
+            <el-icon :size="14">
+              <Download />
+            </el-icon>导出题库
           </button>
           <el-upload :show-file-list="false" accept=".json,application/json" :http-request="() => { }"
             :on-change="onImportBankFile">
             <button type="button" class="cc-btn cc-btn-secondary btn-sm" :disabled="importing">
-              <el-icon :size="14"><Upload /></el-icon>导入题库
+              <el-icon :size="14">
+                <Upload />
+              </el-icon>导入题库
             </button>
           </el-upload>
         </div>
@@ -367,12 +360,16 @@ const redirectToExternalLink = () => {
         </div>
         <div class="btn-group">
           <button type="button" class="cc-btn btn-sm" @click="onExportBackup">
-            <el-icon :size="14"><Download /></el-icon>导出备份
+            <el-icon :size="14">
+              <Download />
+            </el-icon>导出备份
           </button>
           <el-upload :show-file-list="false" accept=".json,application/json" :http-request="() => { }"
             :on-change="onImportBackupFile">
             <button type="button" class="cc-btn cc-btn-secondary btn-sm" :disabled="importing">
-              <el-icon :size="14"><Upload /></el-icon>导入备份
+              <el-icon :size="14">
+                <Upload />
+              </el-icon>导入备份
             </button>
           </el-upload>
         </div>
@@ -388,7 +385,9 @@ const redirectToExternalLink = () => {
       <div class="cc-card-title">
         <span class="title-text">存储管理</span>
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="refreshUsage">
-          <el-icon :size="14"><Refresh /></el-icon>刷新
+          <el-icon :size="14">
+            <Refresh />
+          </el-icon>刷新
         </button>
       </div>
 
@@ -404,9 +403,36 @@ const redirectToExternalLink = () => {
         </div>
       </div>
 
+      <!-- 分类占比 -->
+      <!-- <div class="usage-groups">
+        <span v-for="g in groups" :key="g.label" class="usage-tag">
+          {{ g.label }} · {{ fmtSize(g.chars * 2) }}
+        </span>
+        <span v-if="!groups.length" class="muted">暂无本地数据</span>
+      </div> -->
+
+      <!-- 占用最大项 -->
+      <div class="usage-block">
+        <div class="usage-block-title">localStorage</div>
+        <div class="usage-table">
+          <div class="usage-row usage-head">
+            <span>数据项</span>
+            <span class="usage-size">占用</span>
+          </div>
+          <div v-for="e in topKeys" :key="e.key" class="usage-row">
+            <span class="usage-key">
+              <span class="usage-tag">{{ kindOf(e.key) }}</span>
+              <span class="muted usage-mono">{{ shortKey(e.key) }}</span>
+            </span>
+            <span class="usage-size">{{ fmtSize(e.chars * 2) }}</span>
+          </div>
+          <div v-if="!topKeys.length" class="usage-row muted">暂无本地数据</div>
+        </div>
+      </div>
+
       <!-- 题库存档（IndexedDB） -->
       <div class="usage-block">
-        <div class="usage-block-title">题库存档（IndexedDB，不受 5MB 限制）</div>
+        <div class="usage-block-title">IndexedDB，不受 5MB 限制</div>
         <div class="usage-table">
           <div class="usage-row usage-head">
             <span>数据项</span>
@@ -428,49 +454,26 @@ const redirectToExternalLink = () => {
         </div>
       </div>
 
-      <!-- 分类占比 -->
-      <div class="usage-groups">
-        <span v-for="g in groups" :key="g.label" class="usage-tag">
-          {{ g.label }} · {{ fmtSize(g.chars * 2) }}
-        </span>
-        <span v-if="!groups.length" class="muted">暂无本地数据</span>
-      </div>
-
-      <!-- 占用最大项 -->
-      <div class="usage-block">
-        <div class="usage-block-title">占用最大的数据项（localStorage）</div>
-        <div class="usage-table">
-          <div class="usage-row usage-head">
-            <span>数据项</span>
-            <span class="usage-size">占用</span>
-          </div>
-          <div v-for="e in topKeys" :key="e.key" class="usage-row">
-            <span class="usage-key">
-              <span class="usage-tag">{{ kindOf(e.key) }}</span>
-              <span class="muted usage-mono">{{ shortKey(e.key) }}</span>
-            </span>
-            <span class="usage-size">{{ fmtSize(e.chars * 2) }}</span>
-          </div>
-          <div v-if="!topKeys.length" class="usage-row muted">暂无本地数据</div>
-        </div>
-      </div>
-
       <div style="margin-top: 16px">
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" :disabled="!staleSessions.length"
           @click="onGcSessions">
-          <el-icon :size="14"><Delete /></el-icon>清理废弃会话（{{ staleSessions.length }}）
+          <el-icon :size="14">
+            <Delete />
+          </el-icon>清理废弃会话（{{ staleSessions.length }}）
         </button>
-      </div>      
+      </div>
       <div class="banner banner-info">
         废弃会话＝已无法从「继续上次答题」进入或超过 7 天未更新的会话；应用启动时也会自动回收。
       </div>
 
       <div style="margin-top: 16px">
         <button type="button" class="cc-btn cc-btn-danger btn-sm" @click="onClearCache">
-          <el-icon :size="14"><Delete /></el-icon>清理缓存
+          <el-icon :size="14">
+            <Delete />
+          </el-icon>清理缓存
         </button>
       </div>
-       <div class="banner banner-warning">
+      <div class="banner banner-warning">
         将清空本浏览器中保存的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），包括 IndexedDB 中的题库存档；清理后自动刷新页面，且不可恢复。
       </div>
 
@@ -490,7 +493,9 @@ const redirectToExternalLink = () => {
           <div class="set-desc">同作者的卡片记忆应用，与 Quizor 搭配使用。</div>
         </div>
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="redirectToExternalLink">
-          <el-icon :size="14"><TopRight /></el-icon>前往
+          <el-icon :size="14">
+            <TopRight />
+          </el-icon>前往
         </button>
       </div>
 
@@ -538,7 +543,7 @@ const redirectToExternalLink = () => {
   padding: 16px 0;
 }
 
-.set-row + .set-row {
+.set-row+.set-row {
   border-top: 1px solid var(--q-border);
 }
 
@@ -703,7 +708,7 @@ html.dark .banner-warning {
   transition: background-color 0.15s ease-out;
 }
 
-.usage-row + .usage-row {
+.usage-row+.usage-row {
   border-top: 1px solid var(--q-border);
 }
 
@@ -797,7 +802,7 @@ html.dark .danger-card {
     gap: 12px;
   }
 
-  .set-row > :last-child {
+  .set-row> :last-child {
     align-self: flex-start;
   }
 }

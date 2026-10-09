@@ -205,14 +205,16 @@ onMounted(async () => {
             检测到未完成的{{ unfinished.mode === 'exam' ? '考试' : '练习' }}会话（{{ unfinished.questions.length }} 题）
           </template>
         </el-alert>
-        <el-button type="danger" size="large" style="flex: 1; width: 100%; margin-top: 12px"
+        <el-button type="success" size="large" style="flex: 1; width: 100%; margin-top: 12px"
           @click="continueSession">继续上次答题</el-button>
       </div>
       <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap">
-        <el-button type="primary" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;" @click="goSetup('practice')">
+        <el-button type="primary" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;"
+          @click="goSetup('practice')">
           练习模式
         </el-button>
-        <el-button type="success" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;" @click="goSetup('exam')">
+        <el-button type="warning" size="large" style="flex: 1; min-width: 140px; margin-left: 0px;"
+          @click="goSetup('exam')">
           考试模式
         </el-button>
       </div>
@@ -226,13 +228,8 @@ onMounted(async () => {
       </div>
 
       <el-divider content-position="left"><strong>试卷列表（{{ filteredPapers.length }}）</strong></el-divider>
-      <el-input
-        v-model="paperKeyword"
-        placeholder="输入关键字实时过滤试卷"
-        clearable
-        :prefix-icon="Search"
-        style="margin: 12px 0"
-      />
+      <el-input v-model="paperKeyword" placeholder="输入关键字实时过滤试卷" clearable :prefix-icon="Search"
+        style="margin: 12px 0" />
       <el-table stripe :data="filteredPapers">
         <el-table-column prop="name" label="试卷名称" min-width="200" show-overflow-tooltip />
         <el-table-column label="题数" width="80">
@@ -247,14 +244,9 @@ onMounted(async () => {
       </el-table>
 
       <el-divider content-position="left"><strong>题目列表（{{chapterGroups.reduce((s, g) => s + g.questions.length, 0)
-          }}）</strong></el-divider>      
-      <el-input
-        v-model="questionKeyword"
-        placeholder="输入关键字实时过滤题目（题干 / 章节 / 标签）"
-        clearable
-        :prefix-icon="Search"
-        style="margin: 12px 0"
-      />
+      }}）</strong></el-divider>
+      <el-input v-model="questionKeyword" placeholder="输入关键字实时过滤题目（题干 / 章节 / 标签）" clearable :prefix-icon="Search"
+        style="margin: 12px 0" />
       <el-collapse v-model="activeChapters">
         <el-collapse-item v-for="g in chapterGroups" :key="g.chapter" :name="g.chapter">
           <template #title>{{ g.chapter }}（{{ g.questions.length }}）</template>
