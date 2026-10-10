@@ -8,10 +8,11 @@
  *   作答变更防抖 300ms 落盘 + beforeunload 强制落盘
  * - 键盘操作（设置页可分别开关）：方向键切题（←/↑ 上一题，→/↓ 下一题）、
  *   字母键按选项 key 选答案、数字键 1/2/3… 对应选项 A/B/C…
+ * - 「复制」按钮：把当前题干与选项截成图片写入剪贴板（见 utils/domImage）
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { LayoutGrid, SquarePen, Star, Timer, X, Send } from '@lucide/vue'
+import { Copy, Info, LayoutGrid, SquarePen, Star, Timer, X, Send } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
@@ -31,6 +32,7 @@ import { saveBank } from '@/services/bankService'
 import { useIsMobile } from '@/composables/useIsMobile'
 import type { Question, QuestionType, QuizSession, SessionQuestion } from '@/types'
 import { fmtDuration, typeLabel } from '@/utils/format'
+import { copyElementsAsImage } from '@/utils/domImage'
 import AnswerSheet from '@/components/AnswerSheet.vue'
 import OptionGroup from '@/components/OptionGroup.vue'
 import QuizFormDialog from '@/components/QuizFormDialog.vue'
@@ -151,6 +153,49 @@ function next(): void {
 
 function toggleFav(): void {
   if (current.value) userStore.toggleFavorite(current.value.id)
+}
+
+/* ---------- 复制题干与选项为图片 ---------- */
+
+const qStemRef = ref<HTMLElement>()
+const optionGroupRef = ref<InstanceType<typeof OptionGroup>>()
+const copying = ref(false)
+
+/** 单元素 ref 可能是组件实例（带 $el）也可能是原生元素，统一取 DOM */
+function toElement(target: unknown): HTMLElement | null {
+  if (target instanceof HTMLElement) return target
+  const el = (target as { $el?: unknown } | null)?.$el
+  return el instanceof HTMLElement ? el : null
+}
+
+const canCopy = computed(() => !!current.value?.stem.trim() && !!toElement(qStemRef.value))
+
+/**
+ * 把当前题干与选项截成一张 PNG 写入剪贴板，便于贴到聊天窗口或笔记里。
+ *
+ * 元素在挂载后才有宽度，所以布局宽度在点击时才量。
+ */
+async function copyCurrent(): Promise<void> {
+  if (copying.value) return
+  const stem = toElement(qStemRef.value)
+  if (!stem) return
+  // 截图里没有卡片内边距，用元素自身宽度作为内容宽度，并给窄屏兜一个下限
+  const selfWidth = stem.offsetWidth || stem.getBoundingClientRect().width
+  const width = Math.round(Math.min(1200, Math.max(320, selfWidth)))
+  const options = toElement(optionGroupRef.value)
+  copying.value = true
+  try {
+    await copyElementsAsImage([stem, options].filter((el): el is HTMLElement => !!el), {
+      padding: 14,
+      gap: 14,
+      width
+    })
+    ElMessage.success('题干与选项已复制为图片')
+  } catch (e) {
+    ElMessage.error(e instanceof Error ? e.message : '复制失败，请重试')
+  } finally {
+    copying.value = false
+  }
 }
 
 /* ---------- 开发模式：就地编辑当前题目 ---------- */
@@ -460,16 +505,28 @@ onBeforeUnmount(() => {
       <!-- 题目卡片 -->
       <div class="quiz-main">
         <el-card v-if="current" shadow="never" class="page-card">
-          <div class="muted" style="margin-bottom: 10px">
-            第 {{ index + 1 }} 题 · {{ current.chapter }} · {{ typeLabel(current.type) }} · {{ current.score }} 分
-            <template v-if="mode !== 'exam'"> · 难度</template>
-            <el-rate v-if="mode !== 'exam'" v-model="current.difficulty" size="small" :max="5" disabled />
+          <div class="muted q-head" style="margin-bottom: 10px">
+            <span class="q-head-meta">
+              第 {{ index + 1 }} 题 · {{ current.chapter }} · {{ typeLabel(current.type) }} · {{ current.score }} 分
+              <template v-if="mode !== 'exam'"> · 难度</template>
+              <el-rate v-if="mode !== 'exam'" v-model="current.difficulty" size="small" :max="5" disabled />
+            </span>
+            <span class="q-head-actions">
+              <el-button :icon="Copy" :loading="copying" :disabled="!canCopy" @click="copyCurrent">
+                复制
+              </el-button>
+              <el-tooltip content="复制题干和选项图片到粘贴板" placement="top">
+                <el-icon class="q-hint-icon" :size="15">
+                  <Info />
+                </el-icon>
+              </el-tooltip>
+            </span>
           </div>
-          <RichText class="q-stem" :content="current.stem" />
+          <RichText ref="qStemRef" class="q-stem" :content="current.stem" />
 
           <!-- 选择题 -->
-          <OptionGroup v-if="current.type !== 'text' && answer" :question="current" :selected="answer.keys"
-            :revealed="revealed" @select="onSelect" />
+          <OptionGroup v-if="current.type !== 'text' && answer" ref="optionGroupRef" :question="current"
+            :selected="answer.keys" :revealed="revealed" @select="onSelect" />
           <div v-if="mode === 'practice' && current.type === 'multiple' && !revealed" style="margin-top: 12px">
             <el-button type="primary" :disabled="!answer || !answer.keys.length" @click="reveal">确认作答</el-button>
           </div>
@@ -548,5 +605,39 @@ onBeforeUnmount(() => {
 .slide-leave-to {
   transform: translateX(40px);
   opacity: 0;
+}
+
+/* 题头：元信息在左，复制按钮与提示图标在右 */
+.q-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.q-head-meta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.q-head-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+/* 图标只是说明用的提示，不该有可点击的观感（el-tooltip 的默认 focus 样式也一并去掉） */
+.q-hint-icon {
+  color: var(--q-text-secondary);
+  cursor: help;
+  outline: none;
+}
+
+.q-hint-icon:hover {
+  color: var(--q-text);
 }
 </style>
