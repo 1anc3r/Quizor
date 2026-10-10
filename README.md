@@ -23,6 +23,8 @@
 
 ## 本地启动
 
+需要 **Node.js 22.6 或以上**（构建脚本用 `node --experimental-strip-types` 直接运行 `.ts`，该选项自 Node 22.6 引入；Node 20 会报 `bad option: --experimental-strip-types` 并以 exit 9 退出）。
+
 ```bash
 npm install
 npm run dev
@@ -57,13 +59,13 @@ npm run preview     # 本地预览构建产物
 
 - **索引字段必须保持 `id / type / chapter / difficulty / stem / source / tags`**，`HomeView` 的列表同时兼容索引摘要与全文题目（只取这些字段）。
 - **需要题干/选项/答案的功能必须显式 `await bankStore.ensureFullBank()`**（`QuizSetupView` 组卷、`QuizView` 回填题干都已如此），否则会拿到只有摘要的索引数据。
-- `vite-plugins/` 与 `scripts/` 里的文件也会被 `node --experimental-strip-types` 直接运行，从这类文件 import 项目源码时**必须写全 `.ts` 后缀**：Vite 会做后缀补全，Node 不会——只在 Vite 里跑通（`vite build`）不代表这套脚本能跑，务必单独执行一次 `npm run build:index` 验证。
+- `vite-plugins/` 与 `scripts/` 里的文件也会被 `node --experimental-strip-types` 直接运行（Node 22.6+），从这类文件 import 项目源码时**必须写全 `.ts` 后缀**：Vite 会做后缀补全，Node 不会——只在 Vite 里跑通（`vite build`）不代表这套脚本能跑，务必单独执行一次 `npm run build:index` 验证。
 
 ## 部署到 GitHub Pages
 
 `vite.config.ts` 中 `base: './'`（相对路径），配合 hash 路由，可直接部署到项目页子路径。
 
-**方式一：GitHub Actions（推荐，已内置 `.github/workflows/deploy.yml`）**
+**方式一：GitHub Actions（推荐，已内置 `.github/workflows/static.yml`）**
 
 1. 将本仓库推送到 GitHub；
 2. 仓库 Settings → Pages → Source 选择 **GitHub Actions**；

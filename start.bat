@@ -2,7 +2,7 @@
 
 node -v >nul 2>&1
 if errorlevel 1 (
-    echo [Error] Node.js not detected. Please install Node.js 18 or above first
+    echo [Error] Node.js not detected. Please install Node.js 22.6 or above first
     pause
     exit /b 1
 )

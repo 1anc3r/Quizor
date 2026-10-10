@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Quizor 做题家 — 纯静态题库刷题 Web 应用（Vue 3 + TypeScript + Vite）",
+  "engines": {
+    "node": ">=22.6"
+  },
   "scripts": {
     "dev": "npm run build:index && vite",
     "build:index": "node --experimental-strip-types scripts/build-bank-index.mjs",
