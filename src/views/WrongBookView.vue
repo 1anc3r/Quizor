@@ -11,6 +11,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { Question, QuestionType, WrongItem } from '@/types'
 import { fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
+import SegmentedControl, { type SegOption } from '@/components/SegmentedControl.vue'
 import QuizDetail from '@/components/QuizDetail.vue'
 
 const router = useRouter()
@@ -72,6 +73,12 @@ const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
   { label: '简答', value: 'text' }
 ]
 
+// 排序方式：与设置页「外观模式」同一套分段选择器样式
+const SORT_OPTIONS: SegOption<'count' | 'time'>[] = [
+  { value: 'count', label: '按次数' },
+  { value: 'time', label: '按时间' }
+]
+
 function goPractice(): void {
   router.push({ path: '/setup/practice', query: { scope: 'wrong' } })
 }
@@ -121,10 +128,7 @@ async function removeBatch(): Promise<void> {
         <el-button v-if="selection.length > 0" type="danger" plain :disabled="!selection.length" @click="removeBatch">
           批量移除（{{ selection.length }}）
         </el-button>
-        <el-radio-group v-model="sortBy">
-          <el-radio-button value="count">按次数</el-radio-button>
-          <el-radio-button value="time">按时间</el-radio-button>
-        </el-radio-group>
+        <SegmentedControl v-model:value="sortBy" :options="SORT_OPTIONS" aria-label="排序方式" />
       </div>
 
       <el-table stripe :data="pagedRows" row-key="item.questionId" @selection-change="(r: WrongRow[]) => (selection = r)">

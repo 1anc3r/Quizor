@@ -886,8 +886,16 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
 .seg-item {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 6px 16px;
+  /* line-height 与 height 必须写死，不能靠继承：
+     同一组件出现在不同容器里会拿到不同的继承值（Element Plus 的
+     .el-form-item__content 是 line-height:32px），行盒高度随之变化，
+     同样的分段选择器在设置页 31.5px、在做题设置页 44px。 */
+  height: 32px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  padding: 0 16px;
   border: none;
   border-radius: 6px;
   background: transparent;
@@ -1073,6 +1081,7 @@ html.dark .danger-card {
   padding-top: 20px;
   border-top: 1px solid var(--q-border);
   text-align: center;
+  align-items: center;
 }
 
 .donate-img {

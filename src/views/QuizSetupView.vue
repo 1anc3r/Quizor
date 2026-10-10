@@ -9,8 +9,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
-import type { ExamConfig, PracticeConfig, PracticeScope, QuestionType } from '@/types'
+import type { ExamConfig, ExamSource, PracticeConfig, PracticeScope, QuestionType } from '@/types'
 import { buildExamQuestions, buildPracticeQuestions, loadStoredSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
+import SegmentedControl, { type SegOption } from '@/components/SegmentedControl.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,11 +32,24 @@ const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
   { label: '简答', value: 'text' }
 ]
 
-const SCOPE_OPTIONS: { label: string; value: PracticeScope }[] = [
-  { label: '全部', value: 'all' },
-  { label: '按章节', value: 'chapter' },
-  { label: '仅错题', value: 'wrong' },
-  { label: '仅收藏', value: 'favorite' }
+// 范围 / 题量 / 考试模式：统一用设置页那套分段选择器（全局 .seg 样式）
+const SCOPE_OPTIONS: SegOption<PracticeScope>[] = [
+  { value: 'all', label: '全部' },
+  { value: 'chapter', label: '按章节' },
+  { value: 'wrong', label: '仅错题' },
+  { value: 'favorite', label: '仅收藏' }
+]
+
+const COUNT_OPTIONS: SegOption<number | 'all'>[] = [
+  { value: 10, label: '10' },
+  { value: 20, label: '20' },
+  { value: 50, label: '50' },
+  { value: 'all', label: '全部' }
+]
+
+const EXAM_SOURCE_OPTIONS: SegOption<ExamSource>[] = [
+  { value: 'simulate', label: '模拟模式' },
+  { value: 'paper', label: '真题模式' }
 ]
 
 onMounted(async () => {
@@ -136,12 +150,9 @@ function launch(session: import('@/types').QuizSession): void {
 
       <!-- 练习模式 -->
       <template v-if="mode === 'practice'">
-        <el-form label-width="80px" style="margin-top: 16px; max-width: 640px">
+        <el-form label-width="40px" style="margin-top: 16px; max-width: 640px">
           <el-form-item label="范围">
-            <el-radio-group v-model="practice.scope">
-              <el-radio-button v-for="o in SCOPE_OPTIONS" :key="o.value" :value="o.value">{{ o.label
-                }}</el-radio-button>
-            </el-radio-group>
+            <SegmentedControl v-model:value="practice.scope" :options="SCOPE_OPTIONS" aria-label="练习范围" />
           </el-form-item>
           <el-form-item v-if="practice.scope === 'chapter'" label="章节">
             <el-select v-model="practice.chapter" style="width: 240px">
@@ -149,12 +160,7 @@ function launch(session: import('@/types').QuizSession): void {
             </el-select>
           </el-form-item>
           <el-form-item label="题量">
-            <el-radio-group v-model="practice.count">
-              <el-radio-button :value="10">10</el-radio-button>
-              <el-radio-button :value="20">20</el-radio-button>
-              <el-radio-button :value="50">50</el-radio-button>
-              <el-radio-button value="all">全部</el-radio-button>
-            </el-radio-group>
+            <SegmentedControl v-model:value="practice.count" :options="COUNT_OPTIONS" aria-label="题量" />
           </el-form-item>
           <el-form-item label="题型">
             <el-checkbox-group v-model="practice.types">
@@ -170,12 +176,9 @@ function launch(session: import('@/types').QuizSession): void {
 
       <!-- 考试模式 -->
       <template v-else>
-        <el-form label-width="80px" style="margin-top: 16px; max-width: 640px">
+        <el-form label-width="40px" style="margin-top: 16px; max-width: 640px">
           <el-form-item label="模式">
-            <el-radio-group v-model="exam.source">
-              <el-radio-button value="simulate">模拟模式</el-radio-button>
-              <el-radio-button value="paper">真题模式</el-radio-button>
-            </el-radio-group>
+            <SegmentedControl v-model:value="exam.source" :options="EXAM_SOURCE_OPTIONS" aria-label="考试模式" />
           </el-form-item>
           <el-form-item v-if="exam.source === 'paper'" label="试卷">
             <el-select v-model="exam.paperId" style="width: 640px" placeholder="选择试卷">
@@ -188,10 +191,10 @@ function launch(session: import('@/types').QuizSession): void {
           style="max-width: 640px">
           按组卷规则随机组卷：时长 {{ rule.durationMinutes }} 分钟，总分 {{ rule.totalScore }} 分{{
             rule.passScore ? `，及格线 ${rule.passScore} 分` : ''
-          }}。交卷或超时后统一判分。
+          }}。交卷或超时后统一判分结算。
         </el-alert>
         <el-alert v-else-if="rule" type="info" :closable="false" show-icon style="max-width: 640px">
-          按试卷原始顺序出题，时长 {{ rule.durationMinutes }} 分钟。交卷或超时后统一判分。
+          按试卷原始顺序出题，时长 {{ rule.durationMinutes }} 分钟。交卷或超时后统一判分结算。
         </el-alert>
       </template>
 

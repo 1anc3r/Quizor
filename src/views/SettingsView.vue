@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 设置页：外观偏好、练习/考试偏好记忆、做题偏好、导入导出、存储管理。
+ * 设置页：外观偏好、练习/考试偏好记忆、做题偏好、备份管理、存储管理。
  * Corporate Clean（企业简洁风）：统一的设置行结构 + 一致的按钮层级。
  */
 import { computed, ref, onMounted } from 'vue'
@@ -13,6 +13,7 @@ import * as storage from '@/services/storage'
 import type { BankData, BankRule } from '@/types'
 import { findStaleSessions, gcSessions } from '@/stores/session'
 import { fmtTime, typeLabel } from '@/utils/format'
+import SegmentedControl from '@/components/SegmentedControl.vue'
 
 const bankStore = useBankStore()
 const settingsStore = useSettingsStore()
@@ -32,7 +33,7 @@ const fontOptions = [
   { value: 'large', label: '大' }
 ] as const
 
-/* ---------- 导入导出 ---------- */
+/* ---------- 备份管理 ---------- */
 
 const importing = ref(false)
 
@@ -242,29 +243,14 @@ const redirectToExternalLink = () => {
             <div class="set-label">外观模式</div>
             <div class="set-desc">深色模式适合弱光环境，切换后即时生效。</div>
           </div>
-          <div class="seg" role="radiogroup" aria-label="外观模式">
-            <button v-for="opt in themeOptions" :key="opt.value" type="button" class="seg-item"
-              :class="{ 'is-active': s.theme === opt.value }" :aria-checked="s.theme === opt.value" role="radio"
-              @click="s.theme = opt.value">
-              <el-icon :size="14">
-                <component :is="opt.icon" />
-              </el-icon>
-              {{ opt.label }}
-            </button>
-          </div>
+          <SegmentedControl v-model:value="s.theme" :options="themeOptions" aria-label="外观模式" />
         </div>
         <div class="set-row">
           <div class="set-info">
             <div class="set-label">题干 / 选项字号</div>
-            <div class="set-desc">调整做题时题目与选项的文字大小。</div>
+            <div class="set-desc">调整答题页的题干、选项的文字大小。</div>
           </div>
-          <div class="seg" role="radiogroup" aria-label="字号">
-            <button v-for="opt in fontOptions" :key="opt.value" type="button" class="seg-item"
-              :class="{ 'is-active': s.fontSize === opt.value }" :aria-checked="s.fontSize === opt.value" role="radio"
-              @click="s.fontSize = opt.value">
-              {{ opt.label }}
-            </button>
-          </div>
+          <SegmentedControl v-model:value="s.fontSize" :options="fontOptions" aria-label="字号" />
         </div>
       </div>
     </section>
@@ -297,33 +283,33 @@ const redirectToExternalLink = () => {
           </div>
           <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="settingsStore.resetExam()">重置</button>
         </div>
-        <div class="set-row">
+        <div class="set-row" v-if="isMobile">
           <div class="set-info">
             <div class="set-label">滑动切题</div>
-            <div class="set-desc">开启后，答题页支持左滑下一题、右滑上一题。</div>
+            <div class="set-desc">开启后，答题页支持滑动切题：左滑下一题、右滑上一题。</div>
           </div>
           <el-switch v-model="s.swipe" />
         </div>
-        <div class="set-row">
+        <div class="set-row" v-if="!isMobile">
           <div class="set-info">
             <div class="set-label">键盘切题</div>
-            <div class="set-desc">开启后，在答题页按 ← / ↑ 切到上一题，按 → / ↓ 切到下一题。</div>
+            <div class="set-desc">开启后，答题页支持键盘切题：按 ← / ↑ 切到上一题，按 → / ↓ 切到下一题。</div>
           </div>
           <el-switch v-model="s.keyNav" />
         </div>
-        <div class="set-row">
+        <div class="set-row" v-if="!isMobile">
           <div class="set-info">
             <div class="set-label">键盘作答</div>
             <div class="set-desc">
-              开启后，在答题页选择题可按选项字母键（A、B、C…）作答，数字键 1、2、3… 对应选项 A、B、C…
+              开启后，答题页支持键盘作答：按字母键（A、B、C…）或数字键（1、2、3…），对应选项 A、B、C…
             </div>
           </div>
           <el-switch v-model="s.keyAnswer" />
         </div>
-        <div class="set-row">
+        <div class="set-row" v-if="!isMobile">
           <div class="set-info">
             <div class="set-label">编辑模式</div>
-            <div class="set-desc">开启后，答题页显示「编辑」按钮，可直接编辑当前题目。</div>
+            <div class="set-desc">开启后，答题页导航栏显示「编辑」按钮，支持直接编辑当前题目。</div>
           </div>
           <el-switch v-model="s.devMode" />
         </div>
@@ -337,15 +323,15 @@ const redirectToExternalLink = () => {
       </div>
     </section>
 
-    <!-- 导入导出 -->
+    <!-- 备份管理 -->
     <section class="cc-card settings-card">
       <div class="cc-card-title">
-        <span class="title-text">导入导出</span>
+        <span class="title-text">备份管理</span>
       </div>
       <div class="set-row" style="margin-top: 4px">
         <div class="set-info">
           <div class="set-label">题库文件</div>
-          <div class="set-desc">格式：{ name, rule, Questions, Papers }，导入后作为新题库加入。</div>
+          <div class="set-desc">格式：{ name, rule, Questions, Papers }，用于备份旧题库或加入新题库。</div>
         </div>
         <div class="btn-group">
           <button type="button" class="cc-btn btn-sm" @click="onExportBank">
@@ -384,10 +370,10 @@ const redirectToExternalLink = () => {
           </el-upload>
         </div>
       </div>
-      <div class="banner banner-info">
+      <el-alert type="info" :closable="false" show-icon>
         当前题库 ID：{{ bankStore.currentId || '无'
         }}<template v-if="bankStore.meta">，最近更新以浏览器本地存储为准（{{ fmtTime(Date.now()) }}）</template>。
-      </div>
+      </el-alert>
     </section>
 
     <!-- 存储管理 -->
@@ -404,7 +390,7 @@ const redirectToExternalLink = () => {
       <!-- 用量进度 -->
       <div class="usage-meter">
         <div class="usage-meter-head">
-          <span class="set-label">本地存储用量</span>
+          <span class="set-label">本地存储（localStorage）用量</span>
           <span class="muted">已用 {{ fmtSize(usageInfo.bytes) }} / 预算 {{ fmtSize(BUDGET_BYTES) }}</span>
         </div>
         <div class="progress-track" role="progressbar" :aria-valuenow="budgetPercent" aria-valuemin="0"
@@ -421,9 +407,9 @@ const redirectToExternalLink = () => {
         <span v-if="!groups.length" class="muted">暂无本地数据</span>
       </div> -->
 
-      <!-- 占用最大项 -->
+      <!-- 本地存储（localStorage） -->
       <div class="usage-block">
-        <div class="usage-block-title">localStorage</div>
+        <div class="usage-block-title">本地存储（localStorage），受 5MB 限制</div>
         <div class="usage-table">
           <div class="usage-row usage-head">
             <span>数据项</span>
@@ -440,9 +426,9 @@ const redirectToExternalLink = () => {
         </div>
       </div>
 
-      <!-- 题库存档（IndexedDB） -->
+      <!-- 异步数据库（IndexedDB） -->
       <div class="usage-block">
-        <div class="usage-block-title">IndexedDB，不受 5MB 限制</div>
+        <div class="usage-block-title">异步数据库（IndexedDB），不受 5MB 限制</div>
         <div class="usage-table">
           <div class="usage-row usage-head">
             <span>数据项</span>
@@ -472,9 +458,9 @@ const redirectToExternalLink = () => {
           </el-icon>清理废弃会话（{{ staleSessions.length }}）
         </button>
       </div>
-      <div class="banner banner-info">
-        废弃会话＝已无法从「继续上次答题」进入或超过 7 天未更新的会话；应用启动时也会自动回收。
-      </div>
+      <el-alert type="info" :closable="false" show-icon style="margin-top: 16px">
+        废弃会话：已无法从「继续上次答题」进入或超过 7 天未更新的会话；应用启动时也会自动回收。
+      </el-alert>
 
       <div style="margin-top: 16px">
         <button type="button" class="cc-btn cc-btn-danger btn-sm" @click="onClearCache">
@@ -483,13 +469,12 @@ const redirectToExternalLink = () => {
           </el-icon>清理缓存
         </button>
       </div>
-      <div class="banner banner-warning">
-        将清空本浏览器中保存的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），包括 IndexedDB 中的题库存档；清理后自动刷新页面，且不可恢复。
-      </div>
-
-      <div v-if="budgetPercent >= 80" class="banner banner-warning" style="margin-top: 16px">
-        本地存储占用偏高：建议先「导出备份」，再清理做题记录，或把大图改为外链以减小题库体积。
-      </div>
+      <el-alert type="warning" :closable="false" show-icon style="margin-top: 16px">
+        将清空本浏览器中保存的全部应用数据（题库编辑与本地新增题库、错题本、收藏夹、做题记录、未完成会话与所有设置），包括：本地存储（localStorage）和异步数据库（IndexedDB）。清理后自动刷新页面，且不可恢复。
+      </el-alert>
+      <el-alert v-if="budgetPercent >= 80" type="warning" :closable="false" show-icon style="margin-top: 16px">
+        本地存储占用偏高：建议先「导出备份」，再清理缓存。
+      </el-alert>
     </section>
 
     <!-- 外链与赞赏 -->
