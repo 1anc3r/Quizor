@@ -1143,16 +1143,22 @@ html.dark .danger-card {
 
 /* 赞赏区 */
 .donate {
+  /* Tailwind Preflight 会把 img 设为 display:block，此时 text-align:center 无法居中，
+     因此这里用纵向 flex + align-items:center 让赞赏码与文案一起真正居中 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid var(--q-border);
   text-align: center;
-  align-items: center;
 }
 
 .donate-img {
+  display: block;
   width: 100%;
   max-width: 300px;
+  margin: 0 auto;
   border-radius: var(--q-radius-lg);
   border: 1px solid var(--q-border);
   box-shadow: var(--q-shadow-sm);

@@ -496,7 +496,7 @@ const redirectToExternalLink = () => {
 
       <div class="donate">
         <img src="/WechatCode.jpg" alt="赞赏码" class="donate-img" />
-        <p class="donate-quote">「知识因流动而有价值，感谢您的支持和鼓励！」</p>
+        <p class="donate-quote">「微信赞赏码」</p>
       </div>
     </section>
   </div>
