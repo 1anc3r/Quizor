@@ -450,7 +450,7 @@ const redirectToExternalLink = () => {
         </div>
       </div>
 
-      <div style="margin-top: 16px">
+      <!-- <div style="margin-top: 16px">
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" :disabled="!staleSessions.length"
           @click="onGcSessions">
           <el-icon :size="14">
@@ -460,7 +460,7 @@ const redirectToExternalLink = () => {
       </div>
       <el-alert type="info" :closable="false" show-icon style="margin-top: 16px">
         废弃会话：已无法从「继续上次答题」进入或超过 7 天未更新的会话；应用启动时也会自动回收。
-      </el-alert>
+      </el-alert> -->
 
       <div style="margin-top: 16px">
         <button type="button" class="cc-btn cc-btn-danger btn-sm" @click="onClearCache">
