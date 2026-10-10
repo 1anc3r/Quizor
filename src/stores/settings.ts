@@ -10,6 +10,8 @@ function defaults(): AppSettings {
     theme: 'light',
     fontSize: 'standard',
     swipe: true,
+    keyNav: true,
+    keyAnswer: true,
     devMode: false,
     wrongThreshold: 3,
     practice: { scope: 'all', chapter: '', count: 10, types: ['single', 'multiple', 'judge', 'text'] },

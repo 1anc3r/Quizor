@@ -306,6 +306,23 @@ const redirectToExternalLink = () => {
         </div>
         <div class="set-row">
           <div class="set-info">
+            <div class="set-label">键盘切题</div>
+            <div class="set-desc">开启后，在做题页按 ← / ↑ 切到上一题，按 → / ↓ 切到下一题。</div>
+          </div>
+          <el-switch v-model="s.keyNav" />
+        </div>
+        <div class="set-row">
+          <div class="set-info">
+            <div class="set-label">键盘作答</div>
+            <div class="set-desc">
+              开启后，选择题可按选项字母键（A、B、C…）作答，数字键 1、2、3… 对应选项 A、B、C…；
+              多选按一次切换一个选项。在输入框中打字时不受影响。
+            </div>
+          </div>
+          <el-switch v-model="s.keyAnswer" />
+        </div>
+        <div class="set-row">
+          <div class="set-info">
             <div class="set-label">编辑模式</div>
             <div class="set-desc">开启后，答题页显示「编辑」按钮，可直接编辑当前题目。</div>
           </div>

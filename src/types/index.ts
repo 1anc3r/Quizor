@@ -222,6 +222,10 @@ export interface AppSettings {
   fontSize: FontSize
   /** 滑动切题开关 */
   swipe: boolean
+  /** 键盘切题开关（←/↑ 上一题，→/↓ 下一题） */
+  keyNav: boolean
+  /** 键盘作答开关（字母键 / 数字键选答案） */
+  keyAnswer: boolean
   /** 开发模式：答题页显示编辑按钮，可就地编辑当前题目 */
   devMode: boolean
   /** 错题连续答对移出阈值 */

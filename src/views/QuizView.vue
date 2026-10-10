@@ -6,6 +6,8 @@
  * - 考试模式：倒计时（截止时间 - 当前时间重算）、答题卡、标记，交卷或超时自动交卷统一判分
  * - 断点续答：localStorage 只存题号，挂载时先加载题库再回填题干（hydrateSession），
  *   作答变更防抖 300ms 落盘 + beforeunload 强制落盘
+ * - 键盘操作（设置页可分别开关）：方向键切题（←/↑ 上一题，→/↓ 下一题）、
+ *   字母键按选项 key 选答案、数字键 1/2/3… 对应选项 A/B/C…
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -73,6 +75,24 @@ function onSelect(keys: string[]): void {
   // 练习模式：单选/判断点击即判
   if (mode.value === 'practice' && current.value.type !== 'multiple') {
     reveal()
+  }
+}
+
+/**
+ * 选中某个选项，与鼠标点击走同一套逻辑：
+ * 单选/判断替换，多选切换；练习模式单选/判断随即判定。
+ */
+function pickOption(key: string): void {
+  const cur = current.value
+  const ans = answer.value
+  if (!cur || !ans || revealed.value) return
+  if (cur.type === 'multiple') {
+    const set = new Set(ans.keys)
+    if (set.has(key)) set.delete(key)
+    else set.add(key)
+    onSelect([...set].sort())
+  } else {
+    onSelect([key])
   }
 }
 
@@ -294,6 +314,53 @@ function onTouchEnd(e: TouchEvent): void {
   }
 }
 
+/* ---------- 键盘快捷键 ---------- */
+
+/**
+ * 当前焦点是否在可输入区域：在输入框/富文本里敲字时不能把字母当成选项。
+ * 用 closest 而不是 target.tagName，因为事件可能来自输入框内层节点。
+ */
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  if (target.isContentEditable) return true
+  return !!target.closest('input, textarea, select, [contenteditable="true"]')
+}
+
+/** 键盘按下字母键时命中的选项：优先按选项 key 匹配（可匹配 A-D 之外的 key），否则按 A/B/C… 顺序 */
+function optionByLetter(cur: SessionQuestion, letter: string): string | null {
+  const exact = cur.options.find((o) => o.key.toUpperCase() === letter)
+  if (exact) return exact.key
+  const i = letter.charCodeAt(0) - 65
+  return i >= 0 && i < cur.options.length ? cur.options[i].key : null
+}
+
+function onKeydown(e: KeyboardEvent): void {
+  if (!session.value || submitted.value || e.defaultPrevented) return
+  // 组合键（Ctrl/Alt/Meta 等）交给浏览器，不做题目操作
+  if (e.ctrlKey || e.altKey || e.metaKey) return
+  const s = settingsStore.settings
+  // 焦点在输入框/富文本里时全部交还：方向键是移动光标，字母数字键是打字
+  const typing = isTypingTarget(e.target)
+
+  // 方向键切题：上和左上一题，下和右下一题
+  if (!typing && s.keyNav && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+    e.preventDefault()
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev()
+    else next()
+    return
+  }
+
+  // 字母键选答案，数字键 1/2/3… 对应选项 A/B/C…
+  if (typing || !s.keyAnswer || !/^[a-zA-Z0-9]$/.test(e.key)) return
+  const cur = current.value
+  if (!cur || !answer.value || revealed.value || !cur.options.length) return
+  const index = Number(e.key) - 1
+  const key = /[a-zA-Z]/.test(e.key) ? optionByLetter(cur, e.key.toUpperCase()) : cur.options[index]?.key ?? null
+  if (!key) return
+  e.preventDefault()
+  pickOption(key)
+}
+
 /* ---------- 生命周期 ---------- */
 
 onMounted(async () => {
@@ -335,6 +402,7 @@ onMounted(async () => {
       now.value = Date.now()
     }, 500)
     window.addEventListener('beforeunload', flushSession)
+    window.addEventListener('keydown', onKeydown)
   } finally {
     restoring.value = false
   }
@@ -343,6 +411,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   if (timer !== null) window.clearInterval(timer)
   window.removeEventListener('beforeunload', flushSession)
+  window.removeEventListener('keydown', onKeydown)
   flushSession()
 })
 </script>
