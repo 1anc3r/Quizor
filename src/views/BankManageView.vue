@@ -81,11 +81,17 @@ onBeforeUnmount(() => {
 
 /* ---------- 基本信息 ---------- */
 
-// 名称自动转拼音作为题库 ID
+// 名称自动转拼音作为题库 ID。
+// nameToBankId 内部动态加载拼音字典（约 300KB），因此是异步的；
+// 连续改名时用序号丢弃过期结果，否则慢的那次会把新名字的 id 覆盖回去。
+let idSeq = 0
 watch(
   () => bankMeta.name,
-  (name) => {
-    if (isNewMode.value) bankMeta.id = nameToBankId(name)
+  async (name) => {
+    if (!isNewMode.value) return
+    const seq = ++idSeq
+    const id = await nameToBankId(name)
+    if (seq === idSeq && isNewMode.value) bankMeta.id = id
   }
 )
 

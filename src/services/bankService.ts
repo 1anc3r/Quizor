@@ -9,13 +9,30 @@
  * 原因：一个 880 题的题库 JSON 约 3.3MB，存进 localStorage 要占 6.6MB（UTF-16），
  * 直接超出 5MB 配额 —— 也就是"编辑内置大题库"根本无法保存。
  *
- * 加载顺序：BankManifest 先加载（并与本地新增/删除记录合并），科目题库懒加载 + 内存缓存。
- * 新增科目只需向 public/data/banks/ 添加文件并在 BankManifest.json 登记，无需改代码。
+ * 加载分两层（首屏性能的关键）：
+ * - **索引**（`*_index.json`，构建期生成，约全文的 4%）：只有每题摘要 + 章节/题型，
+ *   供首页列表、统计、章节选择使用；
+ * - **全文**（原始题库 JSON，约 5MB）：含题干富文本、选项、答案、解析、内嵌图片，
+ *   只有真正要答题/组卷/浏览详情时才加载。
+ * GitHub Pages 不对静态 JSON 做 gzip，冷启动原样下载 5MB 是首屏慢的主因，
+ * 索引把首屏数据量降到 1/25。
  */
-import type { BankData, BankManifest, BankMeta, BankRule, OptionItem, Paper, Question, QuestionType } from '@/types'
+import type {
+  BankData,
+  BankIndex,
+  BankManifest,
+  BankMeta,
+  BankRule,
+  OptionItem,
+  Paper,
+  Question,
+  QuestionType
+} from '@/types'
 import * as storage from './storage'
 import { idbDelete, idbGetRaw, idbKeys, idbSetRaw } from './idb'
 import { nameToBankId, uniqueBankId } from '../utils/pinyin'
+import { stemSummary } from '../utils/text'
+import { indexFileName } from '../utils/bankFile'
 
 const K_LOCAL_BANKS = 'localbanks' // BankMeta[] 用户本地新增的题库
 const K_DELETED_BANKS = 'deletedbanks' // string[] 被删除的内置题库 id
@@ -26,6 +43,19 @@ const QUESTION_TYPES: QuestionType[] = ['single', 'multiple', 'judge', 'text']
 
 let manifestCache: BankManifest | null = null
 const bankCache = new Map<string, BankData>()
+const indexCache = new Map<string, BankIndex>()
+
+/** 本地覆盖层的时间戳：没有覆盖层时返回 null */
+function overrideStamp(id: string): number | null {
+  const raw = storage.readRaw(K_BANK_DATA + id)
+  if (raw === null) return null
+  try {
+    const parsed = JSON.parse(raw) as { ts?: unknown }
+    return typeof parsed.ts === 'number' ? parsed.ts : 0
+  } catch {
+    return 0
+  }
+}
 
 const base = () => import.meta.env.BASE_URL
 
@@ -128,6 +158,112 @@ export async function loadManifest(force = false): Promise<BankManifest> {
   return manifestCache
 }
 
+/* ---------------- 题库索引（首屏用的轻量形态） ---------------- */
+
+/** 规整索引：与题库文件同源生成，但仍按不可信输入处理 */
+function normalizeIndex(raw: unknown, id: string): BankIndex | null {
+  if (!raw || typeof raw !== 'object') return null
+  const r = raw as Partial<BankIndex>
+  const questions = Array.isArray(r.questions) ? r.questions : []
+  return {
+    id: typeof r.id === 'string' && r.id ? r.id : id,
+    name: typeof r.name === 'string' ? r.name : id,
+    questionCount: typeof r.questionCount === 'number' ? r.questionCount : questions.length,
+    rule: (r.rule as BankRule) ?? defaultRule(),
+    questions: questions.map((q) => ({
+      id: typeof q.id === 'string' ? q.id : '',
+      type: QUESTION_TYPES.includes(q.type as QuestionType) ? (q.type as QuestionType) : 'single',
+      chapter: typeof q.chapter === 'string' ? q.chapter : '',
+      difficulty: typeof q.difficulty === 'number' ? q.difficulty : 3,
+      stem: typeof q.stem === 'string' ? q.stem : '',
+      source: typeof q.source === 'string' ? q.source : '',
+      tags: Array.isArray(q.tags) ? q.tags.filter((t): t is string => typeof t === 'string') : []
+    })).filter((q) => !!q.id),
+    papers: Array.isArray(r.papers) ? (r.papers as Paper[]) : [],
+    ts: typeof r.ts === 'number' ? r.ts : undefined
+  }
+}
+
+/** 全文数据 → 索引（本地覆盖层/本地题库没有构建期索引，就地派生一份） */
+export function deriveIndex(meta: BankMeta, data: BankData, ts?: number): BankIndex {
+  return {
+    id: meta.id,
+    name: meta.name,
+    questionCount: data.Questions.length,
+    rule: meta.rule,
+    questions: data.Questions.map((q) => ({
+      id: q.id,
+      type: q.type,
+      chapter: q.chapter,
+      difficulty: q.difficulty,
+      // 列表只展示摘要，这里直接截断，避免把 5MB 的富文本题干拷一份进内存
+      stem: stemSummary(q.stem, 80),
+      source: q.source,
+      tags: q.tags
+    })),
+    papers: data.Papers,
+    ts
+  }
+}
+
+/** 索引的静态地址（构建期由 vite 插件生成，与题库文件同目录） */
+export function indexUrl(meta: BankMeta): string {
+  const dir = meta.bankFile.includes('/') ? meta.bankFile.replace(/[^/]+$/, '') : ''
+  return `${base()}data/banks/${dir}${indexFileName(meta.bankFile)}`
+}
+
+/**
+ * 加载题库索引（首屏用）。
+ *
+ * 优先本地覆盖层：用户编辑过的题库，静态索引已经过期，必须就地重新派生，
+ * 否则首页会出现"编辑后仍是旧摘要/旧题数"的错位。
+ */
+export async function loadBankIndex(id: string, force = false): Promise<BankIndex | null> {
+  if (!force && indexCache.has(id)) return indexCache.get(id) as BankIndex
+  const manifest = await loadManifest()
+  const meta = manifest.Banks.find((b) => b.id === id)
+  if (!meta) return null
+
+  const overrideRaw = storage.readRaw(K_BANK_DATA + id)
+  if (overrideRaw !== null) {
+    try {
+      const data = normalizeBankData(JSON.parse(overrideRaw))
+      const index = deriveIndex(meta, data, overrideStamp(id) ?? 0)
+      indexCache.set(id, index)
+      return index
+    } catch {
+      console.warn('[quizor] 本地题库覆盖层损坏，改用静态索引：', id)
+    }
+  }
+
+  try {
+    const res = await fetch(indexUrl(meta))
+    if (res.ok) {
+      const index = normalizeIndex(await res.json(), id)
+      if (index) {
+        indexCache.set(id, index)
+        return index
+      }
+    }
+  } catch (e) {
+    console.warn('[quizor] 题库索引加载失败：', e)
+  }
+  // 索引缺失（例如旧部署还没生成）时由调用方决定是否直接拉全文
+  return null
+}
+
+/**
+ * 能否跳过 IndexedDB 读取。
+ *
+ * 用户每次编辑都会同时写 IDB 与 localStorage 覆盖层，而覆盖层带时间戳。
+ * 索引里的 `ts` 与当前覆盖层一致，就说明这份索引已经反映了最新编辑，
+ * 不必再为"有没有 Override"多查一次 IDB。
+ */
+function indexIsCurrent(id: string, index?: BankIndex | null): boolean {
+  if (!index || typeof index.ts !== 'number') return false
+  return overrideStamp(id) === index.ts
+}
+
 /* ---------------- 题库存档的读写（IndexedDB 优先） ---------------- */
 
 /**
@@ -162,12 +298,14 @@ async function readBankData(id: string): Promise<BankData | null> {
  */
 async function writeBankData(id: string, data: BankData): Promise<boolean> {
   const key = storage.fullKey(K_BANK_DATA + id)
-  if (await idbSetRaw(key, JSON.stringify(data))) {
+  // 覆盖层带上时间戳，索引可据此判断自己是否仍然有效（见 indexIsCurrent）
+  const payload = JSON.stringify({ ...data, ts: Date.now() })
+  if (await idbSetRaw(key, payload)) {
     // 清掉可能残留的 localStorage 覆盖层，否则两处内容会不一致
     storage.removeKey(K_BANK_DATA + id)
     return true
   }
-  return storage.writeJSON(K_BANK_DATA + id, data)
+  return storage.writeJSON(K_BANK_DATA + id, payload)
 }
 
 /**
@@ -189,6 +327,8 @@ export async function migrateBankDataToIdb(): Promise<number> {
     const raw = localStorage.getItem(key)
     if (raw !== null) pending.push({ key, raw })
   }
+  // 绝大多数启动都没有待迁移项，这里提前返回，省掉“打开 IDB → 读全部 key”的等待，
+  // 挂在启动关键路径上的开销直接降到一次 localStorage 遍历
   if (!pending.length) return 0
   const existing = new Set((await idbKeys()) ?? [])
   let moved = 0
@@ -206,9 +346,10 @@ export async function migrateBankDataToIdb(): Promise<number> {
 }
 
 /** 加载题库数据：本地覆盖层优先，其次 fetch 静态 JSON；带内存缓存 */
-export async function loadBank(id: string, force = false): Promise<BankData> {
+export async function loadBank(id: string, force = false, index?: BankIndex | null): Promise<BankData> {
   if (!force && bankCache.has(id)) return bankCache.get(id) as BankData
-  const override = await readBankData(id)
+  // 索引与覆盖层时间戳一致时，说明没有更新的本地编辑，省掉一次 IndexedDB 查询
+  const override = indexIsCurrent(id, index) ? null : await readBankData(id)
   if (override) {
     const data = normalizeBankData(override)
     bankCache.set(id, data)
@@ -265,7 +406,8 @@ export function defaultRule(): BankRule {
 /** 新建题库（名称自动转拼音生成唯一 id），数据初始为空 */
 export async function createBank(name: string, rule: BankRule): Promise<BankMeta> {
   const manifest = await loadManifest()
-  const id = uniqueBankId(nameToBankId(name), manifest.Banks.map((b) => b.id))
+  // nameToBankId 内部动态加载拼音字典（约 300KB），不占用首屏
+  const id = uniqueBankId(await nameToBankId(name), manifest.Banks.map((b) => b.id))
   const meta: BankMeta = {
     id,
     name,

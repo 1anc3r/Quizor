@@ -8,3 +8,11 @@ dist-ssr
 .idea
 *.log
 .acl-recovery
+# 题库索引为构建期产物（npm run build:index 生成），不入版本库
+public/data/banks/*_index.json
+# 性能实测用的临时文件
+_perf*.html
+_perf*.mjs
+_perf*.json
+_netcheck.html
+.tmp-*

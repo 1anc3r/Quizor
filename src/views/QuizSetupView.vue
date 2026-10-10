@@ -38,7 +38,10 @@ const SCOPE_OPTIONS: { label: string; value: PracticeScope }[] = [
   { label: '仅收藏', value: 'favorite' }
 ]
 
-onMounted(() => {
+onMounted(async () => {
+  // 组卷需要题干、选项与答案，必须先把题库全文拉下来（首页只加载了索引）。
+  // await 是必要的：下面的默认章节/试卷要从题库数据里挑第一个。
+  await bankStore.ensureFullBank()
   // 恢复上次对应模式的设置
   if (mode.value === 'practice') {
     Object.assign(practice, JSON.parse(JSON.stringify(settingsStore.settings.practice)))

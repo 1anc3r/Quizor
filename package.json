@@ -5,8 +5,9 @@
   "type": "module",
   "description": "Quizor 做题家 — 纯静态题库刷题 Web 应用（Vue 3 + TypeScript + Vite）",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit -p tsconfig.json && vite build",
+    "dev": "npm run build:index && vite",
+    "build:index": "node --experimental-strip-types scripts/build-bank-index.mjs",
+    "build": "npm run build:index && vue-tsc --noEmit -p tsconfig.json && vite build",
     "build:only": "vite build",
     "preview": "vite preview"
   },

@@ -73,24 +73,65 @@ const questionKeyword = ref('')
 const activeChapters = ref<string[]>([])
 const isMobile = useIsMobile()
 
+/**
+ * 列表数据源：优先用已加载的全文，否则用索引里的摘要。
+ *
+ * 索引（构建期生成，约为全文的 4%）已经带上了每题的纯文本摘要、章节、难度、来源，
+ * 足够渲染列表与章节计数，因此首页不再需要那 5MB 的全文。
+ * 两者字段兼容，模板里统一按 `chapter / id / stem / difficulty / source / type` 取值。
+ */
+const browseQuestions = computed(() => bankStore.bank?.Questions ?? bankStore.index?.questions ?? [])
+const browsePapers = computed(() => bankStore.bank?.Papers ?? bankStore.index?.papers ?? [])
+
+/**
+ * 按需拉全文：用户真正要"看题/搜题"时才下载那 5MB。
+ * 触发点刻意选在交互（展开章节、输入关键字）而非渲染，避免一进首页就偷偷开始下载。
+ */
+function onBrowseIntent(): void {
+  if (!bankStore.hasFullBank) void bankStore.ensureFullBank()
+}
+
+/** 章节展开/收起：标记为已渲染，并顺带触发"要看题"的意图 */
+function onChapterToggle(name: string | number | (string | number)[]): void {
+  markChapterRendered(name)
+  onBrowseIntent()
+}
+
 const filteredPapers = computed(() => {
   const kw = paperKeyword.value.trim().toLowerCase()
-  const papers = bankStore.bank?.Papers ?? []
-  if (!kw) return papers
-  return papers.filter((p) => p.name.toLowerCase().includes(kw) || p.source.toLowerCase().includes(kw))
+  if (!kw) return browsePapers.value
+  return browsePapers.value.filter((p) => p.name.toLowerCase().includes(kw) || p.source.toLowerCase().includes(kw))
 })
 
 interface ChapterGroup {
   chapter: string
-  questions: Question[]
+  questions: BrowseQuestion[]
+}
+
+/** 列表里可能来自索引摘要，也可能来自全文，这里只取两者共有的展示字段 */
+type BrowseQuestion = Pick<Question, 'id' | 'chapter' | 'difficulty' | 'source' | 'tags' | 'stem'> & {
+  type: Question['type']
 }
 
 // ---------- 章节题目分页状态 ----------
 const chapterPageState = reactive<Record<string, { pageSize: number; currentPage: number }>>({})
 
+/**
+ * 已展开过（或当前展开）的章节集合。
+ *
+ * el-collapse-item 的默认插槽即使收起也会被渲染，只是被 CSS 隐藏；880 道题全部进 DOM
+ * 会让首屏白白多做几千次节点创建与布局。这里只在章节第一次展开时才渲染表格内容。
+ * 用 `||` 而不是只依赖事件，是为了让 v-model 的初始值（预展开数组）也能生效。
+ */
+const renderedChapters = reactive<Record<string, boolean>>({})
+function markChapterRendered(name: string | number | (string | number)[]): void {
+  const list = Array.isArray(name) ? name : [name]
+  for (const n of list) renderedChapters[String(n)] = true
+}
+
 const chapterGroups = computed<ChapterGroup[]>(() => {
   const kw = questionKeyword.value.trim().toLowerCase()
-  const questions = (bankStore.bank?.Questions ?? []).filter((q) => {
+  const questions = browseQuestions.value.filter((q) => {
     if (!kw) return true
     return (
       plainText(q.stem).toLowerCase().includes(kw) ||
@@ -98,7 +139,7 @@ const chapterGroups = computed<ChapterGroup[]>(() => {
       q.tags.some((t) => t.toLowerCase().includes(kw))
     )
   })
-  const map = new Map<string, Question[]>()
+  const map = new Map<string, BrowseQuestion[]>()
   for (const q of questions) {
     const arr = map.get(q.chapter) ?? []
     arr.push(q)
@@ -139,7 +180,7 @@ watch(questionKeyword, () => {
 })
 
 // 辅助：获取某个章节分页后的题目列表（用于模板）
-function getPagedQuestions(chapter: string, allQuestions: Question[]): Question[] {
+function getPagedQuestions(chapter: string, allQuestions: BrowseQuestion[]): BrowseQuestion[] {
   const state = chapterPageState[chapter]
   if (!state) return allQuestions
   const start = (state.currentPage - 1) * state.pageSize
@@ -166,7 +207,9 @@ onMounted(async () => {
           @change="onSwitchBank">
           <el-option v-for="b in bankStore.manifest" :key="b.id" :label="b.name" :value="b.id">
             <span>{{ b.name }}</span>
-            <span class="muted" style="float: right">{{ b.questionCount }} 题</span>
+            <span class="muted" style="float: right">
+              {{ b.id === bankStore.currentId ? bankStore.questionCount : b.questionCount }} 题
+            </span>
           </el-option>
         </el-select>
       </div>
@@ -220,16 +263,20 @@ onMounted(async () => {
       </div>
     </el-card>
 
-    <!-- 题库卡片 -->
-    <el-card class="page-card" shadow="never" v-loading="bankStore.loading">
+    <!-- 题库卡片：索引立即可用；全文（约 5MB）在用户真正要看题/搜题时才下载 -->
+    <el-card class="page-card" shadow="never" v-loading="bankStore.loading"
+      element-loading-text="正在加载题目全文…">
       <div class="card-title">
         <span class="title-text">试卷 & 题目列表</span>
+        <el-button v-if="!bankStore.hasFullBank" size="small" :loading="bankStore.loading" @click="onBrowseIntent">
+          加载完整数据
+        </el-button>
         <el-button type="primary" plain :icon="SquarePen" @click="goEditBank">编辑题库</el-button>
       </div>
 
       <el-divider content-position="left"><strong>试卷列表（{{ filteredPapers.length }}）</strong></el-divider>
       <el-input v-model="paperKeyword" placeholder="输入关键字实时过滤试卷" clearable :prefix-icon="Search"
-        style="margin: 12px 0" />
+        style="margin: 12px 0" @focus="onBrowseIntent" />
       <el-table stripe :data="filteredPapers">
         <el-table-column prop="name" label="试卷名称" min-width="200" show-overflow-tooltip />
         <el-table-column label="题数" width="80">
@@ -246,40 +293,46 @@ onMounted(async () => {
       <el-divider content-position="left"><strong>题目列表（{{chapterGroups.reduce((s, g) => s + g.questions.length, 0)
       }}）</strong></el-divider>
       <el-input v-model="questionKeyword" placeholder="输入关键字实时过滤题目（题干 / 章节 / 标签）" clearable :prefix-icon="Search"
-        style="margin: 12px 0" />
-      <el-collapse v-model="activeChapters">
+        style="margin: 12px 0" @focus="onBrowseIntent" />
+      <!-- 展开章节＝明确的"我要看题"意图，此时再拉全文 -->
+      <el-collapse v-model="activeChapters" @change="onChapterToggle">
         <el-collapse-item v-for="g in chapterGroups" :key="g.chapter" :name="g.chapter">
           <template #title>{{ g.chapter }}（{{ g.questions.length }}）</template>
 
-          <!-- 题目表格（分页数据） -->
-          <el-table stripe :data="getPagedQuestions(g.chapter, g.questions)">
-            <el-table-column label="题号" width="80">
-              <template #default="{ row }">
-                <span :title="row.id">{{ row.id.slice(-6) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="题干" min-width="200" show-overflow-tooltip>
-              <template #default="{ row }">{{ truncate(plainText(row.stem), 80) }}</template>
-            </el-table-column>
-            <el-table-column label="难度" width="130">
-              <template #default="{ row }">
-                <el-rate v-model="row.difficulty" :max="5" size="small" disabled />
-              </template>
-            </el-table-column>
-            <el-table-column prop="source" label="来源" width="120" show-overflow-tooltip />
-          </el-table>
+          <!-- 收起时不渲染表格：880 题全部进 DOM 是首屏最大的一笔渲染开销 -->
+          <template v-if="renderedChapters[g.chapter] || activeChapters.includes(g.chapter)">
+            <!-- 题目表格（分页数据） -->
+            <el-table stripe :data="getPagedQuestions(g.chapter, g.questions)">
+              <el-table-column label="题号" width="80">
+                <template #default="{ row }">
+                  <span :title="row.id">{{ row.id.slice(-6) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="题干" min-width="200" show-overflow-tooltip>
+                <!-- 索引里已是纯文本摘要；全文则是富文本，两种形态都过一遍 plainText 归一化 -->
+                <template #default="{ row }">{{ truncate(plainText(row.stem), 80) }}</template>
+              </el-table-column>
+              <el-table-column label="难度" width="130">
+                <template #default="{ row }">
+                  <el-rate v-model="row.difficulty" :max="5" size="small" disabled />
+                </template>
+              </el-table-column>
+              <el-table-column prop="source" label="来源" width="120" show-overflow-tooltip />
+            </el-table>
 
-          <!-- 分页组件（仅当题目总数大于每页条数时显示） -->
-          <el-pagination :current-page="chapterPageState[g.chapter].currentPage"
-            @update:current-page="(val: number) => (chapterPageState[g.chapter].currentPage = val)"
-            :page-size="chapterPageState[g.chapter].pageSize" @update:page-size="
-              (val: number) => {
-                const state = chapterPageState[g.chapter]
-                state.pageSize = val
-                state.currentPage = 1
-              }
-            " :page-sizes="[20, 50, 100]" :total="g.questions.length" layout="total, sizes, prev, pager, next, jumper"
-            style="margin-top: 10px" />
+            <!-- 分页组件（仅当题目总数大于每页条数时显示） -->
+            <el-pagination :current-page="chapterPageState[g.chapter].currentPage"
+              @update:current-page="(val: number) => (chapterPageState[g.chapter].currentPage = val)"
+              :page-size="chapterPageState[g.chapter].pageSize" @update:page-size="
+                (val: number) => {
+                  const state = chapterPageState[g.chapter]
+                  state.pageSize = val
+                  state.currentPage = 1
+                }
+              " :page-sizes="[20, 50, 100]" :total="g.questions.length" layout="total, sizes, prev, pager, next, jumper"
+              style="margin-top: 10px" />
+          </template>
+          <el-empty v-else :image-size="60" description="展开后加载本节题目" />
         </el-collapse-item>
       </el-collapse>
 

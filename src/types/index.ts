@@ -38,6 +38,42 @@ export interface BankData {
   Papers: Paper[]
 }
 
+/**
+ * 题库索引：题库的"摘要形态"，由构建期脚本从题库 JSON 生成（`_index.json`）。
+ *
+ * 为什么需要它：完整题库 JSON 约 5MB（880 题的题干与解析富文本 + 内嵌图片），
+ * 而 GitHub Pages 不会给静态文件做 gzip —— 用户每次冷启动都要原样下载这 5MB。
+ * 首屏（首页/题库列表/统计）其实只需要"每题的摘要 + 章节归属"，因此构建期把这份
+ * 轻量索引单独产出，首屏只拉索引，全文留到真正要答题/浏览时再按需加载。
+ *
+ * 与 `BankData` 的区别：`SummaryQuestion` 只有摘要，没有选项、答案、解析。
+ */
+export interface SummaryQuestion {
+  id: string
+  type: QuestionType
+  chapter: string
+  difficulty: number
+  /** 纯文本摘要（已截断），用于列表展示与关键字过滤 */
+  stem: string
+  source: string
+  tags: string[]
+}
+
+export interface BankIndex {
+  id: string
+  name: string
+  /** 题目总数（以题库文件为准，比 manifest 里的 questionCount 可靠） */
+  questionCount: number
+  rule: BankRule
+  questions: SummaryQuestion[]
+  papers: Paper[]
+  /**
+   * 生成索引所依据的本地覆盖层时间戳（仅有本地编辑的题库才有）。
+   * 用于判断"索引是否仍与本地覆盖层一致"，避免索引与全文数据不同步。
+   */
+  ts?: number
+}
+
 /** 组卷规则项 */
 export interface ComposeItem {
   chapter: string
