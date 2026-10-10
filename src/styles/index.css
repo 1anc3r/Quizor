@@ -305,6 +305,15 @@ button:focus-visible,
   border: 1px solid var(--q-border) !important;
   box-shadow: var(--q-shadow-sm) !important;
   transition: box-shadow 0.2s ease-out;
+  /* el-card 默认取 Element Plus 的 --el-card-bg-color（深色下为 #1d1e1f），
+     与 section.cc-card 的 --q-card（深色下 #1e293b）不一致，这里统一到 cc-card */
+  --el-card-bg-color: var(--q-card);
+  background: var(--q-card) !important;
+}
+
+/* 卡片内容区跟随卡片底色，避免深色模式下 el-card__body 与 cc-card 出现色差 */
+.page-card .el-card__body {
+  background: var(--q-card);
 }
 
 .card-title {
@@ -788,6 +797,63 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
 
 .el-card.page-card:hover {
   box-shadow: var(--q-shadow-md) !important;
+}
+
+/* ---- 表格：深色下对齐 Corporate Clean（slate）配色 ----
+   Element Plus 深色主题自带的是中性灰（#141414 / #1d1d1d / #4c4d4f），
+   放在 slate 蓝调的卡片(#1e293b)里会显得脏、条纹与卡片底几乎同色。
+   这里把表格的底色、表头、条纹、悬停全部换成同一套 slate token。 */
+:root {
+  --q-table-stripe: #f8fafc;
+  --q-table-hover: #f1f5f9;
+}
+
+html.dark {
+  --q-table-stripe: #2b3a52;
+  --q-table-hover: #34455f;
+}
+
+.el-table {
+  /* 表头/表格底色：跟随卡片底色，避免与卡片出现色块 */
+  --el-table-bg-color: var(--q-card);
+  --el-table-tr-bg-color: var(--q-card);
+  --el-table-header-bg-color: var(--q-card);
+  --el-table-expanded-cell-bg-color: var(--q-card);
+  /* 表头文字用次要色，正文用主文字色 */
+  --el-table-header-text-color: var(--q-text-secondary);
+  --el-table-text-color: var(--q-text);
+  --el-table-border-color: var(--q-border);
+  --el-table-row-hover-bg-color: var(--q-table-hover);
+  --el-table-current-row-bg-color: var(--q-primary-soft);
+  color: var(--q-text);
+}
+
+/* stripe 与 hover 的底色是写在单元格上的，需要用 !important 盖过 EP 默认值 */
+.el-table .el-table__body tr.el-table__row--striped > td.el-table__cell {
+  background: var(--q-table-stripe) !important;
+}
+
+/* 放在 stripe 之后：悬停行优先显示 hover 底色 */
+.el-table .el-table__body tr.hover-row > td.el-table__cell,
+.el-table .el-table__body tr.current-row > td.el-table__cell {
+  background: var(--q-table-hover) !important;
+}
+
+/* 展开行内容区用条纹底色，与展开行本体区分开 */
+.el-table .el-table__body tr > td.el-table__expanded-cell {
+  background: var(--q-table-stripe) !important;
+}
+
+.el-table th.el-table__cell,
+.el-table tr,
+.el-table {
+  background-color: var(--q-card);
+}
+
+/* 固定列的投影在浅色下是灰、深色下应更重，否则列边界看不出来 */
+html.dark .el-table {
+  --el-table-fixed-left-column: inset 10px 0 10px -10px rgb(0 0 0 / 0.55);
+  --el-table-fixed-right-column: inset -10px 0 10px -10px rgb(0 0 0 / 0.55);
 }
 
 .el-button {
