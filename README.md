@@ -1,95 +1,148 @@
 # Quizor · 做题家
 
-纯静态题库刷题 Web 应用：无后端、无登录。题库以 JSON 静态文件承载，用户数据（答题记录、错题、收藏、设置）全部保存在浏览器 `localStorage`，构建产物可直接发布 GitHub Pages。
+**纯静态题库刷题 Web 应用**：无后端、无登录、无账号。题库是普通的 JSON 文件，你可以在浏览器里一边刷题一边改题；题干、选项、解析都支持富文本、LaTeX 公式与图文并排；题干和选项可以一键复制成图片，直接粘进 AI 对话框提问。
 
-## 技术栈
+<br>
 
-- Vue 3（Composition API + `<script setup>`）+ TypeScript + Vite
-- Pinia（状态管理）+ Vue Router（`createWebHashHistory`，避免 GitHub Pages 刷新 404）
-- Element Plus（unplugin 按需引入）+ ECharts（仅记录页动态导入、按需注册）
-- Lucide 图标（`@lucide/vue`，逐图标具名导入，Tree-shaking 只打进用到的图标）
-- Fluent Editor（富文本题干/解析，支持图文并排与 LaTeX 公式）+ KaTeX
-- pinyin-pro（题库名称自动转拼音 ID；**动态 import**，字典约 300KB，只在新建/导入题库时下载）
-- 构建期插件：`vite-plugins/bankIndex.ts`（生成题库索引）、`vite-plugins/katexFonts.ts`（KaTeX 字体只留 woff2）
+## 核心特点
 
-### 图标约定
+### 📝 题库结构简单，用记事本就能改
 
-全部图标来自 `@lucide/vue`，按需具名导入（`import { Plus, Search } from '@lucide/vue'`），不使用自动导入：
+题库就是一个 JSON 数组，字段一看就懂，没有嵌套的 DSL、没有 ID 引用表：
 
-- 作为 `el-button` / `el-input` 的 `:icon` 时直接传组件（`<el-button :icon="Plus" />`）。
-- 需要与文字同一基线的行内图标，外包一层 `<el-icon :size="14">`；`.lucide` 在 `src/styles/index.css` 中被收敛为 `1em`，因此宽度跟随 `el-icon` 的 `font-size`。
-- 需要精确像素尺寸时，给图标组件显式传 `:size`（会覆盖 CSS 的 `width`/`height`）。
-- lucide 没有「实心」变体：实心态用 `fill` 表达，例如收藏按钮 `<Star :fill="isFaved ? 'currentColor' : 'none'" />`。
+```jsonc
+{
+  "Questions": [
+    {
+      "id": "kaoyan_guanzong_000055",
+      "type": "single",                       // single 单选 / multiple 多选 / judge 判断 / text 简答
+      "chapter": "逻辑推理",
+      "difficulty": 2,                        // 1-5，星级展示
+      "stem": "题干，支持富文本 HTML",
+      "options": [{ "key": "A", "text": "选项内容" }],
+      "answer": ["E"],                        // 正确选项的 key；简答题留空，参考答案写进 analysis
+      "analysis": "解析，支持富文本 HTML",
+      "source": "2010年真题",
+      "tags": ["逻辑推理"]
+    }
+  ],
+  "Papers": [
+    { "id": "paper_1", "name": "2010年真题", "source": "2010年真题", "difficulty": 4, "questionIds": ["按顺序引用题目 id"] }
+  ]
+}
+```
 
-## 本地启动
+- **四种题型**：单选 `single` / 多选 `multiple` / 判断 `judge` / 简答 `text`。
+- **批量维护不需要打开应用**：把 JSON 丢进 `public/data/banks/`、在 `public/data/BankManifest.json` 登记一行，重新构建即可（会顺便生成首屏索引）。
+- **字段容错**：导入的题库缺 `options`、`difficulty` 写成字符串、`id` 重复都能被自动补齐/去重；只有题干为空的条目会被丢弃。
+- **纯文本也一样能用**：`stem` / `options[].text` / `analysis` 写纯文本（包括 `<`、`>` 这类数学符号）不会被当成 HTML 解析；只有出现真正的标签时才走富文本渲染。
+
+### 🧮 富文本 + 公式 + 图文并排
+
+基于 Fluent Editor + KaTeX，题干、解析、以及**每个选项**都支持排版：
+
+- 加粗 / 斜体 / 下划线 / 删除线、上下标、文字与背景色、对齐、有序无序列表、缩进、引用、代码、表格、分隔线。
+- **LaTeX 公式**行内排版，题库里只存公式源码（`<span class="ql-formula" data-value="...">`），渲染时用 KaTeX 就地重建，题目列表也能显示公式原文而不是一片空白。
+- **图文并排**：插图走工具栏选图、粘贴、拖拽三条路径，都统一经过"压缩 → 内嵌"处理（等比缩到最长边 1280px，按质量 0.82 重编码，优先 WebP；SVG 与 GIF 不压缩），避免一张手机截图吃掉几 MB 存储配额。压缩后仍超过 200KB，会引导你改用 http(s) 外链图片，既不占存储也不涨题库体积。
+- **选项也能用富文本**：选项默认是轻量单行编辑，需要时勾选"富文本选项"即可为每个选项单独开启精简工具栏（保留基础格式与公式，去掉图片/表格）。
+- **安全**：题库 HTML 可能来自外部导入文件，写入 `innerHTML` 前一律经白名单净化（标签白名单 + 属性白名单 + URL 协议白名单，剔除全部 `on*` 事件属性），一个 `.json` 文件无法在应用源下执行脚本。
+
+### ✏️ 边刷题边改题
+
+打开「设置 → 编辑模式」后，答题页导航栏会出现「编辑」按钮：
+
+- **就地编辑当前题目**，不用退回题库管理页、不用中断本次答题。
+- 保存后**立刻生效**：会话内的题目快照替换为新内容，分值保留；如果该题已经判分（练习模式即时反馈），会按新答案**重新判分**，再写回题库持久化。
+- **写盘失败会回滚**：存储配额不足时内存改动被撤销并报错，不会出现"界面显示已更新、刷新后丢失"的错觉。
+- 题库管理页另有三套完整的表格化管理入口：**组卷规则**（章节 × 题型 × 题量 × 分值 × 选项数）、**试卷管理**（可批量把选中题目加入试卷）、**题目管理**（关键字/来源/章节/题型筛选，批量删除）。
+
+### 📋 复制题干 + 选项为图片，粘进 AI 直接问
+
+答题页的复制按钮会把**当前题干与全部选项**渲染成一张 PNG 写入剪贴板（2 倍分辨率、自动补白底，深色模式下也不会糊成黑底浅字），直接粘到 AI 对话、聊天窗口或笔记里：
+
+- **零依赖实现**：不用 html2canvas（200KB 级依赖），而是用浏览器原生 `<svg><foreignObject>` 序列化 + canvas 编码。
+- **所见即所得**：逐元素内联计算样式，公式（KaTeX）、表格、选项边框圆角、选中高亮、答对答错的绿/红状态都会原样保留；外链图片会先转成 data URL，避免截图中出现裂图。
+- **失败时报错而非静默给一张白图**：截图会抽样校验非白像素，内容整体空白时直接抛错。
+- 需要安全上下文（https 或 localhost）与剪贴板权限；不支持时给出可直接照着做的中文提示。
+
+### ⚡ 首屏只加载 3% 的数据
+
+GitHub Pages 不对静态 JSON 做 gzip，而内置示例题库全文 **5512KB**（880 题，含富文本与内嵌图片；在磁盘上 6.06MB，构建期生成的索引为 310KB），冷启动原样下载就是首屏最大的瓶颈。因此构建期会从题库同源生成一份轻量索引：
+
+| 层 | 文件 | 实测体积 | 何时加载 |
+| --- | --- | --- | --- |
+| **索引** | `data/banks/*_index.json`（构建期生成） | **190KB**（全文的 3.4%） | 应用启动。首页列表、章节计数、统计卡片、题目筛选都用它 |
+| **全文** | `data/banks/*.json` | **5512KB** | 进入做题设置/答题页，或用户在首页展开章节、聚焦搜索框 |
+
+首屏数据传输因此减少 **96.6%**。触发点刻意选在**交互**而非渲染，所以一进首页不会偷偷开始下载 5MB。
+
+### 🌐 其它
+
+- **纯静态、零后端**：所有数据留在本机浏览器——题库编辑、错题本、收藏夹、做题记录、设置都不出设备。
+- **两种做题模式**：练习（乱序抽题 + 即时反馈）与考试（倒计时 + 统一判分）。
+- **断点续答**：刷新、关页、换标签页都能无损恢复。
+- **响应式**：桌面端顶部导航 + 键盘操作，移动端底部标签栏 + 滑动切题。
+
+<br>
+
+## 功能总览
+
+| 页面 | 能力 |
+| --- | --- |
+| **首页** | 题库切换与新增、统计卡片（答题量 / 正确率 / 错题数 / 收藏数）、断点续答入口、练习与考试入口、试卷列表与按章节折叠的题目列表（关键字 / 章节 / 标签实时过滤，章节内分页 20/50/100） |
+| **做题设置** | 练习：范围（全部 / 按章节 / 仅错题 / 仅收藏）+ 题量（10/20/50/全部）+ 题型多选；考试：模拟模式（按组卷规则随机组卷）或真题模式（按试卷原始顺序）。两种模式的偏好都会被记住 |
+| **答题页** | 倒计时（按"截止时间 − 当前时间"重算，切后台不漂移）、进度、收藏、标记、答题卡（移动端为抽屉）、复制为图片、就地编辑当前题目、练习模式即时反馈、考试模式统一交卷、超时自动交卷 |
+| **结算页** | 得分 / 试卷总分、正确率、错题数、用时、逐题回顾与答题卡跳转、简答题自评 |
+| **错题本** | 同题更新收录（错误次数 / 最近错误时间 / 上次作答）、筛选排序、练习中**连续答对达到阈值自动移出**（阈值 1–10 可调） |
+| **收藏夹** | 收藏题目汇总，可直接发起"仅收藏"范围的练习 |
+| **记录页** | 全部做题记录表格（模式 / 得分 / 正确率 / 用时 / 时间）+ ECharts 统计（正确率趋势折线、章节正确率柱状，仅本页动态导入按需注册，不进首屏 bundle） |
+| **设置页** | 外观模式（浅色 / 深色）、题干与选项字号（小 / 标准 / 大）、滑动切题、键盘切题、键盘作答、编辑模式、错题移出阈值、备份导入导出、存储用量面板、清理缓存 |
+| **题库管理** | 基本信息（名称自动转拼音 ID、时长、总分、及格线）、组卷规则、试卷列表、题目列表 |
+
+### 键盘与手势
+
+| 操作 | 效果 |
+| --- | --- |
+| `←` / `↑` | 上一题（可在设置中关闭） |
+| `→` / `↓` | 下一题（可在设置中关闭） |
+| `A` / `B` / `C`… 或 `1` / `2` / `3`… | 选择对应选项（可在设置中关闭；选项 key 不是 A/B/C 时按选项顺序回退） |
+| 左滑 / 右滑 | 移动端切题（可在设置中关闭） |
+
+焦点在输入框或富文本编辑器内时，方向键与字母键全部交还给打字，不会误触发选项。
+
+<br>
+
+## 快速开始
 
 需要 **Node.js 22.6 或以上**（构建脚本用 `node --experimental-strip-types` 直接运行 `.ts`，该选项自 Node 22.6 引入；Node 20 会报 `bad option: --experimental-strip-types` 并以 exit 9 退出）。
 
 ```bash
 npm install
-npm run dev
+npm run dev        # 生成题库索引 → 启动 Vite（默认 http://localhost:5173）
 ```
 
-浏览器打开终端提示的地址（默认 <http://localhost:5173>）。
-
-## 构建与类型检查
+其它命令：
 
 ```bash
 npm run build       # 生成题库索引 → vue-tsc 类型检查 → vite 构建，产物在 dist/
 npm run build:index # 只重新生成题库索引（public/data/banks/*_index.json）
+npm run build:only  # 跳过类型检查与索引，直接 vite build
 npm run preview     # 本地预览构建产物
 ```
 
-`npm run dev` 会先生成一次索引再启动开发服务器，因此直接开发也不需要手动准备。
+内置示例题库为 `199_管理类综合能力`（880 题），首次运行 `npm run dev` 会自动为它生成索引。
 
-## 首屏数据分层（性能约定）
+<br>
 
-题库全文（880 题约 5MB，含题干/解析富文本与内嵌图片）**不再随首屏加载**。原因是 GitHub Pages 不对静态 JSON 做 gzip：实测全文 5,060KB 原样传输，在 10Mbps 下要 4 秒以上，这是首屏慢的主因。
+## 新增题库
 
-改用两层结构：
+**方式一：放到静态目录（适合批量整理）**
 
-| 层 | 文件 | 体积 | 何时加载 |
-| --- | --- | --- | --- |
-| 索引 | `data/banks/*_index.json`（构建期生成） | 303KB | 应用启动（首页列表、章节计数、统计都用它） |
-| 全文 | `data/banks/*.json` | 5,060KB | 进入做题设置 / 答题页，或用户展开章节、聚焦搜索框 |
+1. 把题库 JSON 放进 `public/data/banks/`；
+2. 在 `public/data/BankManifest.json` 的 `Banks` 数组里登记 `id / name / bankFile / questionCount / rule`；
+3. `npm run build` 会自动为它生成首屏索引。
 
-实测：首屏数据传输 **5,060KB → 303KB（-94%）**，按 10Mbps 估算从 4.1s 降到 0.25s；首屏总传输（含 JS/CSS）950KB。索引由 `vite-plugins/bankIndex.ts` 在构建期从题库 JSON 同源生成，`*_index.json` 已加入 `.gitignore`（产物不入库，避免与题库更新脱节）。
-
-两条新增约定，改动相关代码时需要遵守：
-
-- **索引字段必须保持 `id / type / chapter / difficulty / stem / source / tags`**，`HomeView` 的列表同时兼容索引摘要与全文题目（只取这些字段）。
-- **需要题干/选项/答案的功能必须显式 `await bankStore.ensureFullBank()`**（`QuizSetupView` 组卷、`QuizView` 回填题干都已如此），否则会拿到只有摘要的索引数据。
-- `vite-plugins/` 与 `scripts/` 里的文件也会被 `node --experimental-strip-types` 直接运行（Node 22.6+），从这类文件 import 项目源码时**必须写全 `.ts` 后缀**：Vite 会做后缀补全，Node 不会——只在 Vite 里跑通（`vite build`）不代表这套脚本能跑，务必单独执行一次 `npm run build:index` 验证。
-
-## 部署到 GitHub Pages
-
-`vite.config.ts` 中 `base: './'`（相对路径），配合 hash 路由，可直接部署到项目页子路径。
-
-**方式一：GitHub Actions（推荐，已内置 `.github/workflows/static.yml`）**
-
-1. 将本仓库推送到 GitHub；
-2. 仓库 Settings → Pages → Source 选择 **GitHub Actions**；
-3. 推送到 `main` 分支即可自动构建并发布。
-
-**方式二：手动发布 dist**
-
-```bash
-npm run build
-# 将 dist/ 目录推送到 gh-pages 分支（或任意静态托管）
-npx gh-pages -d dist
-```
-
-## 新增题库（不改代码）
-
-1. 将题库 JSON 放入 `public/data/banks/`（结构见下）；
-2. 在 `public/data/BankManifest.json` 的 `Banks` 数组中登记 `id / name / bankFile / questionCount / rule`；
-3. 重新构建部署即可（`npm run build` 会自动为题库生成首屏索引）。
-
-也可以在应用内「首页 → 新增题库」创建，或「设置 → 导入题库 JSON」。浏览器内的编辑/新增保存在 localStorage 覆盖层，不影响静态文件本身。
-
-## 数据结构
-
-`public/data/BankManifest.json`：
+`BankManifest.json`：
 
 ```jsonc
 {
@@ -98,13 +151,14 @@ npx gh-pages -d dist
       "id": "kaoyan_guanzong",
       "name": "199_管理类综合能力",
       "bankFile": "Bank_Kaoyan_Guanzong.json",
-      "questionCount": 57,
+      "questionCount": 880,
       "rule": {
-        "durationMinutes": 120,
-        "totalScore": 200,
-        "passScore": 100,
-        "composition": [
-          { "chapter": "问题求解", "type": "single", "count": 15, "scoreEach": 3, "optionCount": 5 }
+        "durationMinutes": 120,       // 考试时长
+        "totalScore": 200,            // 试卷总分
+        "passScore": 100,             // 及格线（可选）
+        "composition": [              // 模拟模式组卷规则
+          { "chapter": "问题求解", "type": "single", "count": 15, "scoreEach": 3, "optionCount": 5 },
+          { "chapter": "论说文",   "type": "text",   "count": 1,  "scoreEach": 35, "optionCount": 0 }
         ]
       }
     }
@@ -112,75 +166,112 @@ npx gh-pages -d dist
 }
 ```
 
-`public/data/banks/Bank_*.json`：
+**方式二：在应用内完成**
 
-```jsonc
-{
-  "Questions": [
-    {
-      "id": "kaoyan_guanzong_000055",
-      "type": "single",            // single 单选 / multiple 多选 / judge 判断 / text 简答
-      "chapter": "逻辑推理",
-      "difficulty": 2,             // 1-5
-      "stem": "题干（纯文本或富文本 HTML，可含 LaTeX 公式节点）",
-      "options": [{ "key": "A", "text": "……" }],
-      "answer": ["E"],
-      "analysis": "解析（纯文本或富文本 HTML）",
-      "source": "2010年真题",
-      "tags": ["逻辑推理"]
-    }
-  ],
-  "Papers": [
-    {
-      "id": "paper_1785472444134",
-      "name": "2010年199管理类综合能力考试",
-      "source": "2010年真题",
-      "difficulty": 4,
-      "questionIds": ["有序引用题目id"]
-    }
-  ]
-}
+- 首页 →「新增题库」：填名称（自动转拼音生成唯一 ID）、时长、总分、及格线与组卷规则。
+- 设置 →「导入题库」：选择符合上述结构的 JSON 文件，作为新题库加入。
+- 两种方式创建的题库都存在浏览器本地，**不影响静态文件本身**——内置题库的编辑以"本地覆盖层"形式保存，内置文件保持原样。
+
+**导出与备份**（设置 → 备份管理）
+
+- **导出题库**：输出 `{ name, rule, Questions, Papers }`，可再次导入或归档。
+- **导出备份 / 导入备份**：包含全部本地数据（`quizor:` 前缀），用于换机、换浏览器迁移。导入为覆盖式，会提示确认。
+
+<br>
+
+## 部署到 GitHub Pages
+
+`vite.config.ts` 中 `base: './'`（相对路径）配合 hash 路由，可直接部署到项目页子路径（history 模式在纯静态托管上刷新会 404，因此必须用 hash）。
+
+**方式一：GitHub Actions（推荐，已内置 `.github/workflows/static.yml`）**
+
+1. 推送仓库到 GitHub；
+2. 仓库 Settings → Pages → Source 选择 **GitHub Actions**；
+3. 推送到 `main` 分支即可自动构建并发布。
+
+**方式二：手动发布 dist**
+
+```bash
+npm run build
+npx gh-pages -d dist        # 或把 dist/ 直接丢到任意静态托管
 ```
 
-## 功能总览
+<br>
 
-- **首页**：题库切换/新增、统计卡片（答题量/正确率/错题数/收藏数）、断点续答「继续上次答题」、练习/考试入口、试卷与题目浏览（章节折叠）。
-- **题库管理**：基本信息（名称自动转拼音 ID、时长、总分、及格线）、组卷规则、试卷管理窗口、题目管理窗口（Fluent Editor 富文本 + LaTeX 公式）。
-- **练习模式**：范围（全部/按章节/仅错题/仅收藏）、题量（10/20/50/全部）、题型筛选；乱序抽题、即时反馈、答错自动入错题本。
-- **考试模式**：模拟模式按组卷规则随机组卷（含倒计时，按"截止时间-当前时间"重算）、真题模式按试卷原始顺序出题；答题卡网格、标记、超时自动交卷、统一判分。
-- **结算页**：分数/总分、正确率、错题数、逐题回顾、答题卡跳转；简答题自评。
-- **错题本**：同题更新收录、筛选/排序、连续答对达到阈值自动移出（阈值可在设置修改）。
-- **收藏夹**、**记录页**（含 ECharts 统计图）、**设置页**（深色模式、字号、滑动切题、导入导出）。
-- **断点续答**：作答变更防抖 300ms 落盘 + `beforeunload` 强制落盘，刷新/关闭后可无损恢复。会话只落盘题号与分值（`StoredQuizSession`），题干/选项/解析在进入答题页时按 id 从题库回填，因此"练习全部"这类大会话也写得进 localStorage；代价是续答时题目内容以题库当前版本为准，题目若已从题库删除则该题从会话中移除。
+## 技术栈
+
+- **Vue 3**（Composition API + `<script setup>`）+ **TypeScript** + **Vite 5**
+- **Pinia**（状态管理）+ **Vue Router**（`createWebHashHistory`）
+- **Element Plus**（unplugin 按需引入，无全量注册）
+- **Fluent Editor**（富文本）+ **KaTeX**（公式）
+- **ECharts**（仅记录页动态导入、按需注册）
+- **Lucide** 图标（`@lucide/vue`，逐图标具名导入，Tree-shaking 只打进用到的图标）
+- **pinyin-pro**（题库名称转拼音 ID，动态 `import`，约 300KB 字典只在新建/导入题库时下载）
+- 构建期插件：`vite-plugins/bankIndex.ts`（生成题库索引）、`vite-plugins/katexFonts.ts`（KaTeX 字体只保留 woff2）
+
+### 图标约定
+
+全部图标来自 `@lucide/vue`，按需具名导入（`import { Plus, Search } from '@lucide/vue'`），不使用自动导入：
+
+- 作为 `el-button` / `el-input` 的 `:icon` 时直接传组件：`<el-button :icon="Plus" />`。
+- 需要与文字同一基线的行内图标，外包一层 `<el-icon :size="14">`；`.lucide` 在 `src/styles/index.css` 中被收敛为 `1em`，因此宽度跟随 `el-icon` 的 `font-size`。
+- 需要精确像素尺寸时给图标组件显式传 `:size`（会覆盖 CSS 的 `width` / `height`）。
+- lucide 没有"实心"变体：实心态用 `fill` 表达，例如收藏按钮 `<Star :fill="isFaved ? 'currentColor' : 'none'" />`。
+
+### 首屏数据分层（改动相关代码时的约定）
+
+- **索引字段必须保持 `id / type / chapter / difficulty / stem / source / tags`**：`HomeView` 的列表同时兼容索引摘要与全文题目，只取这些字段。
+- **需要题干 / 选项 / 答案的功能必须显式 `await bankStore.ensureFullBank()`**（`QuizSetupView` 组卷、`QuizView` 回填题干都已如此），否则会拿到只有摘要的索引数据。
+- `vite-plugins/` 与 `scripts/` 里的文件也会被 `node --experimental-strip-types` 直接运行（Node 22.6+），从这类文件 import 项目源码时**必须写全 `.ts` 后缀**：Vite 会做后缀补全，Node 不会——只在 Vite 里跑通（`vite build`）不代表这套脚本能跑，务必单独执行一次 `npm run build:index` 验证。
+- `*_index.json` 已加入 `.gitignore`：索引必须与题库文件同源生成，提交进仓库会随题库更新而腐坏。
+
+<br>
+
+## 数据存储
+
+- **IndexedDB**：题库存档（内置题库的本地编辑覆盖层、本地新增题库）。一个 880 题的题库 JSON 约 3.3MB，存进 localStorage 要占 6.6MB（UTF-16），直接超出 5MB 配额——也就是"编辑内置大题库"根本无法保存。写入失败会抛错并回滚内存改动。
+- **localStorage**：其余小数据（错题本、收藏夹、做题记录、设置、未完成会话指针、题库元信息），受约 5MB 限制，设置页有实时用量面板与 80% 告警。
+- **会话不随题量增长**：落盘时只保存题号与分值（`StoredSessionQuestion`），题干/选项/解析在进入答题页时按 id 从题库回填。"880 题 · 练习全部"的会话从 3,186,709 字符（≈6.4MB，永远写不进 localStorage）降到 149,454 字符；代价是续答时题目内容以题库当前版本为准，题目若已被删除则该题从会话中移除并提示。
+- **记录也做了瘦身**：做题记录只保存题干摘要（最多 120 字），渲染时按 id 回查题库完整题干，仅当题目已删除时展示摘要。
+- **迁移安全**：历史遗留的 localStorage 题库存档会一次性迁入 IndexedDB，逐字符读回校验一致后才删除源数据，任何一步失败都保留副本。
+- 多标签页同时答题时，**最后落盘的会话覆盖前者**（会话内防抖 300ms + `beforeunload` 强制落盘，保证不丢）。
+
+<br>
 
 ## 目录结构
 
 ```
-quizor/
-├── .github/workflows/deploy.yml   # GitHub Pages 自动部署
+Quizor/
+├── .github/workflows/static.yml   # GitHub Pages 自动部署
 ├── public/
 │   ├── data/
 │   │   ├── BankManifest.json      # 题库清单（含组卷规则）
 │   │   └── banks/                 # 各题库 JSON + 构建期生成的 *_index.json
 │   └── favicon.svg
-├── scripts/build-bank-index.mjs   # 生成题库索引（供 dev 与构建前调用）
+├── scripts/build-bank-index.mjs   # 生成题库索引（dev 与构建前调用）
 ├── vite-plugins/                  # 构建期插件：题库索引、KaTeX 字体瘦身
 ├── src/
-│   ├── components/                # 导航/富文本/编辑器/选项/答题卡/题目详情/两个管理窗口
+│   ├── components/                # 导航 / 富文本 / 富文本编辑器 / 选项组 / 答题卡 / 题目详情 / 题库与试卷窗口
+│   ├── composables/               # 移动端判定
 │   ├── router/                    # hash 路由
-│   ├── services/                  # localStorage 封装、题库加载（覆盖层）、会话/判分、拼音
-│   ├── stores/                    # Pinia：设置 / 题库 / 用户数据（错题·收藏·记录）
+│   ├── services/                  # IndexedDB 与 localStorage 封装、题库加载与覆盖层、备份导入导出
+│   ├── stores/                    # Pinia：设置 / 题库 / 用户数据（错题·收藏·记录）/ 会话与判分
 │   ├── styles/                    # 全局样式、主题变量、移动端适配
 │   ├── types/                     # 全部 TypeScript 类型
-│   ├── utils/                     # id / 格式化工具
-│   ├── views/                     # 首页/题库管理/做题设置/做题/结算/错题/收藏/记录/设置
-│   ├── App.vue / main.ts / env.d.ts
-├── index.html / vite.config.ts / tsconfig*.json / package.json
+│   ├── utils/                     # 文本 / 净化 / 图片 / DOM 截图 / 拼音 / 格式化 / id
+│   ├── views/                     # 首页 / 题库管理 / 做题设置 / 答题 / 结算 / 错题本 / 收藏夹 / 记录 / 设置
+│   └── App.vue / main.ts / env.d.ts
+├── index.html / vite.config.ts / tailwind.config.js / tsconfig*.json / package.json
+└── start.bat                      # Windows 一键启动
 ```
+
+<br>
 
 ## 说明与限制
 
-- 浏览器内的题库编辑存储于 localStorage（容量约 5MB）；大量图片建议优先维护静态 JSON 文件，或定期「导出题库 JSON」归档。
-- 首屏只加载题库索引；题库全文（约 5MB）在进入做题/组卷或展开章节时才下载，因此首页会先看到章节计数与题目摘要，展开后才是完整题干。
-- 会话不随题量增长：只存题号/分值，题干按 id 从题库回填，题库多大都不会撑爆 localStorage（历史版本留下的整题快照会在下次恢复时自动瘦身）。
-- 多标签页同时答题时，最后落盘的会话覆盖前者（同一会话内防抖 + beforeunload 保证不丢）。
+- **数据在本机浏览器里**：换设备、清理浏览器数据或使用隐私模式都可能导致数据丢失，重要题库请定期「导出题库」或「导出备份」。
+- **剪贴板图片**需要安全上下文（https 或 localhost）与浏览器剪贴板权限；`file://` 打开构建产物时该功能不可用。
+- **IndexedDB 不可用**（隐私模式等）时，题库存档退回 localStorage，受 5MB 限制，设置页会给出提示。
+- **首屏只加载索引**：一进首页看到的是章节计数与题目摘要，展开章节或聚焦搜索框时才会拉取全文。
+- **题库 HTML 会被净化**：为保证安全，白名单外的标签与属性（含内嵌 SVG）会被剥掉，内嵌 SVG 图片在渲染时会被拦截，请改用外链。
+- 内置示例题库为 `199_管理类综合能力`（880 题），仅作演示；它随时可以被删除或替换成你自己的题库。
