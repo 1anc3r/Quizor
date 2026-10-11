@@ -44,16 +44,16 @@ const indexCache = new Map<string, BankIndex>()
 /** 正在飞行的全文加载，按题库 id 去重（同一题库被多个页面同时要求时只发一次请求） */
 const inflight = new Map<string, Promise<BankData>>()
 
-/** 本地覆盖层的时间戳：没有覆盖层时返回 null */
-function overrideStamp(id: string): number | null {
-  const raw = storage.readRaw(K_BANK_DATA + id)
-  if (raw === null) return null
-  try {
-    const parsed = JSON.parse(raw) as { ts?: unknown }
-    return typeof parsed.ts === 'number' ? parsed.ts : 0
-  } catch {
-    return 0
-  }
+/**
+ * 覆盖层存档：题库数据 + 写入时间戳。
+ *
+ * `ts` 由 `writeBankData` 随数据一起写入，只用于标记"这份数据是什么时候存的"。
+ * 注意它与"索引是否最新"是两件事，不要互相替代（见 `loadBankIndex` / `loadBankUncached`）。
+ */
+interface BankOverride {
+  data: BankData
+  /** 旧格式存档（以及手工改过的备份）没有该字段，按 0 计 */
+  ts: number
 }
 
 const base = () => import.meta.env.BASE_URL
@@ -162,6 +162,12 @@ export function indexUrl(meta: BankMeta): string {
  *
  * 优先本地覆盖层：用户编辑过的题库，静态索引已经过期，必须就地重新派生，
  * 否则首页会出现"编辑后仍是旧摘要/旧题数"的错位。
+ *
+ * **本地题库（导入/新建）必须走这条派生路径**：静态索引是构建期按
+ * `public/data/BankManifest.json` 逐个生成的，本地题库不在其中，
+ * 去 fetch `data/banks/<本地id>_index.json` 只会拿到 404（静态托管开了 SPA 回退时
+ * 还会拿到 200 + index.html，再被 `res.json()` 解析失败）—— 现象就是
+ * "从设置页导入题库后，一切换过去就提示「题库索引加载失败」"。
  */
 export async function loadBankIndex(id: string, force = false): Promise<BankIndex | null> {
   if (!force && indexCache.has(id)) return indexCache.get(id) as BankIndex
@@ -169,16 +175,14 @@ export async function loadBankIndex(id: string, force = false): Promise<BankInde
   const meta = manifest.Banks.find((b) => b.id === id)
   if (!meta) return null
 
-  const overrideRaw = storage.readRaw(K_BANK_DATA + id)
-  if (overrideRaw !== null) {
-    try {
-      const data = normalizeBankData(JSON.parse(overrideRaw))
-      const index = deriveIndex(meta, data, overrideStamp(id) ?? 0)
-      indexCache.set(id, index)
-      return index
-    } catch {
-      console.warn('[quizor] 本地题库覆盖层损坏，改用静态索引：', id)
-    }
+  // 覆盖层的读取必须走 readBankData（IndexedDB 优先），不能只看 localStorage：
+  // writeBankData 写成功后就删掉了 localStorage 副本，只查 localStorage 会得出
+  // "没有覆盖层"的错误结论，本地题库于是完全没有索引可用。
+  const override = await readBankData(id)
+  if (override) {
+    const index = deriveIndex(meta, normalizeBankData(override.data), override.ts)
+    indexCache.set(id, index)
+    return index
   }
 
   try {
@@ -204,41 +208,45 @@ export async function loadBankIndex(id: string, force = false): Promise<BankInde
   return null
 }
 
-/**
- * 能否跳过 IndexedDB 读取。
- *
- * 用户每次编辑都会同时写 IDB 与 localStorage 覆盖层，而覆盖层带时间戳。
- * 索引里的 `ts` 与当前覆盖层一致，就说明这份索引已经反映了最新编辑，
- * 不必再为"有没有 Override"多查一次 IDB。
- */
-function indexIsCurrent(id: string, index?: BankIndex | null): boolean {
-  if (!index || typeof index.ts !== 'number') return false
-  return overrideStamp(id) === index.ts
-}
-
 /* ---------------- 题库存档的读写（IndexedDB 优先） ---------------- */
 
 /**
- * 读取题库存档：IndexedDB 优先，其次 localStorage 里的历史覆盖层。
+ * 读取覆盖层存档：IndexedDB 优先，其次 localStorage 里的历史覆盖层。
  * 命中历史数据时顺手迁进 IDB（读回校验通过才删除源数据）。
+ *
+ * **两层都要查，这是本地题库能否显示的关键**：`writeBankData` 一旦成功写进 IDB
+ * 就会删掉 localStorage 副本，只查 localStorage 会得到"没有覆盖层"的结论，
+ * 而本地题库的全部数据恰恰只存在于这里（没有静态文件可退）。
+ *
+ * 返回 `{ data, ts }` 而不是裸数据：时间戳与数据同源，就地取出，
+ * 免得调用方为了拿 `ts` 再解析一遍几 MB 的 JSON 字符串。
  */
-async function readBankData(id: string): Promise<BankData | null> {
+async function readBankData(id: string): Promise<BankOverride | null> {
   const key = storage.fullKey(K_BANK_DATA + id)
   const fromIdb = await idbGetRaw(key)
   if (fromIdb !== null) {
-    try {
-      return JSON.parse(fromIdb) as BankData
-    } catch {
-      console.warn('[quizor] IndexedDB 中的题库数据损坏，回退 localStorage：', key)
-    }
+    const stored = parseOverride(fromIdb)
+    if (stored) return stored
+    console.warn('[quizor] IndexedDB 中的题库数据损坏，回退 localStorage：', key)
   }
   const legacy = storage.readRaw(K_BANK_DATA + id)
   if (legacy === null) return null
+  const stored = parseOverride(legacy)
+  if (!stored) {
+    console.warn('[quizor] localStorage 中的题库数据损坏：', key)
+    return null
+  }
   if ((await idbSetRaw(key, legacy)) && (await idbGetRaw(key)) === legacy) {
     storage.removeKey(K_BANK_DATA + id)
   }
+  return stored
+}
+
+/** 解析覆盖层存档，附带取出时间戳；内容不是合法 JSON 时返回 null */
+function parseOverride(raw: string): BankOverride | null {
   try {
-    return JSON.parse(legacy) as BankData
+    const parsed = JSON.parse(raw) as BankData & { ts?: unknown }
+    return { data: parsed, ts: typeof parsed.ts === 'number' ? parsed.ts : 0 }
   } catch {
     return null
   }
@@ -250,7 +258,7 @@ async function readBankData(id: string): Promise<BankData | null> {
  */
 async function writeBankData(id: string, data: BankData): Promise<boolean> {
   const key = storage.fullKey(K_BANK_DATA + id)
-  // 覆盖层带上时间戳，索引可据此判断自己是否仍然有效（见 indexIsCurrent）
+  // 存档带上时间戳：与数据同源，读回时一并取出（见 parseOverride），供派生索引标记来源
   const payload = JSON.stringify({ ...data, ts: Date.now() })
   if (await idbSetRaw(key, payload)) {
     // 清掉可能残留的 localStorage 覆盖层，否则两处内容会不一致
@@ -328,10 +336,16 @@ async function loadBankUncached(
   index: BankIndex | null | undefined,
   onProgress: LoadProgress | undefined
 ): Promise<BankData> {
-  // 索引与覆盖层时间戳一致时，说明没有更新的本地编辑，省掉一次 IndexedDB 查询
-  const override = indexIsCurrent(id, index) ? null : await readBankData(id)
+  // 有覆盖层就必须用它：内置题库的静态 JSON 是构建期版本，拿它当全文会把用户的编辑
+  // 悄悄回退掉；本地题库则根本没有静态文件可退。
+  //
+  // 这里不能拿"索引是否最新"来决定要不要读覆盖层 —— 索引只是个派生摘要，
+  // 它是否最新与"全文该从哪来"是两回事。早先正是这样判的（indexIsCurrent），
+  // 于是 IDB 不可用（隐私模式）时覆盖层只落在 localStorage、派生索引的 ts 又恰好与之相等，
+  // 全文反而被送去请求一个不存在的静态地址，本地题库直接打不开。
+  const override = await readBankData(id)
   if (override) {
-    const data = normalizeBankData(override)
+    const data = normalizeBankData(override.data)
     bankCache.set(id, data)
     return data
   }

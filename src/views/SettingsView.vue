@@ -212,12 +212,7 @@ async function onClearCache(): Promise<void> {
   window.setTimeout(() => window.location.reload(), 800)
 }
 
-function onResize(): void {
-  isMobile.value = window.innerWidth <= 768
-}
-
 onMounted(async () => {
-  window.addEventListener('resize', onResize)
   void refreshUsage()
 })
 
