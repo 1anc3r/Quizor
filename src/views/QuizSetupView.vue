@@ -9,9 +9,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
-import type { ExamConfig, ExamSource, PracticeConfig, PracticeScope, QuestionType } from '@/types'
+import type { ExamConfig, ExamSource, PracticeConfig, PracticeScope } from '@/types'
 import { buildExamQuestions, buildPracticeQuestions, loadStoredSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
 import { bankProgressText } from '@/utils/bankProgress'
+import { TYPE_OPTIONS } from '@/utils/format'
 import SegmentedControl, { type SegOption } from '@/components/SegmentedControl.vue'
 
 const route = useRoute()
@@ -25,13 +26,6 @@ const mode = computed<'practice' | 'exam'>(() => (route.params.mode === 'exam' ?
 
 const practice = reactive<PracticeConfig>({ scope: 'all', chapter: '', count: 10, types: [] })
 const exam = reactive<ExamConfig>({ source: 'simulate', paperId: '' })
-
-const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
-  { label: '单选', value: 'single' },
-  { label: '多选', value: 'multiple' },
-  { label: '判断', value: 'judge' },
-  { label: '简答', value: 'text' }
-]
 
 // 范围 / 题量 / 考试模式：统一用设置页那套分段选择器（全局 .seg 样式）
 const SCOPE_OPTIONS: SegOption<PracticeScope>[] = [

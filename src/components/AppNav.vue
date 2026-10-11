@@ -5,7 +5,7 @@
  */
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { CircleX, House, List, Settings, Star, Wrench } from '@lucide/vue'
+import { CircleX, House, List, Settings, Star, } from '@lucide/vue'
 
 const route = useRoute()
 

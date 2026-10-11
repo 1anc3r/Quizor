@@ -4,6 +4,8 @@
  * 两个列表均可折叠，支持单项与批量操作。
  */
 import { computed, ref, watch } from 'vue'
+import { PAGE_SIZES, PAGINATION_LAYOUT, DEFAULT_PAGE_SIZE, usePagedList } from '@/composables/usePagedList'
+import { useRowSelection } from '@/composables/useRowSelection'
 import type { Paper, Question } from '@/types'
 import { plainText, shortId, truncate, typeLabel } from '@/utils/format'
 
@@ -32,15 +34,17 @@ const inKeyword = ref('')
 const outKeyword = ref('')
 const inSource = ref('')
 const outSource = ref('')
-const inSelection = ref<Question[]>([])
-const outSelection = ref<Question[]>([])
 const activePanels = ref<string[]>([])
-
-// 分页状态
-const inPageSize = ref(20)
-const inCurrentPage = ref(1)
-const outPageSize = ref(20)
-const outCurrentPage = ref(1)
+const {
+  selection: inSelection,
+  onSelectionChange: onInSelect,
+  clearSelection: clearInSelection
+} = useRowSelection<Question>()
+const {
+  selection: outSelection,
+  onSelectionChange: onOutSelect,
+  clearSelection: clearOutSelection
+} = useRowSelection<Question>()
 
 const qMap = computed(() => new Map(props.questions.map((q) => [q.id, q])))
 
@@ -49,14 +53,14 @@ watch(visible, (v) => {
     form.value = JSON.parse(JSON.stringify(props.paper)) as Paper
     inKeyword.value = ''
     outKeyword.value = ''
-    inSelection.value = []
-    outSelection.value = []
     activePanels.value = []
     // 重置分页
-    inCurrentPage.value = 1
-    outCurrentPage.value = 1
-    inPageSize.value = 20
-    outPageSize.value = 20
+    clearInSelection()
+    clearOutSelection()
+    resetInPage()
+    resetOutPage()
+    inPageSize.value = DEFAULT_PAGE_SIZE
+    outPageSize.value = DEFAULT_PAGE_SIZE
   }
 })
 
@@ -92,38 +96,15 @@ const outList = computed(() =>
   .filter((q) => !(outSource.value && q.source !== outSource.value))
 )
 
-// 分页后的数据
-const pagedInList = computed(() => {
-  const start = (inCurrentPage.value - 1) * inPageSize.value
-  const end = start + inPageSize.value
-  return inList.value.slice(start, end)
-})
+// 分页（放在两个列表之后：页码要按过滤后的条数收拢）
+const { currentPage: inCurrentPage, pageSize: inPageSize, pagedRows: pagedInList, resetPage: resetInPage } =
+  usePagedList(inList)
+const { currentPage: outCurrentPage, pageSize: outPageSize, pagedRows: pagedOutList, resetPage: resetOutPage } =
+  usePagedList(outList)
 
-const pagedOutList = computed(() => {
-  const start = (outCurrentPage.value - 1) * outPageSize.value
-  const end = start + outPageSize.value
-  return outList.value.slice(start, end)
-})
-
-// 监听关键词变化重置页码
-watch(inKeyword, () => { inCurrentPage.value = 1 })
-watch(outKeyword, () => { outCurrentPage.value = 1 })
-
-// 监听列表总条数变化，修正当前页（防止超出）
-watch(inList, (newList) => {
-  const total = newList.length
-  const maxPage = Math.ceil(total / inPageSize.value) || 1
-  if (inCurrentPage.value > maxPage) inCurrentPage.value = maxPage
-})
-watch(outList, (newList) => {
-  const total = newList.length
-  const maxPage = Math.ceil(total / outPageSize.value) || 1
-  if (outCurrentPage.value > maxPage) outCurrentPage.value = maxPage
-})
-
-// 分页大小变化时重置页码到1
-watch(inPageSize, () => { inCurrentPage.value = 1 })
-watch(outPageSize, () => { outCurrentPage.value = 1 })
+// 换关键字或来源时回到第一页
+watch([inKeyword, inSource], resetInPage)
+watch([outKeyword, outSource], resetOutPage)
 
 function addOne(q: Question): void {
   if (!form.value.questionIds.includes(q.id)) form.value.questionIds.push(q.id)
@@ -135,13 +116,13 @@ function removeOne(q: Question): void {
 
 function addBatch(): void {
   outSelection.value.forEach(addOne)
-  outSelection.value = []
+  clearOutSelection()
 }
 
 function removeBatch(): void {
   const ids = new Set(inSelection.value.map((q) => q.id))
   form.value.questionIds = form.value.questionIds.filter((id) => !ids.has(id))
-  inSelection.value = []
+  clearInSelection()
 }
 
 function onSave(): void {
@@ -185,7 +166,7 @@ function onSave(): void {
         </div>
         <el-table
           :data="pagedInList"
-          @selection-change="(rows: Question[]) => (inSelection = rows)"
+          @selection-change="onInSelect"
         >
           <el-table-column type="selection" width="40" />
           <el-table-column label="题号" width="80">
@@ -213,10 +194,10 @@ function onSave(): void {
         <el-pagination
           v-model:current-page="inCurrentPage"
           v-model:page-size="inPageSize"
-          :page-sizes="[20, 50, 100]"
+          :page-sizes="PAGE_SIZES"
           :total="inList.length"
           :hide-on-single-page="true"
-          layout="total, sizes, prev, pager, next, jumper"
+          :layout="PAGINATION_LAYOUT"
           style="margin-top: 12px;"
         />
       </el-collapse-item>
@@ -236,7 +217,7 @@ function onSave(): void {
         </div>
         <el-table
           :data="pagedOutList"
-          @selection-change="(rows: Question[]) => (outSelection = rows)"
+          @selection-change="onOutSelect"
         >
           <el-table-column type="selection" width="40" />
           <el-table-column label="题号" width="90">
@@ -264,10 +245,10 @@ function onSave(): void {
         <el-pagination
           v-model:current-page="outCurrentPage"
           v-model:page-size="outPageSize"
-          :page-sizes="[20, 50, 100]"
+          :page-sizes="PAGE_SIZES"
           :total="outList.length"
           :hide-on-single-page="true"
-          layout="total, sizes, prev, pager, next, jumper"
+          :layout="PAGINATION_LAYOUT"
           style="margin-top: 12px;"
         />
       </el-collapse-item>

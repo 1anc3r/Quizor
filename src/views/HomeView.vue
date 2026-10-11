@@ -4,6 +4,7 @@
  */
 import { computed, onMounted, ref, watch, reactive } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { DEFAULT_PAGE_SIZE, PAGE_SIZES, PAGINATION_LAYOUT, clampPage, pageSlice } from '@/composables/usePagedList'
 import { useRouter } from 'vue-router'
 import { Plus, Search, SquarePen, Trophy, Sprout, Puzzle, BookText, BookCheck, BookX, BookHeart } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
@@ -166,18 +167,13 @@ const chapterGroups = computed<ChapterGroup[]>(() => {
   }
   const groups = [...map.entries()].map(([chapter, qs]) => ({ chapter, questions: qs }))
 
-  // 初始化每个章节的分页状态，并修正 currentPage 不超出总页数
+  // 初始化每个章节的分页状态，并把页码收进有效区间（筛选后题目变少时不至于停在空白页）
   for (const g of groups) {
-    if (!chapterPageState[g.chapter]) {
-      chapterPageState[g.chapter] = { pageSize: 20, currentPage: 1 }
-    } else {
-      const total = g.questions.length
-      const size = chapterPageState[g.chapter].pageSize
-      const maxPage = Math.ceil(total / size) || 1
-      if (chapterPageState[g.chapter].currentPage > maxPage) {
-        chapterPageState[g.chapter].currentPage = maxPage
-      }
-    }
+    const state = (chapterPageState[g.chapter] ??= {
+      pageSize: DEFAULT_PAGE_SIZE,
+      currentPage: 1
+    })
+    state.currentPage = clampPage(state.currentPage, g.questions.length, state.pageSize)
   }
 
   // 移除已经不存在章节的分页状态
@@ -202,9 +198,15 @@ watch(questionKeyword, () => {
 function getPagedQuestions(chapter: string, allQuestions: BrowseQuestion[]): BrowseQuestion[] {
   const state = chapterPageState[chapter]
   if (!state) return allQuestions
-  const start = (state.currentPage - 1) * state.pageSize
-  const end = start + state.pageSize
-  return allQuestions.slice(start, end)
+  return pageSlice(allQuestions, state.currentPage, state.pageSize)
+}
+
+// 辅助：改某个章节的每页条数（与列表页一致，回到第 1 页）
+function setChapterPageSize(chapter: string, size: number): void {
+  const state = chapterPageState[chapter]
+  if (!state) return
+  state.pageSize = size
+  state.currentPage = 1
 }
 
 onMounted(async () => {
@@ -354,13 +356,9 @@ onMounted(async () => {
             <!-- 分页组件（仅当题目总数大于每页条数时显示） -->
             <el-pagination :current-page="chapterPageState[g.chapter].currentPage"
               @update:current-page="(val: number) => (chapterPageState[g.chapter].currentPage = val)"
-              :page-size="chapterPageState[g.chapter].pageSize" @update:page-size="
-                (val: number) => {
-                  const state = chapterPageState[g.chapter]
-                  state.pageSize = val
-                  state.currentPage = 1
-                }
-              " :page-sizes="[20, 50, 100]" :total="g.questions.length" layout="total, sizes, prev, pager, next, jumper"
+              :page-size="chapterPageState[g.chapter].pageSize"
+              @update:page-size="(val: number) => setChapterPageSize(g.chapter, val)"
+              :page-sizes="PAGE_SIZES" :total="g.questions.length" :layout="PAGINATION_LAYOUT"
               style="margin-top: 10px" />
           </template>
           <el-empty v-else :image-size="60" description="展开后加载本节题目" />
