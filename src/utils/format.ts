@@ -60,6 +60,18 @@ export function fmtBytes(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
+/**
+ * 同 `fmtBytes`，但 MB 保留两位小数。
+ *
+ * 给"正在下载 6MB 全文"这类进度显示用：一位小数在 5.6MB→5.7MB 之间几乎不动，
+ * 看起来像卡住了，两位小数才能反映出确实在前进。
+ */
+export function fmtBytesPrecise(bytes: number): string {
+  if (bytes < 1024) return `${Math.max(0, Math.round(bytes))} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`
+}
+
 /** 题号短显：取 id 末 6 位 */
 export function shortId(id: string): string {
   return id.length > 8 ? id.slice(-6) : id

@@ -17,29 +17,26 @@
  * GitHub Pages 不对静态 JSON 做 gzip，冷启动原样下载 5MB 是首屏慢的主因，
  * 索引把首屏数据量降到 1/25。
  */
-import type {
-  BankData,
-  BankIndex,
-  BankManifest,
-  BankMeta,
-  BankRule,
-  OptionItem,
-  Paper,
-  Question,
-  QuestionType
-} from '@/types'
+import type { BankData, BankIndex, BankManifest, BankMeta, BankRule, Paper, QuestionType } from '@/types'
 import * as storage from './storage'
 import { idbDelete, idbGetRaw, idbKeys, idbSetRaw } from './idb'
 import { nameToBankId, uniqueBankId } from '../utils/pinyin'
 import { stemSummary } from '../utils/text'
 import { indexFileName } from '../utils/bankFile'
+import { normalizeBankData, QUESTION_TYPES } from './bankNormalize'
+import { parseBankJsonWithProgress, type LoadProgress } from './bankWorkerApi'
+
+/**
+ * 规整逻辑（`normalizeBankData` / `normalizeQuestions`）搬到了 `./bankNormalize`：
+ * Worker 也要用它，留在这里会形成 `bankWorker → bankService → bankWorkerApi → bankWorker`
+ * 的循环依赖。这里原样再导出，保持既有调用方（导入题库、备份恢复等）不用改。
+ */
+export { normalizeBankData, normalizeQuestions, QUESTION_TYPES } from './bankNormalize'
 
 const K_LOCAL_BANKS = 'localbanks' // BankMeta[] 用户本地新增的题库
 const K_DELETED_BANKS = 'deletedbanks' // string[] 被删除的内置题库 id
 const K_BANK_DATA = 'bankdata:' // + id → BankData（内置题库的编辑覆盖层 / 本地题库数据）
 const K_BANK_META = 'bankmeta:' // + id → BankMeta（内置题库元信息的编辑覆盖层）
-
-const QUESTION_TYPES: QuestionType[] = ['single', 'multiple', 'judge', 'text']
 
 let manifestCache: BankManifest | null = null
 const bankCache = new Map<string, BankData>()
@@ -58,83 +55,6 @@ function overrideStamp(id: string): number | null {
 }
 
 const base = () => import.meta.env.BASE_URL
-
-/**
- * 把来源不可信的题目数组规整为合法 `Question`。
- *
- * 内置题库文件、用户导入的题库、备份文件都可能字段缺失或类型错误
- * （例如缺 `options`、`difficulty` 是字符串、`id` 重复），
- * 直接使用会在渲染与判分环节抛出异常，因此统一补默认值后放行。
- * 题干为空的条目无法作答，直接丢弃。
- */
-export function normalizeQuestions(raw: unknown): Question[] {
-  if (!Array.isArray(raw)) return []
-  const seen = new Set<string>()
-  const out: Question[] = []
-
-  raw.forEach((item, i) => {
-    if (!item || typeof item !== 'object') return
-    const q = item as Partial<Question>
-    const stem = typeof q.stem === 'string' ? q.stem : ''
-    if (!stem.trim()) return
-
-    let id = typeof q.id === 'string' && q.id ? q.id : `imported_${i + 1}`
-    if (seen.has(id)) {
-      let n = 2
-      while (seen.has(`${id}_${n}`)) n++
-      id = `${id}_${n}`
-    }
-    seen.add(id)
-
-    const type: QuestionType = QUESTION_TYPES.includes(q.type as QuestionType)
-      ? (q.type as QuestionType)
-      : 'single'
-    const options: OptionItem[] = Array.isArray(q.options)
-      ? q.options
-          .filter((o): o is OptionItem => !!o && typeof o === 'object')
-          .map((o, oi) => ({
-            key: typeof o.key === 'string' && o.key ? o.key : String.fromCharCode(65 + oi),
-            text: typeof o.text === 'string' ? o.text : ''
-          }))
-      : []
-    const difficulty =
-      typeof q.difficulty === 'number' && Number.isFinite(q.difficulty)
-        ? Math.min(5, Math.max(1, Math.round(q.difficulty)))
-        : 3
-
-    out.push({
-      id,
-      type,
-      chapter: typeof q.chapter === 'string' ? q.chapter : '',
-      difficulty,
-      stem,
-      options,
-      answer: Array.isArray(q.answer) ? q.answer.filter((k): k is string => typeof k === 'string') : [],
-      analysis: typeof q.analysis === 'string' ? q.analysis : '',
-      source: typeof q.source === 'string' ? q.source : '',
-      tags: Array.isArray(q.tags) ? q.tags.filter((t): t is string => typeof t === 'string') : []
-    })
-  })
-
-  return out
-}
-
-/** 规整一整个 BankData（题目 + 试卷），所有读取路径都要经过它 */
-function normalizeBankData(raw: unknown): BankData {
-  const r = (raw ?? {}) as Partial<BankData>
-  const papers: Paper[] = Array.isArray(r.Papers)
-    ? r.Papers
-        .filter((p): p is Paper => !!p && typeof p === 'object' && typeof p.id === 'string')
-        .map((p) => ({
-          ...p,
-          name: typeof p.name === 'string' ? p.name : '',
-          source: typeof p.source === 'string' ? p.source : '',
-          difficulty: typeof p.difficulty === 'number' ? p.difficulty : 3,
-          questionIds: Array.isArray(p.questionIds) ? p.questionIds.filter((x): x is string => typeof x === 'string') : []
-        }))
-    : []
-  return { Questions: normalizeQuestions(r.Questions), Papers: papers }
-}
 
 /** 加载题库清单：内置 BankManifest + 本地新增 - 本地删除 + 元信息覆盖 */
 export async function loadManifest(force = false): Promise<BankManifest> {
@@ -345,8 +265,17 @@ export async function migrateBankDataToIdb(): Promise<number> {
   return moved
 }
 
-/** 加载题库数据：本地覆盖层优先，其次 fetch 静态 JSON；带内存缓存 */
-export async function loadBank(id: string, force = false, index?: BankIndex | null): Promise<BankData> {
+/**
+ * 加载题库数据：本地覆盖层优先，其次静态 JSON（Worker 分片下载 + 解析）；带内存缓存。
+ *
+ * `onProgress` 只反映"静态 JSON 的下载/解析"，本地覆盖层没有网络阶段，不会触发它。
+ */
+export async function loadBank(
+  id: string,
+  force = false,
+  index?: BankIndex | null,
+  onProgress?: LoadProgress
+): Promise<BankData> {
   if (!force && bankCache.has(id)) return bankCache.get(id) as BankData
   // 索引与覆盖层时间戳一致时，说明没有更新的本地编辑，省掉一次 IndexedDB 查询
   const override = indexIsCurrent(id, index) ? null : await readBankData(id)
@@ -358,10 +287,8 @@ export async function loadBank(id: string, force = false, index?: BankIndex | nu
   const manifest = await loadManifest()
   const meta = manifest.Banks.find((b) => b.id === id)
   if (!meta) throw new Error(`题库不存在：${id}`)
-  const res = await fetch(`${base()}data/banks/${meta.bankFile}`)
-  if (!res.ok) throw new Error(`题库文件加载失败：${meta.bankFile}`)
   // 静态 JSON 与导入文件同源风险，一律规整后再缓存
-  const data = normalizeBankData(await res.json())
+  const data = await parseBankJsonWithProgress(`${base()}data/banks/${meta.bankFile}`, onProgress)
   bankCache.set(id, data)
   return data
 }

@@ -10,7 +10,7 @@ import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/stores/session'
 import type { Question, StoredQuizSession } from '@/types'
-import { plainText, truncate } from '@/utils/format'
+import { fmtBytesPrecise, plainText, truncate } from '@/utils/format'
 
 const router = useRouter()
 const bankStore = useBankStore()
@@ -96,6 +96,37 @@ function onChapterToggle(name: string | number | (string | number)[]): void {
   markChapterRendered(name)
   onBrowseIntent()
 }
+
+/**
+ * 全文加载进度条的文案。
+ *
+ * 列表在本卡片里始终可用（索引摘要已经够渲染），所以进度是"旁边的一条细线"而不是全屏遮罩：
+ * 用户既能继续浏览已有内容，也能看见后台到底在干什么。
+ */
+const progressPhaseText = computed<string>(() => {
+  switch (bankStore.progress.phase) {
+    case 'download':
+      return '下载题目全文'
+    case 'parse':
+      return '解析题目数据'
+    case 'normalize':
+      return '整理题目数据'
+    default:
+      return '即将完成'
+  }
+})
+
+/** 已知总字节数时才有百分比可言；响应头缺 Content-Length 时返回 null，避免显示假数字 */
+const progressPercent = computed<number | null>(() => {
+  const { loaded, total } = bankStore.progress
+  return total > 0 ? Math.round((loaded / total) * 100) : null
+})
+
+const progressBytes = computed<string>(() => {
+  const { loaded, total } = bankStore.progress
+  if (!total) return fmtBytesPrecise(loaded)
+  return `${fmtBytesPrecise(loaded)} / ${fmtBytesPrecise(total)}`
+})
 
 const filteredPapers = computed(() => {
   const kw = paperKeyword.value.trim().toLowerCase()
@@ -263,14 +294,26 @@ onMounted(async () => {
       </div>
     </el-card>
 
-    <!-- 题库卡片：索引立即可用；全文（约 5MB）在用户真正要看题/搜题时才下载 -->
-    <el-card class="page-card" shadow="never" v-loading="bankStore.loading"
-      element-loading-text="正在加载题目全文…">
+    <!-- 题库卡片：索引立即可用；全文（约 6MB）在用户真正要看题/搜题时才下载，
+         下载进度以卡片顶部的一条细线呈现，列表在下载期间保持可用 -->
+    <el-card class="page-card" shadow="never">
+      <div v-if="bankStore.showProgress" class="bank-progress">
+        <div class="progress-track">
+          <div class="progress-fill" :style="{ width: `${Math.round(bankStore.progress.ratio * 100)}%` }"></div>
+        </div>
+        <div class="progress-meta muted">
+          <span>{{ progressPhaseText }}…</span>
+          <span v-if="progressPercent !== null">{{ progressPercent }}%（{{ progressBytes }}）</span>
+          <span v-else>{{ progressBytes }}</span>
+          <span class="muted">此期间可继续浏览下方列表</span>
+        </div>
+      </div>
+
       <div class="card-title">
         <span class="title-text">试卷 & 题目列表</span>
-        <el-button v-if="!bankStore.hasFullBank" :loading="bankStore.loading" @click="onBrowseIntent">
-          加载完整数据
-        </el-button>
+        <!-- <el-button v-if="!bankStore.hasFullBank" :loading="bankStore.showProgress" @click="onBrowseIntent">
+          {{ bankStore.showProgress ? '正在加载…' : '加载完整数据' }}
+        </el-button> -->
         <el-button type="primary" plain :icon="SquarePen" @click="goEditBank">编辑题库</el-button>
       </div>
 
@@ -336,7 +379,46 @@ onMounted(async () => {
         </el-collapse-item>
       </el-collapse>
 
-      <el-empty v-if="!bankStore.loading && !chapterGroups.length" description="当前题库暂无题目" />
+      <el-empty v-if="!bankStore.showProgress && !chapterGroups.length" description="当前题库暂无题目" />
     </el-card>
   </div>
 </template>
+
+<style scoped>
+/**
+ * 全文加载进度条：卡片顶部一条细线 + 一行说明。
+ * 用卡片内的普通元素而不是 v-loading 遮罩 —— 遮罩会盖住列表，
+ * 而列表用的是索引摘要，加载全文期间完全可用，没必要挡住它。
+ */
+.bank-progress {
+  margin-bottom: 12px;
+}
+
+.bank-progress .progress-track {
+  height: 6px;
+}
+
+.bank-progress .progress-fill {
+  transition: width 0.2s ease-out;
+}
+
+.progress-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 末位提示语在大屏上贴右、在小屏上独占一行：不占额外行高又保持对齐 */
+.progress-meta .muted:last-child {
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .progress-meta .muted:last-child {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+</style>
