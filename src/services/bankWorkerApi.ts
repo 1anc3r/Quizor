@@ -12,7 +12,7 @@
  *    走同一条分片解析路径，因此大文件导入也不会把主线程卡死。
  */
 import type { BankData } from '@/types'
-import { normalizeBankData } from './bankNormalize'
+import { BankUrlError, normalizeBankData } from './bankNormalize'
 import { parseTopLevelArrays } from './bankWorkerParse'
 import { createBankWorker, type WorkerResponse } from './bankWorker'
 
@@ -99,6 +99,12 @@ function getWorker(): Worker | null {
 async function loadViaMainThread(url: string, onProgress?: LoadProgress): Promise<BankData> {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`题库文件加载失败（HTTP ${res.status}）`)
+  // 与 Worker 同样的判断：路径无效时静态托管会用 200 + HTML 应答，
+  // 放过去只会变成一句莫名其妙的 JSON 语法错误
+  const ctype = res.headers.get('content-type') ?? ''
+  if (ctype && !/json|text\/plain|octet-stream/i.test(ctype)) {
+    throw new BankUrlError(`题库文件地址无效（返回 ${ctype.split(';')[0]}，不是 JSON）：${url}`)
+  }
   const text = await res.text()
   onProgress?.({ phase: 'download', ratio: W_DOWNLOAD, loaded: text.length, total: text.length })
   return parseBankJsonText(text, onProgress)
@@ -118,12 +124,16 @@ export async function parseBankJsonWithProgress(
   try {
     return await parse()
   } catch (e) {
+    // 地址本身无效（返回 HTML、路径拼错）时重试与回退都不会有不同结果，
+    // 只有反复请求：直接抛出，让调用方一次给出明确的错误提示。
+    if (e instanceof BankUrlError) throw e
     // 进度已回退，重开一次：静态 JSON 命中 HTTP 缓存，重下代价接近 0
     console.warn('[quizor] Worker 加载题库失败，重试一次：', e)
     onProgress?.({ phase: 'download', ratio: 0, loaded: 0, total: 0 })
     try {
       return await parse()
     } catch (e2) {
+      if (e2 instanceof BankUrlError) throw e2
       console.warn('[quizor] Worker 重试仍失败，退回主线程：', e2)
       onProgress?.({ phase: 'download', ratio: 0, loaded: 0, total: 0 })
       return loadViaMainThread(url, onProgress)

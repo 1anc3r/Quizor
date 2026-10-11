@@ -9,7 +9,7 @@
  *
  * 线程边界只传**最终对象**，不传 6MB 原始文本 —— 后者要完整复制一份，等于白白多花一次内存。
  */
-import { normalizeBankData } from './bankNormalize'
+import { BankUrlError, normalizeBankData } from './bankNormalize'
 import { parseTopLevelArrays } from './bankWorkerParse'
 
 interface LoadRequest {
@@ -130,6 +130,12 @@ async function fetchText(url: string, step: number): Promise<string> {
   try {
     const res = await fetch(url, { signal: ctrl.signal })
     if (!res.ok) throw new Error(`题库文件加载失败（HTTP ${res.status}）`)
+    // 路径写错时，静态托管（dev server 的 SPA 回退、GitHub Pages 的 404 页）会返回 200 + HTML，
+    // 直接进入解析只会得到一句没有上下文的 JSON 语法错误；这里提前拦住并说明。
+    const ctype = res.headers.get('content-type') ?? ''
+    if (ctype && !/json|text\/plain|octet-stream/i.test(ctype)) {
+      throw new BankUrlError(`题库文件地址无效（返回 ${ctype.split(';')[0]}，不是 JSON）：${url}`)
+    }
 
     const total = Number(res.headers.get('content-length') ?? 0)
     const body = res.body

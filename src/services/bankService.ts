@@ -41,6 +41,8 @@ const K_BANK_META = 'bankmeta:' // + id → BankMeta（内置题库元信息的�
 let manifestCache: BankManifest | null = null
 const bankCache = new Map<string, BankData>()
 const indexCache = new Map<string, BankIndex>()
+/** 正在飞行的全文加载，按题库 id 去重（同一题库被多个页面同时要求时只发一次请求） */
+const inflight = new Map<string, Promise<BankData>>()
 
 /** 本地覆盖层的时间戳：没有覆盖层时返回 null */
 function overrideStamp(id: string): number | null {
@@ -55,6 +57,26 @@ function overrideStamp(id: string): number | null {
 }
 
 const base = () => import.meta.env.BASE_URL
+
+/**
+ * 规整清单项，并用内置清单兜住缺失字段。
+ *
+ * 元信息覆盖层是**历史遗留数据**：用户在上一个版本里保存过的题库，
+ * 其 `meta` 可能是照着当时的结构写的，未必带 `bankFile`。
+ * 覆盖层整体取代内置项会造成两个后果，所以这里逐字段合并：
+ * - `bankFile` 丢失 → 拼出 `data/banks/undefined` 这种请求，404 页面还会被当成 JSON 解析；
+ * - `name`/`rule` 丢失 → 界面直接不显示题库名、组卷规则回落到默认值。
+ */
+function mergeMeta(builtin: BankMeta, override: BankMeta | null): BankMeta {
+  if (!override) return builtin
+  return {
+    ...builtin,
+    ...override,
+    // 这两个字段缺了就彻底不可用，不允许被覆盖层清空
+    id: override.id || builtin.id,
+    bankFile: override.bankFile || builtin.bankFile
+  }
+}
 
 /** 加载题库清单：内置 BankManifest + 本地新增 - 本地删除 + 元信息覆盖 */
 export async function loadManifest(force = false): Promise<BankManifest> {
@@ -73,7 +95,7 @@ export async function loadManifest(force = false): Promise<BankManifest> {
   const local = storage.readJSON<BankMeta[]>(K_LOCAL_BANKS, [])
   const banks = builtin
     .filter((b) => !deleted.includes(b.id))
-    .map((b) => storage.readJSON<BankMeta | null>(K_BANK_META + b.id, null) ?? b)
+    .map((b) => mergeMeta(b, storage.readJSON<BankMeta | null>(K_BANK_META + b.id, null)))
   manifestCache = { Banks: [...banks, ...local] }
   return manifestCache
 }
@@ -157,6 +179,13 @@ export async function loadBankIndex(id: string, force = false): Promise<BankInde
   }
 
   try {
+    // bankFile 缺失时拼出来的是 `/undefined`，而静态托管（含 dev server 的 SPA 回退）
+    // 会拿 index.html 以 200 应答，于是"HTML 当 JSON 解析"失败被反复重试。
+    // 这里直接认定索引不可用，交给调用方决定是否拉全文。
+    if (!meta.bankFile) {
+      console.warn('[quizor] 题库缺少 bankFile，跳过索引请求：', id)
+      return null
+    }
     const res = await fetch(indexUrl(meta))
     if (res.ok) {
       const index = normalizeIndex(await res.json(), id)
@@ -276,7 +305,26 @@ export async function loadBank(
   index?: BankIndex | null,
   onProgress?: LoadProgress
 ): Promise<BankData> {
-  if (!force && bankCache.has(id)) return bankCache.get(id) as BankData
+  if (!force && bankCache.has(id)) return (await bankCache.get(id)) as BankData
+  // 首页预取、设置页导出、组卷页、结果页都会在相近时刻要同一题库：
+  // 不去重就会有多次 6MB 请求同时压在身上。
+  const pending = inflight.get(id)
+  if (pending) return pending
+  const task = loadBankUncached(id, index, onProgress)
+  inflight.set(id, task)
+  try {
+    return await task
+  } finally {
+    // 失败时不能留在 inflight 里，否则后续请求会一直拿到同一个已失败的 Promise
+    if (inflight.get(id) === task) inflight.delete(id)
+  }
+}
+
+async function loadBankUncached(
+  id: string,
+  index: BankIndex | null | undefined,
+  onProgress: LoadProgress | undefined
+): Promise<BankData> {
   // 索引与覆盖层时间戳一致时，说明没有更新的本地编辑，省掉一次 IndexedDB 查询
   const override = indexIsCurrent(id, index) ? null : await readBankData(id)
   if (override) {
@@ -287,6 +335,9 @@ export async function loadBank(
   const manifest = await loadManifest()
   const meta = manifest.Banks.find((b) => b.id === id)
   if (!meta) throw new Error(`题库不存在：${id}`)
+  // 早失败：bankFile 缺失时拼出的是 `/undefined`，SPA 静态托管会以 200 返回 index.html，
+  // 那会被当成 JSON 解析失败，用户只看到"题库加载失败"却无从判断真实原因。
+  if (!meta.bankFile) throw new Error(`题库元信息缺少文件名（bankFile），无法加载：${meta.name || id}`)
   // 静态 JSON 与导入文件同源风险，一律规整后再缓存
   const data = await parseBankJsonWithProgress(`${base()}data/banks/${meta.bankFile}`, onProgress)
   bankCache.set(id, data)
@@ -391,6 +442,10 @@ function downloadJson(payload: unknown, filename: string): void {
   const a = document.createElement('a')
   a.href = url
   a.download = filename
+  a.rel = 'noopener'
+  document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(url)
+  a.remove()
+  // 立即 revoke 会让还没开始读取的浏览器拿不到数据（备份文件动辄数 MB），延后一拍更稳
+  setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }

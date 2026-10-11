@@ -553,9 +553,9 @@ onBeforeUnmount(() => {
                 保存图片
               </el-button>
               <el-button v-else :icon="Copy" :loading="copying" :disabled="!canCopy" @click="copyCurrent">
-                复制
+                复制图片
               </el-button>
-              <el-tooltip :content="isMobile ? '把题干和选项保存为图片，再从相册分享' : '复制题干和选项图片到粘贴板'"
+              <el-tooltip :content="isMobile ? '下载题干和选项图片，再从相册分享' : '复制题干和选项图片到粘贴板'"
                 placement="top">
                 <el-icon class="q-hint-icon" :size="15">
                   <Info />

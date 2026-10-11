@@ -12,6 +12,21 @@ import type { BankData, OptionItem, Paper, Question, QuestionType } from '@/type
 
 export const QUESTION_TYPES: QuestionType[] = ['single', 'multiple', 'judge', 'text']
 
+/**
+ * 题库地址无效（路径拼错、`bankFile` 缺失、静态托管用 200 + HTML 应答）。
+ *
+ * 单独建一个错误类型是为了让"重试 / 回退主线程"的兜底逻辑能认出**不该重试**的失败：
+ * 这类错误重试多少次都一样，但静态资源命中 HTTP 缓存后重试几乎无成本，
+ * 若不区分就会把一次配置错误放大成反复请求。定义在共享模块里，
+ * 主线程与 Worker 都能 `instanceof` 判断。
+ */
+export class BankUrlError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'BankUrlError'
+  }
+}
+
 /** 规整进度钩子：题目与试卷共用同一个计数器，逐条 +1 */
 export interface NormalizeCounter {
   bump: () => void
