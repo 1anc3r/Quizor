@@ -1175,7 +1175,6 @@ html.dark .danger-card {
   }
 
   .set-row> :last-child {
-    flex-direction: column;
     align-self: flex-start;
   }
 }
