@@ -301,9 +301,9 @@ onMounted(async () => {
 
       <div class="card-title">
         <span class="title-text">试卷 & 题目列表</span>
-        <!-- <el-button v-if="!bankStore.hasFullBank" :loading="bankStore.showProgress" @click="onBrowseIntent">
-          {{ bankStore.showProgress ? '正在加载…' : '加载完整数据' }}
-        </el-button> -->
+        <el-button v-if="!bankStore.hasFullBank" :loading="bankStore.showProgress" @click="onBrowseIntent">
+          {{ bankStore.showProgress ? '正在加载…' : '下载完整题库数据' }}
+        </el-button>
         <el-button type="primary" plain :icon="SquarePen" @click="goEditBank">编辑题库</el-button>
       </div>
 
