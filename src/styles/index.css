@@ -1044,6 +1044,36 @@ html.dark .banner-warning {
   transition: width 0.2s ease-out;
 }
 
+/*
+ * 总量未知时的不确定态：一段色块来回滑动，表示"正在进行，但不知道还有多久"。
+ * 题库全文走 gzip 传输时响应头给不出解压后的体积，此时宁可不画确定进度 ——
+ * 一条卡在 0% 的实心条比动画更像"死掉了"。.progress-track 已是 overflow:hidden，
+ * 色块滑出轨道即被裁掉。
+ */
+.progress-track.is-indeterminate .progress-fill {
+  width: 40%;
+  animation: q-progress-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes q-progress-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+/* 尊重"减少动效"偏好：退化成一条静止的半透明满宽色块，仍能看出"正在加载" */
+@media (prefers-reduced-motion: reduce) {
+  .progress-track.is-indeterminate .progress-fill {
+    animation: none;
+    width: 100%;
+    opacity: 0.5;
+  }
+}
+
 /* 存储表格：hover 行高亮 */
 .usage-block {
   margin-top: 20px;

@@ -11,6 +11,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { ExamConfig, ExamSource, PracticeConfig, PracticeScope, QuestionType } from '@/types'
 import { buildExamQuestions, buildPracticeQuestions, loadStoredSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
+import { bankProgressText } from '@/utils/bankProgress'
 import SegmentedControl, { type SegOption } from '@/components/SegmentedControl.vue'
 
 const route = useRoute()
@@ -52,10 +53,30 @@ const EXAM_SOURCE_OPTIONS: SegOption<ExamSource>[] = [
   { value: 'paper', label: '真题模式' }
 ]
 
+/* ---------------- 全文加载状态 ----------------
+ * 本页要等全文到位才能挑默认章节/试卷，而首页只加载了索引：
+ * 用户从首页点进来时如果预取还没跑完，这里会实打实地等一次下载。
+ * 因此必须把"在等什么、还要等多久"显式画出来 —— 没有提示的等待，体感就是卡住。
+ */
+/** 只在"真的还没到位"时才显示指示条，避免每次进页面闪一下 */
+const bankLoading = ref(!bankStore.hasFullBank)
+
+/**
+ * 等待文案，与首页进度条同一口径：分母是**解压后**的字节数。
+ * 拿不到可信总量时只说"已下载 X"，不编百分比。
+ */
+const bankLoadingText = computed<string>(() => bankProgressText(bankStore.progress))
+
+/** 与首页同一条判据：下载阶段拿不到可信总量时用不确定态动画，别画一条卡在 0% 的实心条 */
+const bankProgressIndeterminate = computed<boolean>(
+  () => bankStore.progress.phase === 'download' && !bankStore.progress.total
+)
+
 onMounted(async () => {
   // 组卷需要题干、选项与答案，必须先把题库全文拉下来（首页只加载了索引）。
   // await 是必要的：下面的默认章节/试卷要从题库数据里挑第一个。
   await bankStore.ensureFullBank()
+  bankLoading.value = false
   // 恢复上次对应模式的设置
   if (mode.value === 'practice') {
     Object.assign(practice, JSON.parse(JSON.stringify(settingsStore.settings.practice)))
@@ -148,6 +169,17 @@ function launch(session: import('@/types').QuizSession): void {
         <span class="muted">{{ bankStore.meta?.name }}</span>
       </div>
 
+      <!-- 全文加载指示：组卷要用题干/选项/答案，这一步没走完就开不了局。
+           明确画出来（含真实进度），避免用户点了「开始答题」才发现还要等 -->
+      <div v-if="bankLoading" class="setup-progress">
+        <div class="progress-track" :class="{ 'is-indeterminate': bankProgressIndeterminate }">
+          <div class="progress-fill"
+            :style="bankProgressIndeterminate ? undefined : { width: `${Math.round(Math.min(1, Math.max(0, bankStore.progress.ratio)) * 100)}%` }">
+          </div>
+        </div>
+        <div class="muted setup-progress-text">{{ bankLoadingText }}</div>
+      </div>
+
       <!-- 练习模式 -->
       <template v-if="mode === 'practice'">
         <el-form label-width="40px" style="margin-top: 16px; max-width: 640px">
@@ -199,9 +231,27 @@ function launch(session: import('@/types').QuizSession): void {
       </template>
 
       <div style="margin-top: 20px">
-        <el-button type="primary" size="large" @click="start">开始答题</el-button>
+        <!-- loading 兼作禁用：加载期间点它只会弹一句"题库尚未加载完成"，
+             不如直接不给点，等就绪后自动放开 -->
+        <el-button type="primary" size="large" :loading="bankLoading" @click="start">开始答题</el-button>
         <el-button size="large" @click="router.back()">返回</el-button>
       </div>
     </el-card>
   </div>
 </template>
+
+<style scoped>
+.setup-progress {
+  margin-top: 16px;
+  max-width: 640px;
+}
+
+.setup-progress .progress-track {
+  height: 6px;
+}
+
+.setup-progress-text {
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+</style>

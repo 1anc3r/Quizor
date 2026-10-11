@@ -40,9 +40,13 @@ export interface BankLoadProgress {
   /** download：拉字节；parse：切分 JSON；normalize：补默认值/去重 id；done：全部就绪 */
   phase: 'download' | 'parse' | 'normalize' | 'done'
   ratio: number
-  /** 下载阶段：已收字节数 */
+  /** 下载阶段：已收**解压后**字节数 */
   loaded: number
-  /** 下载阶段：总字节数（响应头没给 content-length 时为 0） */
+  /**
+   * 下载阶段：**解压后**的总字节数；`0` 表示未知
+   * （传输被压缩但索引没给出 `fullSize`，或响应头没有 `Content-Length`）。
+   * 未知时不该编百分比，只显示"已下载 X"。
+   */
   total: number
 }
 
@@ -111,6 +115,27 @@ function getWorker(): Worker | null {
   }
 }
 
+/**
+ * 文本的 UTF-8 字节数（逐码点累加，不另建编码缓冲区 —— 全文有 6MB，多拷贝一份不值当）。
+ *
+ * 不能用 `text.length`：那是 UTF-16 码元个数，中文题干占一半以上的题库会少算近一半体积，
+ * 而这一路（主线程兜底）的进度文案正是按字节展示的。
+ */
+function utf8ByteLength(text: string): number {
+  let bytes = 0
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i)
+    if (code < 0x80) bytes += 1
+    else if (code < 0x800) bytes += 2
+    else if (code >= 0xd800 && code <= 0xdbff && i + 1 < text.length) {
+      // 代理对（emoji 等）合成一个 4 字节码点，低位码元要跳过
+      bytes += 4
+      i++
+    } else bytes += 3
+  }
+  return bytes
+}
+
 /** 主线程兜底：直接 fetch 全文再分片解析 */
 async function loadViaMainThread(url: string, onProgress?: LoadProgress): Promise<BankData> {
   const res = await fetch(url)
@@ -122,26 +147,34 @@ async function loadViaMainThread(url: string, onProgress?: LoadProgress): Promis
     throw new BankUrlError(`题库文件地址无效（返回 ${ctype.split(';')[0]}，不是 JSON）：${url}`)
   }
   const text = await res.text()
-  onProgress?.({ phase: 'download', ratio: W_DOWNLOAD, loaded: text.length, total: text.length })
+  // 这一路没有分片进度可报，直接把"下载完成"补上；总量也用真实字节数，
+  // 与 Worker 路径（解压后字节）保持同一口径
+  const bytes = utf8ByteLength(text)
+  onProgress?.({ phase: 'download', ratio: W_DOWNLOAD, loaded: bytes, total: bytes })
   return parseBankJsonText(text, onProgress)
 }
 
 /**
  * 分片加载题库 JSON 并返回规整后的 `BankData`。
  *
+ * `expectedTotal` 是全文**解压后**的字节数（构建期索引里的 `fullSize`）。
+ * 托管方压缩传输时响应头的 `Content-Length` 是压缩后的体积，不能当下载进度的分母，
+ * 详见 `bankWorker.ts` 的 `resolveTotal`。
+ *
  * `onProgress` 在首次尝试失败、准备重下时会**回退到 0**，
  * 因此进度条看起来是"重来一遍"而不是"卡在 60%"。
  */
 export async function parseBankJsonWithProgress(
   url: string,
-  onProgress?: LoadProgress
+  onProgress?: LoadProgress,
+  expectedTotal?: number
 ): Promise<BankData> {
   // 最后一道闸：`fetch(undefined)` 会去请求 `/undefined`，而静态托管对未知路径
   // 要么回 200 + index.html 要么回 404，两种都只会变成一句莫名其妙的加载失败
   if (typeof url !== 'string' || !url) {
     throw new BankUrlError(`题库文件地址无效：${String(url)}`)
   }
-  const parse = (): Promise<BankData> => runWorkerLoad(url, onProgress)
+  const parse = (): Promise<BankData> => runWorkerLoad(url, onProgress, expectedTotal)
   try {
     return await parse()
   } catch (e) {
@@ -163,7 +196,7 @@ export async function parseBankJsonWithProgress(
 }
 
 /** 一次完整的 Worker 加载流程：把 Worker 的三类进度事件折算成总进度后上报 */
-function runWorkerLoad(url: string, onProgress?: LoadProgress): Promise<BankData> {
+function runWorkerLoad(url: string, onProgress?: LoadProgress, expectedTotal?: number): Promise<BankData> {
   return new Promise<BankData>((resolve, reject) => {
     const w = getWorker()
     if (!w) {
@@ -181,7 +214,9 @@ function runWorkerLoad(url: string, onProgress?: LoadProgress): Promise<BankData
         case 'download':
           onProgress?.({
             phase: 'download',
-            ratio: W_DOWNLOAD * (msg.total ? msg.loaded / msg.total : 0),
+            // 夹到 [0,1]：分母来源若意外偏小（旧索引缺 fullSize 时曾用过压缩体积），
+            // 溢出 100% 的宽度会画出卡片，并让进度条提前满格
+            ratio: W_DOWNLOAD * Math.min(1, msg.total ? msg.loaded / msg.total : 0),
             loaded: msg.loaded,
             total: msg.total
           })
@@ -220,6 +255,6 @@ function runWorkerLoad(url: string, onProgress?: LoadProgress): Promise<BankData
 
     w.addEventListener('message', onMessage)
     w.addEventListener('error', onError)
-    w.postMessage({ type: 'load', url: new URL(url, location.href).href })
+    w.postMessage({ type: 'load', url: new URL(url, location.href).href, expectedTotal })
   })
 }

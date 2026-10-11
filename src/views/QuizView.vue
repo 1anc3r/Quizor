@@ -33,6 +33,7 @@ import { saveBank } from '@/services/bankService'
 import { useIsMobile } from '@/composables/useIsMobile'
 import type { Question, QuestionType, QuizSession, SessionQuestion } from '@/types'
 import { fmtDuration, typeLabel } from '@/utils/format'
+import { bankProgressText } from '@/utils/bankProgress'
 import { copyElementsAsImage, downloadElementsAsImage } from '@/utils/domImage'
 import AnswerSheet from '@/components/AnswerSheet.vue'
 import OptionGroup from '@/components/OptionGroup.vue'
@@ -52,6 +53,17 @@ const userStore = useUserDataStore()
 const session = ref<QuizSession | null>(null)
 const restoring = ref(true)
 const submitted = ref(false)
+
+/**
+ * 恢复期间的等待文案。
+ *
+ * 刷新/重开页面进来时题库全文往往还没到（首页只加载索引，预取要等浏览器空闲），
+ * 而回填题干必须等全文 —— 这段等待过去是一句写死的"正在恢复会话…"，
+ * 用户看不出是在下载还是在卡死，所以这里接上真实进度。
+ */
+const restoringText = computed<string>(() =>
+  bankStore.hasFullBank ? '正在恢复会话…' : `正在恢复会话…（${bankProgressText(bankStore.progress)}）`
+)
 
 const mode = computed(() => session.value?.mode ?? 'practice')
 const questions = computed<SessionQuestion[]>(() => session.value?.questions ?? [])
@@ -451,9 +463,15 @@ onMounted(async () => {
       router.replace('/')
       return
     }
-    // 题干要按 id 从题库回填，所以必须先把会话所属题库加载好
-    if (stored.bankId !== bankStore.currentId || !bankStore.bank) {
+    // 题干要按 id 从题库回填，所以必须先把会话所属题库加载好。
+    // switchBank 只拿到索引（它会把 bank 置空），全文还得单独要一次：
+    // 刷新页面后浏览器的空闲预取几乎不可能刚好跑完，这段等待是常态而不是异常。
+    if (stored.bankId !== bankStore.currentId) {
       await bankStore.switchBank(stored.bankId)
+    }
+    if (!bankStore.bank && bankStore.currentId === stored.bankId) {
+      // 失败原因交给下面那句统一解释，这里不再叠一个提示框
+      await bankStore.ensureFullBank(false)
     }
     // 题库没加载出来（被删除/加载失败）时不能用空题目去 hydrate：
     // 那会把所有题判成"已从题库删除"从而清掉会话数据。此时保留会话，让用户先恢复题库。
@@ -500,7 +518,7 @@ onBeforeUnmount(() => {
   <!-- 恢复中：题干要从题库按 id 回填后再渲染，避免先闪一屏空题 -->
   <div v-if="restoring" class="quiz-page">
     <div class="quiz-main">
-      <el-card v-loading="true" element-loading-text="正在恢复会话…" shadow="never" class="page-card"
+      <el-card v-loading="true" :element-loading-text="restoringText" shadow="never" class="page-card"
         style="min-height: 180px" />
     </div>
   </div>

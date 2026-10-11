@@ -16,6 +16,13 @@ interface LoadRequest {
   type: 'load'
   /** 已解析为绝对地址的题库 JSON URL（Worker 里相对地址解析基准不直观，主线程先算好） */
   url: string
+  /**
+   * 全文**解压后**的预期字节数（构建期索引里的 `fullSize`）。
+   *
+   * 传输被 gzip 压缩时 `Content-Length` 是压缩后的体积，不能当下载进度的分母；
+   * 主线程从索引里读出这个值传进来，拿不到就缺失（按"总量未知"处理）。
+   */
+  expectedTotal?: number
   /** 流式读取每次汇报之间的最小字节间隔，默认 256KB */
   progressStep?: number
   /** 规整阶段的进度汇报条数间隔，默认 64 条 */
@@ -69,7 +76,7 @@ if (typeof window === 'undefined') {
 
 async function run(req: LoadRequest): Promise<void> {
   const startedAt = Date.now()
-  const text = await fetchText(req.url, req.progressStep ?? DEFAULT_STEP)
+  const text = await fetchText(req.url, req.progressStep ?? DEFAULT_STEP, req.expectedTotal ?? 0)
 
   // 下载完到开始解析之间先报一次 0%，否则进度条会停在 100% 的下载阶段不动
   const downloadMs = Date.now() - startedAt
@@ -127,12 +134,34 @@ async function run(req: LoadRequest): Promise<void> {
 }
 
 /**
+ * 算下载进度的分母 —— 必须与 `reader.read()` 交出的字节**同单位**。
+ *
+ * 托管方给 JSON 开了 gzip 时，`Content-Length` 是**压缩后**的体积
+ * （6.03MB 的题库实测 1.20MB），而响应体在 fetch 层就已被解压，
+ * 分片累加出来的是**解压后**的字节。早先直接拿它当分母，于是首页显示
+ * "1.06 MB / 1.20 MB"、百分比冲到 480%，进度条更是在下载只走了 1/5 时就满格消失，
+ * 让用户以为"题库已经加载完"，进练习/考试却还要等 —— 一个分母同时造成两个现象。
+ *
+ * 解压后的总体积只有构建期索引（`fullSize`）知道；拿不到就返回 0，
+ * 调用方按"总量未知"处理：照常流式读取并汇报已下载字节数，但不编百分比、不画确定进度。
+ */
+function resolveTotal(res: Response, expectedTotal: number): number {
+  const encoding = (res.headers.get('content-encoding') ?? '').trim().toLowerCase()
+  // 响应已被 fetch 自动解压；这里只判断"传输时是否压缩过"
+  const compressed = !!encoding && encoding !== 'identity'
+  if (compressed) return Number.isFinite(expectedTotal) && expectedTotal > 0 ? expectedTotal : 0
+  const length = Number(res.headers.get('content-length') ?? 0)
+  return Number.isFinite(length) && length > 0 ? length : 0
+}
+
+/**
  * 分片读取响应体，并在读取过程中汇报字节进度。
  *
- * 没有 `Content-Length` 时（极少数静态托管会省略）读成 blob 再解码，
- * 此时没有字节进度可报，只能直接进入解析阶段。
+ * `total` 未知（传输被压缩但索引没给 `fullSize`，或响应头没有 `Content-Length`）时
+ * **仍然分片读取**，只是汇报的 `total` 为 0：主线程据此显示"已下载 X"而不是假百分比。
+ * 早先这种情况直接走 `res.text()`，于是整个下载阶段一个进度都报不出来。
  */
-async function fetchText(url: string, step: number): Promise<string> {
+async function fetchText(url: string, step: number, expectedTotal: number): Promise<string> {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS)
   try {
@@ -145,10 +174,10 @@ async function fetchText(url: string, step: number): Promise<string> {
       throw new BankUrlError(`题库文件地址无效（返回 ${ctype.split(';')[0]}，不是 JSON）：${url}`)
     }
 
-    const total = Number(res.headers.get('content-length') ?? 0)
     const body = res.body
-    if (!body || !total) return await res.text()
+    if (!body) return await res.text()
 
+    const total = resolveTotal(res, expectedTotal)
     const reader = body.getReader()
     const chunks: Uint8Array[] = []
     let loaded = 0

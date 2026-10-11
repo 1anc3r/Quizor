@@ -12,9 +12,9 @@
  * 加载分两层（首屏性能的关键）：
  * - **索引**（`*_index.json`，构建期生成，约全文的 4%）：只有每题摘要 + 章节/题型，
  *   供首页列表、统计、章节选择使用；
- * - **全文**（原始题库 JSON，约 5MB）：含题干富文本、选项、答案、解析、内嵌图片，
+ * - **全文**（原始题库 JSON，约 6MB）：含题干富文本、选项、答案、解析、内嵌图片，
  *   只有真正要答题/组卷/浏览详情时才加载。
- * GitHub Pages 不对静态 JSON 做 gzip，冷启动原样下载 5MB 是首屏慢的主因，
+ * 托管方会给静态 JSON 加 gzip（6MB → 约 1.2MB），首屏省下的仍是"下载 + 解析 + 常驻内存"，
  * 索引把首屏数据量降到 1/25。
  */
 import type { BankData, BankIndex, BankManifest, BankMeta, BankRule, Paper, QuestionType } from '@/types'
@@ -122,6 +122,9 @@ function normalizeIndex(raw: unknown, id: string): BankIndex | null {
       tags: Array.isArray(q.tags) ? q.tags.filter((t): t is string => typeof t === 'string') : []
     })).filter((q) => !!q.id),
     papers: Array.isArray(r.papers) ? (r.papers as Paper[]) : [],
+    // 全文解压后的字节数（构建期写入），下载进度的分母靠它 —— 新字段必须显式搬运，
+    // 否则白名单式构造会把它丢掉，运行时又退化成"拿压缩后的 Content-Length 当分母"
+    fullSize: typeof r.fullSize === 'number' && r.fullSize > 0 ? r.fullSize : undefined,
     ts: typeof r.ts === 'number' ? r.ts : undefined
   }
 }
@@ -339,7 +342,12 @@ async function loadBankUncached(
   // 那会被当成 JSON 解析失败，用户只看到"题库加载失败"却无从判断真实原因。
   if (!meta.bankFile) throw new Error(`题库元信息缺少文件名（bankFile），无法加载：${meta.name || id}`)
   // 静态 JSON 与导入文件同源风险，一律规整后再缓存
-  const data = await parseBankJsonWithProgress(`${base()}data/banks/${meta.bankFile}`, onProgress)
+  // 传入索引里的 fullSize：托管方压缩传输时，下载进度的分母只能是构建期记下的解压后体积
+  const data = await parseBankJsonWithProgress(
+    `${base()}data/banks/${meta.bankFile}`,
+    onProgress,
+    index?.fullSize
+  )
   bankCache.set(id, data)
   return data
 }
