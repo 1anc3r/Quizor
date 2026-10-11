@@ -34,29 +34,37 @@ export type WorkerResponse =
   | { type: 'done'; data: unknown; parseMs: number }
   | { type: 'error'; message: string }
 
-/**
- * 创建 Worker 实例（只在主线程调用）。
- *
- * 用 `new URL(..., import.meta.url)` + `{ type: 'module' }` 而不是 `?worker` 后缀导入：
- * 前者不需要为 `*?worker` 额外声明模块类型，且是 Vite 官方支持的 Worker 产物形式。
- * 本模块被主线程 import 时只执行到这一层，`onmessage` 赋值不会产生副作用。
- */
-export function createBankWorker(): Worker {
-  return new Worker(new URL('./bankWorker.ts', import.meta.url), { type: 'module' })
-}
-
-const workerScope = self as unknown as {
+interface WorkerScope {
   postMessage(message: WorkerResponse): void
   onmessage: ((event: MessageEvent<LoadRequest>) => void) | null
 }
 
+const workerScope = self as unknown as WorkerScope
+
 /** 总耗时超过该值时按"下载"上报，避免把下载时间算进"解析耗时" */
 const PARSE_BUDGET_MS = 1_500
 
-workerScope.onmessage = (event: MessageEvent<LoadRequest>): void => {
-  void run(event.data).catch((e: unknown) => {
-    workerScope.postMessage({ type: 'error', message: e instanceof Error ? e.message : String(e) })
-  })
+/**
+ * 只在真正的 Worker 作用域里接管消息。
+ *
+ * **绝对不能无条件赋值 `self.onmessage`**：主线程的 `self` 就是 `window`，
+ * 只要有任何模块为了拿 `createBankWorker` 而 import 本文件，顶层语句就会在主线程执行，
+ * `window.onmessage` 会被这段 Worker 逻辑顶掉。此后任何发给 window 的消息
+ * （浏览器扩展、devtools、页面自身的 postMessage）都会跑一次 `run(req)`：
+ * `req.url` 是 undefined 时 `fetch(undefined)` 变成请求 `/undefined`（静态托管回 200 + HTML
+ * 或直接 404 都算失败），catch 里又 `postMessage` 回 window，**再次触发自己**，
+ * 于是形成自我激发的死循环——实测能刷出上千条 404 与 ERR_INSUFFICIENT_RESOURCES。
+ * Worker 里没有 `window`，用它判断既准确又不必依赖 `WorkerGlobalScope` 类型。
+ */
+if (typeof window === 'undefined') {
+  workerScope.onmessage = (event: MessageEvent<LoadRequest>): void => {
+    const req = event.data as LoadRequest | null | undefined
+    // 没有 url 的消息一律忽略：`fetch(undefined)` 会去请求当前目录下的 `/undefined`
+    if (!req || typeof req.url !== 'string' || !req.url) return
+    void run(req).catch((e: unknown) => {
+      workerScope.postMessage({ type: 'error', message: e instanceof Error ? e.message : String(e) })
+    })
+  }
 }
 
 async function run(req: LoadRequest): Promise<void> {

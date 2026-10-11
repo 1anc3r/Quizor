@@ -14,7 +14,23 @@
 import type { BankData } from '@/types'
 import { BankUrlError, normalizeBankData } from './bankNormalize'
 import { parseTopLevelArrays } from './bankWorkerParse'
-import { createBankWorker, type WorkerResponse } from './bankWorker'
+import type { WorkerResponse } from './bankWorker'
+
+/**
+ * 创建 Worker 实例（只在主线程调用）。
+ *
+ * 用 `new URL(..., import.meta.url)` + `{ type: 'module' }` 而不是 `?worker` 后缀导入：
+ * 前者不需要为 `*?worker` 额外声明模块类型，且是 Vite 官方支持的 Worker 产物形式。
+ *
+ * **这个工厂必须待在主线程模块里，不能放回 `bankWorker.ts`**：放在那边的话，主线程为了
+ * 拿到它就得 import 整个 Worker 模块，那份代码会被打进主包并在主线程执行一遍，
+ * 顶掉 `window.onmessage`（详见 bankWorker.ts 里的说明）。
+ * 这里只写 `new URL('./bankWorker.ts', import.meta.url)`，Vite 静态识别后照样产出独立 chunk，
+ * 主线程侧只有 `import type`（编译期擦除），不会把 Worker 代码拉进主包。
+ */
+function createBankWorker(): Worker {
+  return new Worker(new URL('./bankWorker.ts', import.meta.url), { type: 'module' })
+}
 
 /**
  * 进度快照。`ratio` 是 0-1 的**总**进度（下载占前 40%，解析 40%–70%，规整 70%–100%），
@@ -120,6 +136,11 @@ export async function parseBankJsonWithProgress(
   url: string,
   onProgress?: LoadProgress
 ): Promise<BankData> {
+  // 最后一道闸：`fetch(undefined)` 会去请求 `/undefined`，而静态托管对未知路径
+  // 要么回 200 + index.html 要么回 404，两种都只会变成一句莫名其妙的加载失败
+  if (typeof url !== 'string' || !url) {
+    throw new BankUrlError(`题库文件地址无效：${String(url)}`)
+  }
   const parse = (): Promise<BankData> => runWorkerLoad(url, onProgress)
   try {
     return await parse()
