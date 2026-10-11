@@ -13,13 +13,13 @@ import { fmtBytesPrecise } from '@/utils/format'
 export function bankPhaseLabel(phase: BankLoadProgress['phase']): string {
   switch (phase) {
     case 'download':
-      return '下载题库数据'
+      return '下载完整题库数据'
     case 'parse':
-      return '解析题库数据'
+      return '解析完整题库数据'
     case 'normalize':
-      return '整理题库数据'
+      return '整理完整题库数据'
     default:
-      return '即将完成'
+      return '即将完成…'
   }
 }
 
