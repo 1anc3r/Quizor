@@ -318,17 +318,54 @@ export async function captureElementsAsPng(
 }
 
 /**
+ * 把若干 DOM 元素截图并**存为文件**（而不是写剪贴板）。
+ *
+ * 移动端存在的理由：iOS Safari 与多数 Android 浏览器不支持以编程方式写入图片到剪贴板
+ * （`ClipboardItem` 缺失，或 `navigator.clipboard.write` 只接受文本），
+ * 用户拿不到任何东西。存成图片文件则可以走系统的「存到相册 / 下载」，
+ * 再手动分享——这是移动端唯一可靠的路径。
+ *
+ * 截图本身与复制完全共用 `captureElementsAsPng`，因此两者画面一致。
+ *
+ * @param sources 参与截图的元素，按数组顺序纵向拼接
+ * @param filename 建议的文件名（浏览器可能忽略，尤其移动端多会改成自己的命名）
+ */
+export async function downloadElementsAsImage(
+  sources: Element[],
+  options: CaptureOptions = {},
+  filename = 'quizor-question.png'
+): Promise<void> {
+  const blob = await captureElementsAsPng(sources, options)
+  if (!blob) throw new Error('没有可保存的内容')
+  // `a[download]` 在部分移动端浏览器里会被忽略，但这是无依赖实现里唯一支持的方式
+  const url = URL.createObjectURL(blob)
+  try {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.rel = 'noopener'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  } finally {
+    // 立即撤销会让尚未开始下载的浏览器拿不到数据，延后一拍更稳
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+  }
+}
+
+/**
  * 把若干 DOM 元素作为图片写入剪贴板。
  *
  * 需要安全上下文（https 或 localhost）与浏览器剪贴板权限；
- * 不支持时抛出可直接展示给用户的中文错误。
+ * 不支持时抛出可直接展示给用户的中文错误。移动端基本都不支持写图片，
+ * 调用方应优先改用 `downloadElementsAsImage`。
  */
 export async function copyElementsAsImage(
   sources: Element[],
   options: CaptureOptions = {}
 ): Promise<void> {
   if (typeof ClipboardItem === 'undefined' || !navigator.clipboard?.write) {
-    throw new Error('当前浏览器不支持复制图片，请改用长按/右键保存')
+    throw new Error('当前浏览器不支持复制图片，请改用下载图片')
   }
   const blob = await captureElementsAsPng(sources, options)
   if (!blob) throw new Error('没有可复制的内容')

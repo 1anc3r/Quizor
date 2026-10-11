@@ -8,11 +8,12 @@
  *   作答变更防抖 300ms 落盘 + beforeunload 强制落盘
  * - 键盘操作（设置页可分别开关）：方向键切题（←/↑ 上一题，→/↓ 下一题）、
  *   字母键按选项 key 选答案、数字键 1/2/3… 对应选项 A/B/C…
- * - 「复制」按钮：把当前题干与选项截成图片写入剪贴板（见 utils/domImage）
+ * - 题干与选项导出为图片（见 utils/domImage）：桌面端「复制」写剪贴板，
+ *   移动端剪贴板存不了图片，改为「保存图片」下载成文件
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Copy, Info, LayoutGrid, SquarePen, Star, Timer, X, Send } from '@lucide/vue'
+import { Copy, Download, Info, LayoutGrid, SquarePen, Star, Timer, X, Send } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
@@ -32,7 +33,7 @@ import { saveBank } from '@/services/bankService'
 import { useIsMobile } from '@/composables/useIsMobile'
 import type { Question, QuestionType, QuizSession, SessionQuestion } from '@/types'
 import { fmtDuration, typeLabel } from '@/utils/format'
-import { copyElementsAsImage } from '@/utils/domImage'
+import { copyElementsAsImage, downloadElementsAsImage } from '@/utils/domImage'
 import AnswerSheet from '@/components/AnswerSheet.vue'
 import OptionGroup from '@/components/OptionGroup.vue'
 import QuizFormDialog from '@/components/QuizFormDialog.vue'
@@ -155,7 +156,7 @@ function toggleFav(): void {
   if (current.value) userStore.toggleFavorite(current.value.id)
 }
 
-/* ---------- 复制题干与选项为图片 ---------- */
+/* ---------- 复制/下载题干与选项为图片 ---------- */
 
 const qStemRef = ref<HTMLElement>()
 const optionGroupRef = ref<InstanceType<typeof OptionGroup>>()
@@ -170,6 +171,19 @@ function toElement(target: unknown): HTMLElement | null {
 
 const canCopy = computed(() => !!current.value?.stem.trim() && !!toElement(qStemRef.value))
 
+/** 截图里没有卡片内边距，用元素自身宽度作为内容宽度，并给窄屏兜一个下限 */
+function captureSources(): { sources: HTMLElement[]; options: { padding: number; gap: number; width: number } } | null {
+  const stem = toElement(qStemRef.value)
+  if (!stem) return null
+  const selfWidth = stem.offsetWidth || stem.getBoundingClientRect().width
+  const width = Math.round(Math.min(1200, Math.max(320, selfWidth)))
+  const options = toElement(optionGroupRef.value)
+  return {
+    sources: [stem, options].filter((el): el is HTMLElement => !!el),
+    options: { padding: 14, gap: 14, width }
+  }
+}
+
 /**
  * 把当前题干与选项截成一张 PNG 写入剪贴板，便于贴到聊天窗口或笔记里。
  *
@@ -177,25 +191,46 @@ const canCopy = computed(() => !!current.value?.stem.trim() && !!toElement(qStem
  */
 async function copyCurrent(): Promise<void> {
   if (copying.value) return
-  const stem = toElement(qStemRef.value)
-  if (!stem) return
-  // 截图里没有卡片内边距，用元素自身宽度作为内容宽度，并给窄屏兜一个下限
-  const selfWidth = stem.offsetWidth || stem.getBoundingClientRect().width
-  const width = Math.round(Math.min(1200, Math.max(320, selfWidth)))
-  const options = toElement(optionGroupRef.value)
+  const shot = captureSources()
+  if (!shot) return
   copying.value = true
   try {
-    await copyElementsAsImage([stem, options].filter((el): el is HTMLElement => !!el), {
-      padding: 14,
-      gap: 14,
-      width
-    })
+    await copyElementsAsImage(shot.sources, shot.options)
     ElMessage.success('题干与选项已复制为图片')
   } catch (e) {
     ElMessage.error(e instanceof Error ? e.message : '复制失败，请重试')
   } finally {
     copying.value = false
   }
+}
+
+/**
+ * 移动端：把同一张截图存成图片文件。
+ *
+ * 手机浏览器的剪贴板基本不能写入图片，所以移动端不给「复制」而是给「保存图片」，
+ * 用户存到相册后再自己分享。截图逻辑与复制完全共用，画面一致。
+ */
+async function downloadCurrent(): Promise<void> {
+  if (copying.value) return
+  const shot = captureSources()
+  if (!shot) return
+  copying.value = true
+  try {
+    await downloadElementsAsImage(shot.sources, shot.options, shotFilename())
+    ElMessage.success('图片已保存，请在相册或「下载」中查看')
+  } catch (e) {
+    ElMessage.error(e instanceof Error ? e.message : '保存失败，请重试')
+  } finally {
+    copying.value = false
+  }
+}
+
+/** 文件名带上科目与题号，存到相册后不至于一堆同名文件互相覆盖 */
+function shotFilename(): string {
+  const q = current.value
+  const parts = [q?.chapter, q ? `第${index.value + 1}题` : ''].filter(Boolean).join('-')
+  const safe = parts.replace(/[\\/:*?"<>|\s]+/g, '').slice(0, 40)
+  return `Quizor-${safe || '题目'}.png`
 }
 
 /* ---------- 开发模式：就地编辑当前题目 ---------- */
@@ -512,10 +547,16 @@ onBeforeUnmount(() => {
               <el-rate v-if="mode !== 'exam'" v-model="current.difficulty" size="small" :max="5" disabled />
             </span>
             <span class="q-head-actions">
-              <el-button :icon="Copy" :loading="copying" :disabled="!canCopy" @click="copyCurrent">
+              <!-- 移动端剪贴板写不了图片，改走"存成文件"，截图逻辑与复制共用 -->
+              <el-button v-if="isMobile" :icon="Download" :loading="copying" :disabled="!canCopy"
+                @click="downloadCurrent">
+                保存图片
+              </el-button>
+              <el-button v-else :icon="Copy" :loading="copying" :disabled="!canCopy" @click="copyCurrent">
                 复制
               </el-button>
-              <el-tooltip content="复制题干和选项图片到粘贴板" placement="top">
+              <el-tooltip :content="isMobile ? '把题干和选项保存为图片，再从相册分享' : '复制题干和选项图片到粘贴板'"
+                placement="top">
                 <el-icon class="q-hint-icon" :size="15">
                   <Info />
                 </el-icon>
@@ -607,7 +648,7 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
-/* 题头：元信息在左，复制按钮与提示图标在右 */
+/* 题头：元信息在左，导出图片按钮与提示图标在右 */
 .q-head {
   display: flex;
   align-items: center;
