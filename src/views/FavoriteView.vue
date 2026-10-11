@@ -3,7 +3,7 @@
  * 收藏夹（当前题库）：关键字查询、章节/题型/来源筛选、按时间排序、
  * 明细展开、练习入口、单条/批量移除。
  */
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
@@ -60,6 +60,17 @@ watch(rows, () => {
 })
 watch(pageSize, () => {
   currentPage.value = 1
+})
+
+// 有收藏、但全文还没到位：此刻列表为空是「还在加载」，不是「没有收藏」
+const pendingRows = computed(
+  () => !rows.value.length && bankStore.loading && Object.keys(userStore.favorites).length > 0
+)
+
+// 冷启动直接进 #/favorite 时全文还没加载（首页的空闲预取最长要数秒），questionMap 还是空的，
+// 列表会先显示「暂无收藏」，看着像收藏被清掉了。收藏夹本来就要靠全文回填题干，这里直接要一次。
+onMounted(() => {
+  void bankStore.ensureFullBank()
 })
 
 const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
@@ -162,7 +173,8 @@ async function removeBatch(): Promise<void> {
         :total="rows.length" :hide-on-single-page="true" layout="total, sizes, prev, pager, next, jumper"
         style="margin-top: 12px" />
 
-      <el-empty v-if="!rows.length" description="暂无收藏" />
+      <el-empty v-if="pendingRows" description="正在加载…" />
+      <el-empty v-else-if="!rows.length" description="暂无收藏" />
     </el-card>
   </div>
 </template>

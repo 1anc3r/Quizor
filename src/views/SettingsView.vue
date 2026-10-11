@@ -10,7 +10,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { createBank, defaultRule, exportBackup, exportBankFile, loadBank, saveBank } from '@/services/bankService'
 import { useIsMobile } from '@/composables/useIsMobile'
 import * as storage from '@/services/storage'
-import type { BankData, BankRule } from '@/types'
+import type { BankData, BankMeta, BankRule } from '@/types'
 import { findStaleSessions, gcSessions } from '@/stores/session'
 import { fmtTime, typeLabel } from '@/utils/format'
 import SegmentedControl from '@/components/SegmentedControl.vue'
@@ -43,10 +43,15 @@ function onExportBank(): void {
     ElMessage.warning('当前没有可用题库')
     return
   }
-  void loadBank(meta.id).then((data) => {
-    exportBankFile(meta, data)
-    ElMessage.success('题库已导出')
-  })
+  void loadBank(meta.id)
+    .then((data) => {
+      exportBankFile(meta, data)
+      ElMessage.success('题库已导出')
+    })
+    // 少了这个 catch，加载失败就是一个 unhandled rejection：用户点了导出却什么都没发生
+    .catch((e: unknown) => {
+      ElMessage.error(e instanceof Error ? e.message : '题库加载失败，导出未完成')
+    })
 }
 
 async function onExportBackup(): Promise<void> {
@@ -79,12 +84,21 @@ async function onImportBankFile(uploadFile: { raw?: File }): Promise<void> {
       return
     }
     const name = json.name || file.name.replace(/\.json$/i, '')
-    const meta = await createBank(name, json.rule ?? defaultRule())
     const data: BankData = {
       Questions: Array.isArray(json.Questions) ? json.Questions : [],
       Papers: Array.isArray(json.Papers) ? json.Papers : []
     }
-    await saveBank(meta, data)
+    // createBank 会先把空题库写进清单，再由 saveBank 填内容；后者失败（多为存储配额不足）
+    // 时不回滚，题库列表里就会留下一个 0 题的残留，所以拿住 meta 以便清理。
+    let meta: BankMeta | null = null
+    try {
+      meta = await createBank(name, json.rule ?? defaultRule())
+      await saveBank(meta, data)
+    } catch (e) {
+      if (meta) await bankStore.removeBank(meta.id).catch(() => {})
+      ElMessage.error(e instanceof Error ? e.message : '题库保存失败，导入未完成')
+      return
+    }
     await bankStore.afterBankEdited(meta.id)
     ElMessage.success(`题库「${meta.name}」导入成功`)
   } catch {
