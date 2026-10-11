@@ -14,8 +14,8 @@ export const useBankStore = defineStore('bank', () => {
   const manifest = ref<BankMeta[]>([])
   const currentId = ref<string>(storage.readJSON<string>(K_CURRENT, ''))
   /**
-   * 题库**索引**（摘要形态，约全文的 4%）：首页只依赖它，因此它是启动时唯一会拉取的题库数据。
-   * 详见 services/bankService 的说明 —— GitHub Pages 不压缩静态 JSON，首屏拉全文就是 5MB。
+   * 题库**索引**（摘要形态，约全文的 5%）：首页只依赖它，因此它是启动时唯一会拉取的题库数据。
+   * 详见 services/bankService 的说明 —— 全文 6MB 级，首屏拉全文就是替用户多花这份流量。
    */
   const index = ref<BankIndex | null>(null)
   /**
@@ -36,8 +36,15 @@ export const useBankStore = defineStore('bank', () => {
 
   /** 是否正在加载全文（按需 + 后台预取都算） */
   const fullLoading = computed<boolean>(() => loading.value)
-  /** 进度条是否应该显示：只有真正在拉数据、并且还没走完时才显示 */
-  const showProgress = computed<boolean>(() => loading.value && progress.ratio < 1)
+  /**
+   * 进度条是否应该显示：从"开始拉全文"一直显示到"全文真的进了内存"。
+   *
+   * 早先判的是 `progress.ratio < 1`，而 ratio 是"下载 40% + 解析 30% + 规整 30%"的合成值：
+   * 上游一旦把 ratio 报成 1（例如分母错用了压缩后的 Content-Length，实际下载还没走完），
+   * 进度条就整个消失。用户看到条走完、以为题库已经就绪，进练习/考试却还要等 ——
+   * 这里改成只认"数据到手"这个唯一事实，条走完就等于真加载完。
+   */
+  const showProgress = computed<boolean>(() => loading.value && !bank.value)
 
   function resetProgress(): void {
     progress.phase = 'download'
@@ -50,7 +57,9 @@ export const useBankStore = defineStore('bank', () => {
     // 不做"只增不减"保护：重试时上游会把进度显式打回 0，
     // 压住回退反而会让进度条永久停在失败点。
     progress.phase = p.phase
-    progress.ratio = p.ratio
+    // 但必须夹到 [0,1]：上游的字节分母若出现偏差（旧索引缺 fullSize 时曾把压缩体积当分母），
+    // 溢出 100% 的宽度会画出卡片之外，也会让"条走完"提前发生
+    progress.ratio = Math.min(1, Math.max(0, p.ratio))
     progress.loaded = p.loaded
     progress.total = p.total
   }

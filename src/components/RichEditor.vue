@@ -13,6 +13,7 @@ import '@opentiny/fluent-editor/style.css'
 import katex from 'katex'
 import { IMAGE_EMBED_MAX_BYTES, dataUrlBytes, embedStorageBytes, isEmbeddableType, prepareImageFile } from '@/utils/image'
 import { fmtBytes } from '@/utils/format'
+import { sanitizeHtml } from '@/utils/sanitize'
 
   // Fluent Editor 的 formula 模块从 window.katex 读取渲染器
   ; (window as unknown as { katex: typeof katex }).katex = katex
@@ -195,7 +196,10 @@ onMounted(() => {
       }
     }
   })
-  if (props.modelValue) editor!.root.innerHTML = props.modelValue
+  // 编辑路径与渲染路径一样只接收净化后的 HTML：题库可以来自外部文件，
+  // 把带 onerror 的 <img> 原样写进 contenteditable，用户一点"编辑题目"就会
+  // 在应用源下执行（RichText.vue 早已净化，这里此前漏了）
+  editor!.root.innerHTML = sanitizeHtml(props.modelValue)
   document.addEventListener('paste', onPaste, true)
   document.addEventListener('drop', onDrop, true)
   editor!.on('text-change', () => {
@@ -213,8 +217,11 @@ watch(
   () => props.modelValue,
   (v) => {
     if (internalChange || !editor) return
-    if ((editor.root.innerHTML || '') !== (v || '')) {
-      editor.root.innerHTML = v || ''
+    const next = sanitizeHtml(v || '')
+    // 与"将要写入的内容"比较：净化会改写属性顺序并丢弃白名单外的属性，
+    // 拿净化结果和原文比会误判成"内容变了"，白白重置一次光标
+    if ((editor.root.innerHTML || '') !== next) {
+      editor.root.innerHTML = next
     }
   }
 )

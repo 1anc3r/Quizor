@@ -1,8 +1,8 @@
 /**
  * 构建期题库索引生成插件。
  *
- * 背景：`public/data/banks/*.json` 里的完整题库约 5MB（题干/解析富文本 + 内嵌图片），
- * 而 GitHub Pages 对静态 JSON 不做 gzip，冷启动必须原样下载这 5MB —— 这是首屏慢的主因。
+ * 背景：`public/data/banks/*.json` 里的完整题库约 6MB（题干/解析富文本 + 内嵌图片），
+ * 托管方会把它 gzip 到约 1.2MB，但解压后仍有 6MB 要下载、解析并常驻内存 —— 这是首屏慢的主因。
  *
  * 这里在构建时按 `public/data/BankManifest.json` 逐个题库生成 `*_index.json`：
  * 只保留"每题的纯文本摘要 + 章节/题型/难度/来源/标签"与试卷清单，
@@ -49,8 +49,20 @@ function summarize(html: string): string {
   return text.length > SUMMARY_LEN ? `${text.slice(0, SUMMARY_LEN)}…` : text
 }
 
-/** 单个题库 JSON → 索引对象 */
-export function buildIndex(bank: Record<string, unknown>, meta: Record<string, unknown>): Record<string, unknown> {
+/**
+ * 单个题库 JSON → 索引对象。
+ *
+ * `fullSize` 是全文**解压后**的字节数，由调用方按原始文本算好传进来：
+ * 托管方（GitHub Pages/Fastly）会给 JSON 加 gzip，运行时从响应头拿到的
+ * `Content-Length` 是压缩后的体积（6MB → 约 1.2MB），拿它当下载进度的分母
+ * 会算出"480%"这种百分比、并让进度条在下载尚未完成时就满格。
+ * 这份解压后的总量浏览器侧算不出来，只能在构建期记账。
+ */
+export function buildIndex(
+  bank: Record<string, unknown>,
+  meta: Record<string, unknown>,
+  fullSize?: number
+): Record<string, unknown> {
   const questions = Array.isArray(bank.Questions) ? (bank.Questions as Record<string, unknown>[]) : []
   const papers = Array.isArray(bank.Papers) ? (bank.Papers as Record<string, unknown>[]) : []
   return {
@@ -58,6 +70,8 @@ export function buildIndex(bank: Record<string, unknown>, meta: Record<string, u
     name: typeof bank.name === 'string' && bank.name ? bank.name : meta.name,
     questionCount: questions.length,
     rule: bank.rule ?? meta.rule,
+    // 0/负数/缺失一律不写：JSON.stringify 会丢掉 undefined，此时前端按"总量未知"处理
+    fullSize: typeof fullSize === 'number' && fullSize > 0 ? fullSize : undefined,
     questions: questions.map((q) => ({
       id: q.id,
       type: q.type,
@@ -98,13 +112,17 @@ export function bankIndexPlugin(): Plugin {
         if (!bankFile) continue
         try {
           const raw = await readFile(join(dataDir, 'banks', bankFile), 'utf8')
+          // 全文的字节数按 UTF-8 编码算：raw.length 是 UTF-16 码元个数，
+          // 中文题干占比高的题库会少算一半以上，而下载进度是按字节统计的
+          const fullSize = new TextEncoder().encode(raw).length
           const bank = JSON.parse(raw) as Record<string, unknown>
-          const index = buildIndex(bank, meta)
+          const index = buildIndex(bank, meta, fullSize)
           const body = JSON.stringify(index)
+          const indexSize = new TextEncoder().encode(body).length
           this.emitFile({ type: 'asset', fileName: `data/banks/${indexFileName(bankFile)}`, source: body })
-          const ratio = raw.length ? Math.round((body.length / raw.length) * 100) : 0
+          const ratio = fullSize ? Math.round((indexSize / fullSize) * 100) : 0
           this.info?.(
-            `题库索引 ${indexFileName(bankFile)}: ${(body.length / 1024).toFixed(0)}KB / 全文 ${(raw.length / 1024).toFixed(0)}KB（${ratio}%）`
+            `题库索引 ${indexFileName(bankFile)}: ${(indexSize / 1024).toFixed(0)}KB / 全文 ${(fullSize / 1024).toFixed(0)}KB（${ratio}%）`
           )
           total++
         } catch (e) {

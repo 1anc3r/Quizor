@@ -33,7 +33,10 @@ const DROP_WITH_CONTENT = new Set([
   'legend', 'audio', 'video', 'source', 'track', 'canvas', 'applet', 'portal'
 ])
 
-/** 允许保留的属性名（`on*` 事件属性一律无条件剔除，不在此表内） */
+/**
+ * 允许保留的属性名（`on*` 事件属性一律无条件剔除，不在此表内）。
+ * `contenteditable` 虽在表内，但只有值恰为 `false` 时才放行，见 `sanitizeElement()`。
+ */
 const ALLOWED_ATTRS = new Set([
   'align', 'alt', 'class', 'colspan', 'contenteditable', 'data-value',
   'height', 'href', 'rel', 'rowspan', 'span', 'src', 'start', 'style',
@@ -82,9 +85,25 @@ function sanitizeElement(el: Element): void {
       el.removeAttribute(attr.name)
       continue
     }
+    // 渲染出的题目必须是只读的：`contenteditable="true"`（或空值，按规范等价于 true）
+    // 会让用户在页面上就地改写题目，并让 QuizView 的键盘快捷键把它当成"正在输入"。
+    // 只保留 `false`——Quill 用它标记公式、表格等不可编辑的嵌入块。
+    if (name === 'contenteditable' && attr.value.trim().toLowerCase() !== 'false') {
+      el.removeAttribute(attr.name)
+      continue
+    }
     if (name === 'style' && DANGEROUS_STYLE.test(attr.value)) {
       el.removeAttribute(attr.name)
     }
+  }
+
+  // 外链一律补上 rel：题库 HTML 来自外部文件，不该指望浏览器对 target="_blank"
+  // 的隐式 noopener。作者自己写的 token（如 nofollow）保留，只做并集。
+  if (tag === 'a' && el.hasAttribute('href')) {
+    const tokens = new Set((el.getAttribute('rel') ?? '').split(/\s+/).filter(Boolean))
+    tokens.add('noopener')
+    tokens.add('noreferrer')
+    el.setAttribute('rel', Array.from(tokens).join(' '))
   }
 }
 

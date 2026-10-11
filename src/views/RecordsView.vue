@@ -5,6 +5,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { PAGE_SIZES, PAGINATION_LAYOUT, usePagedList } from '@/composables/usePagedList'
 import type { ECharts } from 'echarts/core'
 import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
@@ -19,22 +20,7 @@ const userStore = useUserDataStore()
 const sortedRecords = computed(() => [...userStore.records].sort((a, b) => b.endTime - a.endTime))
 
 // ---------- 分页 ----------
-const pageSize = ref(20)
-const currentPage = ref(1)
-
-const pagedRecords = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return sortedRecords.value.slice(start, end)
-})
-
-// 当总记录数变化或每页条数变化时重置页码
-watch(sortedRecords, () => {
-  currentPage.value = 1
-})
-watch(pageSize, () => {
-  currentPage.value = 1
-})
+const { currentPage, pageSize, pagedRows: pagedRecords } = usePagedList(sortedRecords)
 
 const isMobile = useIsMobile()
 
@@ -210,8 +196,8 @@ onBeforeUnmount(() => {
       </el-table>
 
       <!-- 分页 -->
-      <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[20, 50, 100]"
-        :total="sortedRecords.length" :hide-on-single-page="true" layout="total, sizes, prev, pager, next, jumper"
+      <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="PAGE_SIZES"
+        :total="sortedRecords.length" :hide-on-single-page="true" :layout="PAGINATION_LAYOUT"
         style="margin-top: 12px" />
 
       <el-empty v-if="!sortedRecords.length" description="暂无做题记录" />

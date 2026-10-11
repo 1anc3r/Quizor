@@ -11,6 +11,16 @@ export function typeLabel(t: QuestionType): string {
   return TYPE_LABELS[t] ?? t
 }
 
+/**
+ * 题型下拉 / 多选的选项列表。
+ *
+ * 与 `TYPE_LABELS` 同源，避免"改了一处标签、另一处还是旧文案"；下拉的展示顺序
+ * 就是 `TYPE_LABELS` 的书写顺序（单选、多选、判断、简答）。
+ */
+export const TYPE_OPTIONS: { label: string; value: QuestionType }[] = (
+  Object.keys(TYPE_LABELS) as QuestionType[]
+).map((value) => ({ label: TYPE_LABELS[value], value }))
+
 /** 秒 → HH:MM:SS（不足 1 小时为 MM:SS） */
 export function fmtDuration(totalSec: number): string {
   const sec = Math.max(0, Math.floor(totalSec))

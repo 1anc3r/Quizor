@@ -4,13 +4,15 @@
  */
 import { computed, onMounted, ref, watch, reactive } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { DEFAULT_PAGE_SIZE, PAGE_SIZES, PAGINATION_LAYOUT, clampPage, pageSlice } from '@/composables/usePagedList'
 import { useRouter } from 'vue-router'
 import { Plus, Search, SquarePen, Trophy, Sprout, Puzzle, BookText, BookCheck, BookX, BookHeart } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/stores/session'
 import type { Question, StoredQuizSession } from '@/types'
-import { fmtBytesPrecise, plainText, truncate } from '@/utils/format'
+import { plainText, truncate } from '@/utils/format'
+import { bankProgressText } from '@/utils/bankProgress'
 
 const router = useRouter()
 const bankStore = useBankStore()
@@ -102,31 +104,18 @@ function onChapterToggle(name: string | number | (string | number)[]): void {
  *
  * 列表在本卡片里始终可用（索引摘要已经够渲染），所以进度是"旁边的一条细线"而不是全屏遮罩：
  * 用户既能继续浏览已有内容，也能看见后台到底在干什么。
+ * 文案口径统一在 `@/utils/bankProgress`（首页、做题设置页、恢复会话页三处共用）。
  */
-const progressPhaseText = computed<string>(() => {
-  switch (bankStore.progress.phase) {
-    case 'download':
-      return '下载题目全文'
-    case 'parse':
-      return '解析题目数据'
-    case 'normalize':
-      return '整理题目数据'
-    default:
-      return '即将完成'
-  }
-})
 
-/** 已知总字节数时才有百分比可言；响应头缺 Content-Length 时返回 null，避免显示假数字 */
-const progressPercent = computed<number | null>(() => {
-  const { loaded, total } = bankStore.progress
-  return total > 0 ? Math.round((loaded / total) * 100) : null
-})
-
-const progressBytes = computed<string>(() => {
-  const { loaded, total } = bankStore.progress
-  if (!total) return fmtBytesPrecise(loaded)
-  return `${fmtBytesPrecise(loaded)} / ${fmtBytesPrecise(total)}`
-})
+/**
+ * 总量未知（传输被压缩但索引没给出解压后体积）时进度条切成不确定态动画。
+ *
+ * 此时既没有可信的百分比，也不该画一条看起来"确定"的实心条：
+ * 后者会让人以为"条快满了=马上就好"，而实际剩余时间完全未知。
+ */
+const progressIndeterminate = computed<boolean>(
+  () => bankStore.progress.phase === 'download' && !bankStore.progress.total
+)
 
 const filteredPapers = computed(() => {
   const kw = paperKeyword.value.trim().toLowerCase()
@@ -178,18 +167,13 @@ const chapterGroups = computed<ChapterGroup[]>(() => {
   }
   const groups = [...map.entries()].map(([chapter, qs]) => ({ chapter, questions: qs }))
 
-  // 初始化每个章节的分页状态，并修正 currentPage 不超出总页数
+  // 初始化每个章节的分页状态，并把页码收进有效区间（筛选后题目变少时不至于停在空白页）
   for (const g of groups) {
-    if (!chapterPageState[g.chapter]) {
-      chapterPageState[g.chapter] = { pageSize: 20, currentPage: 1 }
-    } else {
-      const total = g.questions.length
-      const size = chapterPageState[g.chapter].pageSize
-      const maxPage = Math.ceil(total / size) || 1
-      if (chapterPageState[g.chapter].currentPage > maxPage) {
-        chapterPageState[g.chapter].currentPage = maxPage
-      }
-    }
+    const state = (chapterPageState[g.chapter] ??= {
+      pageSize: DEFAULT_PAGE_SIZE,
+      currentPage: 1
+    })
+    state.currentPage = clampPage(state.currentPage, g.questions.length, state.pageSize)
   }
 
   // 移除已经不存在章节的分页状态
@@ -214,9 +198,15 @@ watch(questionKeyword, () => {
 function getPagedQuestions(chapter: string, allQuestions: BrowseQuestion[]): BrowseQuestion[] {
   const state = chapterPageState[chapter]
   if (!state) return allQuestions
-  const start = (state.currentPage - 1) * state.pageSize
-  const end = start + state.pageSize
-  return allQuestions.slice(start, end)
+  return pageSlice(allQuestions, state.currentPage, state.pageSize)
+}
+
+// 辅助：改某个章节的每页条数（与列表页一致，回到第 1 页）
+function setChapterPageSize(chapter: string, size: number): void {
+  const state = chapterPageState[chapter]
+  if (!state) return
+  state.pageSize = size
+  state.currentPage = 1
 }
 
 onMounted(async () => {
@@ -298,13 +288,13 @@ onMounted(async () => {
          下载进度以卡片顶部的一条细线呈现，列表在下载期间保持可用 -->
     <el-card class="page-card" shadow="never">
       <div v-if="bankStore.showProgress" class="bank-progress">
-        <div class="progress-track">
-          <div class="progress-fill" :style="{ width: `${Math.round(bankStore.progress.ratio * 100)}%` }"></div>
+        <div class="progress-track" :class="{ 'is-indeterminate': progressIndeterminate }">
+          <div class="progress-fill"
+            :style="progressIndeterminate ? undefined : { width: `${Math.round(bankStore.progress.ratio * 100)}%` }">
+          </div>
         </div>
         <div class="progress-meta muted">
-          <span>{{ progressPhaseText }}…</span>
-          <span v-if="progressPercent !== null">{{ progressPercent }}%（{{ progressBytes }}）</span>
-          <span v-else>{{ progressBytes }}</span>
+          <span>{{ bankProgressText(bankStore.progress) }}</span>
           <span class="muted">此期间可继续浏览下方列表</span>
         </div>
       </div>
@@ -366,13 +356,9 @@ onMounted(async () => {
             <!-- 分页组件（仅当题目总数大于每页条数时显示） -->
             <el-pagination :current-page="chapterPageState[g.chapter].currentPage"
               @update:current-page="(val: number) => (chapterPageState[g.chapter].currentPage = val)"
-              :page-size="chapterPageState[g.chapter].pageSize" @update:page-size="
-                (val: number) => {
-                  const state = chapterPageState[g.chapter]
-                  state.pageSize = val
-                  state.currentPage = 1
-                }
-              " :page-sizes="[20, 50, 100]" :total="g.questions.length" layout="total, sizes, prev, pager, next, jumper"
+              :page-size="chapterPageState[g.chapter].pageSize"
+              @update:page-size="(val: number) => setChapterPageSize(g.chapter, val)"
+              :page-sizes="PAGE_SIZES" :total="g.questions.length" :layout="PAGINATION_LAYOUT"
               style="margin-top: 10px" />
           </template>
           <el-empty v-else :image-size="60" description="展开后加载本节题目" />

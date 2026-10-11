@@ -14,7 +14,10 @@ import { createBank, defaultRule, loadBank, loadManifest, saveBank } from '@/ser
 import { nameToBankId } from '@/utils/pinyin'
 import { useBankStore } from '@/stores/bankStore'
 import { useIsMobile } from '@/composables/useIsMobile'
-import { plainText, shortId, truncate, typeLabel } from '@/utils/format'
+import { PAGE_SIZES, PAGINATION_LAYOUT, usePagedList } from '@/composables/usePagedList'
+import { useQuestionFilters } from '@/composables/useQuestionFilters'
+import { useRowSelection } from '@/composables/useRowSelection'
+import { TYPE_OPTIONS, plainText, shortId, truncate, typeLabel } from '@/utils/format'
 import { genId } from '@/utils/id'
 import PaperFormDialog from '@/components/PaperFormDialog.vue'
 import QuizFormDialog from '@/components/QuizFormDialog.vue'
@@ -154,14 +157,11 @@ async function onDeleteBank(): Promise<void> {
 
 /* ---------- 组卷规则 ---------- */
 
-const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
-  { label: '单选', value: 'single' },
-  { label: '多选', value: 'multiple' },
-  { label: '判断', value: 'judge' },
-  { label: '简答', value: 'text' }
-]
-
-const composeSelection = ref<ComposeItem[]>([])
+const {
+  selection: composeSelection,
+  onSelectionChange: onComposeSelect,
+  clearSelection: clearComposeSelection
+} = useRowSelection<ComposeItem>()
 
 const chapterOptions = computed<string[]>(() => {
   const set = new Set<string>()
@@ -189,7 +189,7 @@ function removeCompose(i: number): void {
 function removeComposeBatch(): void {
   const set = new Set(composeSelection.value)
   bankMeta.rule.composition = bankMeta.rule.composition.filter((c) => !set.has(c))
-  composeSelection.value = []
+  clearComposeSelection()
   persist()
 }
 
@@ -213,9 +213,13 @@ const chapterOptionCount = computed<Record<string, number>>(() => {
 
 const pKeyword = ref('')
 const pSource = ref('')
-const pSelection = ref<Paper[]>([])
 const pDialogVisible = ref(false)
 const editingPaper = ref<Paper>({ id: '', name: '', source: '', difficulty: 3, questionIds: [] })
+const {
+  selection: pSelection,
+  onSelectionChange: onPaperSelect,
+  clearSelection: clearPaperSelection
+} = useRowSelection<Paper>()
 
 const filteredPapers = computed(() => {
   const kw = pKeyword.value.trim().toLowerCase()
@@ -227,32 +231,11 @@ const filteredPapers = computed(() => {
 })
 
 // 分页相关
-const pPage = ref(1)
-const pPageSize = ref(20)
+const { currentPage: pPage, pageSize: pPageSize, pagedRows: pagedPapers, resetPage: resetPaperPage } =
+  usePagedList(filteredPapers)
 
-const pagedPapers = computed(() => {
-  const start = (pPage.value - 1) * pPageSize.value
-  const end = start + pPageSize.value
-  return filteredPapers.value.slice(start, end)
-})
-
-// 每页条数变化时重置页码到1
-watch(pPageSize, () => {
-  pPage.value = 1
-})
-
-// 当总记录数变化时，自动修正当前页（防止超出范围）
-watch(
-  () => filteredPapers.value.length,
-  (newLen) => {
-    const totalPages = Math.ceil(newLen / pPageSize.value)
-    if (pPage.value > totalPages && totalPages > 0) {
-      pPage.value = totalPages
-    } else if (newLen === 0) {
-      pPage.value = 1
-    }
-  }
-)
+// 换过滤条件时回到第一页
+watch([pKeyword, pSource], resetPaperPage)
 
 function openPaperDialog(p?: Paper): void {
   editingPaper.value = p
@@ -287,63 +270,41 @@ async function removePaperBatch(): Promise<void> {
   }
   const ids = new Set(pSelection.value.map((p) => p.id))
   bankData.Papers = bankData.Papers.filter((p) => !ids.has(p.id))
-  pSelection.value = []
+  clearPaperSelection()
   persist()
 }
 
 /* ---------- 题目列表 ---------- */
 
-const qKeyword = ref('')
-const qChapter = ref('')
-const qSource = ref('')
-const qType = ref<'' | QuestionType>('')
-const qSelection = ref<Question[]>([])
 const qDialogVisible = ref(false)
 const editingQuestion = ref<Question | null>(null)
 const addToPaperVisible = ref(false)
 const addToPaperTarget = ref('')
 
-const filteredQuestions = computed(() => {
-  const kw = qKeyword.value.trim().toLowerCase()
-  return bankData.Questions.filter((q) => {
-    if (qChapter.value && q.chapter !== qChapter.value) return false
-    if (qType.value && q.type !== qType.value) return false
-    if (qSource.value && q.source !== qSource.value) return false
-    if (!kw) return true
-    return (
-      plainText(q.stem).toLowerCase().includes(kw) ||
-      q.id.toLowerCase().includes(kw) ||
-      q.source.toLowerCase().includes(kw) ||
-      q.tags.some((t) => t.toLowerCase().includes(kw))
-    )
-  })
-})
+// 关键字 + 章节/题型/来源：与错题本、收藏夹共用同一份筛选状态；
+// 题库管理里关键字还要比题号、来源、标签
+const {
+  keyword: qKeyword,
+  chapter: qChapter,
+  type: qType,
+  source: qSource,
+  matches: matchesQuestion
+} = useQuestionFilters((q) => [q.id, q.source, ...q.tags])
+
+const {
+  selection: qSelection,
+  onSelectionChange: onQuestionSelect,
+  clearSelection: clearQuestionSelection
+} = useRowSelection<Question>()
+
+const filteredQuestions = computed(() => bankData.Questions.filter((q) => matchesQuestion(q)))
 
 // 分页相关
-const qPage = ref(1)
-const qPageSize = ref(20)
+const { currentPage: qPage, pageSize: qPageSize, pagedRows: pagedQuestions, resetPage: resetQuestionPage } =
+  usePagedList(filteredQuestions)
 
-const pagedQuestions = computed(() => {
-  const start = (qPage.value - 1) * qPageSize.value
-  const end = start + qPageSize.value
-  return filteredQuestions.value.slice(start, end)
-})
-
-watch(qPageSize, () => {
-  qPage.value = 1
-})
-
-watch(
-  () => filteredQuestions.value.length,
-  (newLen) => {
-    const totalPages = Math.ceil(newLen / qPageSize.value)
-    if (qPage.value > totalPages && totalPages > 0) {
-      qPage.value = totalPages
-    } else if (newLen === 0) {
-      qPage.value = 1
-    }
-  }
-)
+// 换过滤条件时回到第一页
+watch([qKeyword, qChapter, qType, qSource], resetQuestionPage)
 
 const allTags = computed<string[]>(() => {
   const set = new Set<string>()
@@ -384,7 +345,7 @@ async function removeQuestionBatch(): Promise<void> {
   const ids = new Set(qSelection.value.map((q) => q.id))
   bankData.Questions = bankData.Questions.filter((q) => !ids.has(q.id))
   bankData.Papers.forEach((p) => (p.questionIds = p.questionIds.filter((id) => !ids.has(id))))
-  qSelection.value = []
+  clearQuestionSelection()
   persist()
 }
 
@@ -464,7 +425,7 @@ function confirmAddToPaper(): void {
               </el-button>
             </div>
             <el-table stripe :data="bankMeta.rule.composition"
-              @selection-change="(rows: ComposeItem[]) => (composeSelection = rows)">
+              @selection-change="onComposeSelect">
               <el-table-column type="selection" width="40" fixed="left" />
               <el-table-column label="章节" width="200">
                 <template #default="{ row }">
@@ -529,7 +490,7 @@ function confirmAddToPaper(): void {
           </div>
         </div>
         <el-table stripe :data="pagedPapers" style="margin-top: 12px"
-          @selection-change="(rows: Paper[]) => (pSelection = rows)">
+          @selection-change="onPaperSelect">
           <el-table-column type="selection" width="40" fixed="left" />
           <el-table-column prop="name" label="试卷名称" min-width="200" show-overflow-tooltip />
           <el-table-column label="题数" width="80">
@@ -549,8 +510,8 @@ function confirmAddToPaper(): void {
           </el-table-column>
         </el-table>
         <!-- 试卷分页 -->
-        <el-pagination v-model:current-page="pPage" v-model:page-size="pPageSize" :page-sizes="[20, 50, 100]"
-          :total="filteredPapers.length" :hide-on-single-page="true" layout="total, sizes, prev, pager, next, jumper"
+        <el-pagination v-model:current-page="pPage" v-model:page-size="pPageSize" :page-sizes="PAGE_SIZES"
+          :total="filteredPapers.length" :hide-on-single-page="true" :layout="PAGINATION_LAYOUT"
           style="margin-top: 12px;" />
       </el-card>
 
@@ -583,7 +544,7 @@ function confirmAddToPaper(): void {
           </div>
         </div>
         <el-table stripe :data="pagedQuestions" style="margin-top: 12px"
-          @selection-change="(rows: Question[]) => (qSelection = rows)">
+          @selection-change="onQuestionSelect">
           <el-table-column type="selection" width="40" fixed="left" />
           <el-table-column label="题号" width="80">
             <template #default="{ row }">
@@ -612,8 +573,8 @@ function confirmAddToPaper(): void {
         </el-table>
         <!-- 试卷分页 -->
         <el-pagination v-model:current-page="qPage" v-model:page-size="qPageSize"
-          :page-sizes="[20, 50, 100]" :total="filteredQuestions.length" :hide-on-single-page="true"
-          layout="total, sizes, prev, pager, next, jumper" style="margin-top: 12px;" />
+          :page-sizes="PAGE_SIZES" :total="filteredQuestions.length" :hide-on-single-page="true"
+          :layout="PAGINATION_LAYOUT" style="margin-top: 12px;" />
       </el-card>
 
       <!-- 试卷管理窗口 -->

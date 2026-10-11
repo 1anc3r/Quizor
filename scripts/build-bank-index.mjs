@@ -29,16 +29,20 @@ async function main() {
   for (const meta of banks) {
     if (!meta || typeof meta.bankFile !== 'string' || !meta.bankFile) continue
     const raw = await readFile(join(banksDir, meta.bankFile), 'utf8')
+    // 全文按 UTF-8 字节数记账（不能用 raw.length：那是 UTF-16 码元数，中文题干会少算一半），
+    // 下载进度的分母就是它 —— 详见 vite-plugins/bankIndex.ts 的 buildIndex 注释
+    const fullSize = new TextEncoder().encode(raw).length
     const bank = JSON.parse(raw)
-    const body = JSON.stringify(buildIndex(bank, meta))
+    const body = JSON.stringify(buildIndex(bank, meta, fullSize))
+    const indexSize = new TextEncoder().encode(body).length
     const out = join(banksDir, indexFileName(meta.bankFile))
     await writeFile(out, body, 'utf8')
-    fullBytes += raw.length
-    indexBytes += body.length
-    const ratio = raw.length ? ((body.length / raw.length) * 100).toFixed(1) : '0'
+    fullBytes += fullSize
+    indexBytes += indexSize
+    const ratio = fullSize ? ((indexSize / fullSize) * 100).toFixed(1) : '0'
     console.log(
-      `[bank-index] ${indexFileName(meta.bankFile)}  ${(body.length / 1024).toFixed(0)}KB` +
-        `  (全文 ${(raw.length / 1024).toFixed(0)}KB，${ratio}%)  题目 ${bank.Questions?.length ?? 0} 道`
+      `[bank-index] ${indexFileName(meta.bankFile)}  ${(indexSize / 1024).toFixed(0)}KB` +
+        `  (全文 ${(fullSize / 1024).toFixed(0)}KB，${ratio}%)  题目 ${bank.Questions?.length ?? 0} 道`
     )
   }
   const saved = fullBytes ? (100 - (indexBytes / fullBytes) * 100).toFixed(1) : '0'

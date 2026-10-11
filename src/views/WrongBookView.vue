@@ -3,14 +3,17 @@
  * 错题本（当前题库）：答错自动收录（同题更新），支持关键字查询、
  * 章节/题型/来源筛选、按错误次数/时间排序、明细展开、练习入口、单条/批量移除。
  */
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { PAGE_SIZES, PAGINATION_LAYOUT, usePagedList } from '@/composables/usePagedList'
+import { useQuestionFilters } from '@/composables/useQuestionFilters'
+import { useRowSelection } from '@/composables/useRowSelection'
 import { useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
-import type { Question, QuestionType, WrongItem } from '@/types'
-import { fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
+import type { Question, WrongItem } from '@/types'
+import { TYPE_OPTIONS, fmtTime, plainText, shortId, truncate, typeLabel } from '@/utils/format'
 import SegmentedControl, { type SegOption } from '@/components/SegmentedControl.vue'
 import QuizDetail from '@/components/QuizDetail.vue'
 
@@ -19,59 +22,52 @@ const bankStore = useBankStore()
 const settingsStore = useSettingsStore()
 const userStore = useUserDataStore()
 
-const keyword = ref('')
-const filterChapter = ref('')
-const filterType = ref<'' | QuestionType>('')
-const filterSource = ref('')
 const sortBy = ref<'count' | 'time'>('time')
-const selection = ref<WrongRow[]>([])
 const isMobile = useIsMobile()
-
-// ---------- 分页 ----------
-const pageSize = ref(20)
-const currentPage = ref(1)
 
 interface WrongRow {
   item: WrongItem
   question: Question
 }
 
+// 关键字 + 章节/题型/来源：与收藏夹、题库管理的题目列表共用同一份筛选状态
+const {
+  keyword,
+  chapter: filterChapter,
+  type: filterType,
+  source: filterSource,
+  matches
+} = useQuestionFilters()
+
 const rows = computed<WrongRow[]>(() => {
-  const kw = keyword.value.trim().toLowerCase()
   const out: WrongRow[] = []
   for (const item of Object.values(userStore.wrong)) {
     const q = bankStore.questionMap.get(item.questionId)
-    if (!q) continue
-    if (filterChapter.value && q.chapter !== filterChapter.value) continue
-    if (filterType.value && q.type !== filterType.value) continue
-    if (filterSource.value && q.source !== filterSource.value) continue
-    if (kw && !plainText(q.stem).toLowerCase().includes(kw) && !q.chapter.toLowerCase().includes(kw)) continue
+    if (!q || !matches(q)) continue
     out.push({ item, question: q })
   }
   out.sort((a, b) => (sortBy.value === 'count' ? b.item.count - a.item.count : b.item.lastTime - a.item.lastTime))
   return out
 })
 
-const pagedRows = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return rows.value.slice(start, end)
-})
+// ---------- 分页 ----------
+const { currentPage, pageSize, pagedRows, resetPage } = usePagedList(rows)
 
-// 过滤条件变化时重置页码
-watch(rows, () => {
-  currentPage.value = 1
-})
-watch(pageSize, () => {
-  currentPage.value = 1
-})
+// 换过滤条件时回到第一页；列表自身增删只收拢页码，不把用户弹回开头
+watch([keyword, filterChapter, filterType, filterSource], resetPage)
 
-const TYPE_OPTIONS: { label: string; value: QuestionType }[] = [
-  { label: '单选', value: 'single' },
-  { label: '多选', value: 'multiple' },
-  { label: '判断', value: 'judge' },
-  { label: '简答', value: 'text' }
-]
+const { selection, onSelectionChange, clearSelection } = useRowSelection<WrongRow>()
+
+// 有错题、但全文还没到位：此刻列表为空是「还在加载」，不是「没有错题」
+const pendingRows = computed(
+  () => !rows.value.length && bankStore.loading && Object.keys(userStore.wrong).length > 0
+)
+
+// 冷启动直接进 #/wrong 时全文还没加载（首页的空闲预取最长要数秒），questionMap 还是空的，
+// 列表会先显示「暂无错题」，看着像题目丢了。错题本本来就要靠全文回填题干，这里直接要一次。
+onMounted(() => {
+  void bankStore.ensureFullBank()
+})
 
 // 排序方式：与设置页「外观模式」同一套分段选择器样式
 const SORT_OPTIONS: SegOption<'count' | 'time'>[] = [
@@ -99,7 +95,7 @@ async function removeBatch(): Promise<void> {
     return
   }
   userStore.removeWrong(selection.value.map((r) => r.item.questionId))
-  selection.value = []
+  clearSelection()
 }
 </script>
 
@@ -131,7 +127,7 @@ async function removeBatch(): Promise<void> {
         <SegmentedControl v-model:value="sortBy" :options="SORT_OPTIONS" aria-label="排序方式" />
       </div>
 
-      <el-table stripe :data="pagedRows" row-key="item.questionId" @selection-change="(r: WrongRow[]) => (selection = r)">
+      <el-table stripe :data="pagedRows" row-key="item.questionId" @selection-change="onSelectionChange">
         <el-table-column type="selection" width="40" fixed="left" />
         <el-table-column type="expand">
           <template #default="{ row }">
@@ -181,11 +177,12 @@ async function removeBatch(): Promise<void> {
       </el-table>
 
       <!-- 分页 -->
-      <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[20, 50, 100]"
-        :total="rows.length" :hide-on-single-page="true" layout="total, sizes, prev, pager, next, jumper"
+      <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="PAGE_SIZES"
+        :total="rows.length" :hide-on-single-page="true" :layout="PAGINATION_LAYOUT"
         style="margin-top: 12px" />
 
-      <el-empty v-if="!rows.length" description="暂无错题" />
+      <el-empty v-if="pendingRows" description="正在加载…" />
+      <el-empty v-else-if="!rows.length" description="暂无错题" />
     </el-card>
   </div>
 </template>
