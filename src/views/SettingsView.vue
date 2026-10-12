@@ -490,17 +490,17 @@ const redirectToExternalLink = () => {
     <section class="cc-card settings-card about-card">
       <div class="cc-card-title">
         <span class="title-text">关于</span>
+        <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="redirectToExternalLink">
+          <el-icon :size="14">
+            <SquareArrowOutUpRight />
+          </el-icon>前往
+        </button>
       </div>
       <div class="set-row" style="margin-top: 4px">
         <div class="set-info">
           <div class="set-label">Quizor·做题家</div>
           <div class="set-desc">纯静态题库刷题 Web 应用：无后端、无登录。题库以 JSON 静态文件承载，用户数据（答题记录、错题、收藏、设置）全部保存在浏览器 localStorage / IndexedDB，构建产物可直接发布 GitHub Pages。</div>
         </div>
-        <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="redirectToExternalLink">
-          <el-icon :size="14">
-            <SquareArrowOutUpRight />
-          </el-icon>前往
-        </button>
       </div>
       <div class="set-row" style="margin-top: 4px">
         <div class="set-info">
@@ -510,7 +510,6 @@ const redirectToExternalLink = () => {
       </div>
 
       <div class="donate">
-        <div class="set-label">赞赏码</div>
         <img src="/WechatCode.jpg" alt="赞赏码" class="donate-img" />
       </div>
     </section>
