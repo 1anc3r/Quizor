@@ -67,21 +67,59 @@
   --el-box-shadow-light: var(--q-shadow-md);
 }
 
+/* 深色模式：5 级背景层级（统一 h=215° 蓝灰，由深到浅），
+   凹陷元素只比卡片暗一档，禁用纯黑。见《配色风格分析与方案》 */
 html.dark {
-  --q-bg: #0f172a;
-  --q-card: #1e293b;
-  --q-text: #e5eaf3;
-  --q-text-secondary: #94a3b8;
+  /* 背景层级 */
+  --q-bg: #0d1420;          /* 页面背景 */
+  --q-card: #1a2536;        /* 主卡片 */
+  --q-bg-inset: #131c2a;    /* 输入框 / 表头 / 筛选器等凹陷容器 */
+  --q-bg-elevated: #223049; /* hover / 浮层 / 选中行 */
+  /* 文字 */
+  --q-text: #e6ecf5;
+  --q-text-secondary: #9aa7bc;
   --q-text-placeholder: #64748b;
-  --q-border: #334155;
-  --q-border-strong: #475569;
-  --q-primary: #3b82f6;
-  --q-primary-hover: #60a5fa;
-  --q-primary-soft: #1e3a8a;
-  --q-success-soft: #14532d;
-  --q-danger-soft: #7f1d1d;
-  --q-warning-soft: #78350f;
-  --q-info-soft: #1f2937;
+  /* 边框 */
+  --q-border: rgba(148, 163, 184, 0.12);
+  --q-border-strong: rgba(148, 163, 184, 0.24);
+  /* 强调色（全屏唯一蓝） */
+  --q-primary: #4c8dff;
+  --q-primary-hover: #3a7aec;
+  --q-primary-soft: rgba(76, 141, 255, 0.14);
+  /* 语义色软底：压低饱和度的深色 tint，不再用实色块 */
+  --q-success-soft: rgba(22, 163, 74, 0.14);
+  --q-danger-soft: rgba(220, 38, 38, 0.14);
+  --q-warning-soft: rgba(217, 119, 6, 0.14);
+  --q-info-soft: #131c2a;
+
+  /* ---- Element Plus 深色变量映射到同一套 token，
+     消除组件内部 EP 默认纯黑（#141414 系）造成的“黑洞” ---- */
+  --el-color-primary: var(--q-primary);
+  --el-color-primary-dark-2: #3a7aec;
+  --el-color-primary-light-3: #6fa5ff;
+  --el-color-primary-light-5: #8fb8ff;
+  --el-color-primary-light-7: rgba(143, 184, 255, 0.6);
+  --el-color-primary-light-8: rgba(143, 184, 255, 0.4);
+  --el-color-primary-light-9: rgba(143, 184, 255, 0.2);
+  --el-text-color-primary: var(--q-text);
+  --el-text-color-regular: var(--q-text);
+  --el-text-color-secondary: var(--q-text-secondary);
+  --el-text-color-placeholder: var(--q-text-placeholder);
+  --el-text-color-disabled: var(--q-text-placeholder);
+  --el-border-color: var(--q-border);
+  --el-border-color-light: var(--q-border);
+  --el-border-color-lighter: var(--q-border);
+  --el-border-color-extra-light: var(--q-border);
+  --el-border-color-hover: var(--q-border-strong);
+  --el-fill-color: var(--q-bg-elevated);
+  --el-fill-color-light: var(--q-bg-inset);
+  --el-fill-color-lighter: var(--q-bg-inset);
+  --el-fill-color-blank: var(--q-bg-inset);
+  --el-bg-color: var(--q-card);
+  --el-bg-color-page: var(--q-bg);
+  --el-bg-color-overlay: var(--q-bg-elevated);
+  --el-disabled-bg-color: var(--q-bg-inset);
+  --el-mask-color: rgba(13, 20, 32, 0.65);
 }
 
 * {
@@ -142,7 +180,7 @@ body {
 
 .cc-btn:focus-visible {
   outline: none;
-  box-shadow: var(--q-shadow-sm), 0 0 0 2px #fff, 0 0 0 4px #3b82f6;
+  box-shadow: var(--q-shadow-sm), 0 0 0 2px #fff, 0 0 0 4px var(--q-primary);
 }
 
 .cc-btn:disabled {
@@ -167,11 +205,14 @@ body {
 
 html.dark .cc-btn-secondary {
   background: transparent;
-  color: #e5eaf3;
+  color: #8fb8ff;
+  border-color: var(--q-border);
 }
 
 html.dark .cc-btn-secondary:hover {
-  background: #0f172a;
+  background: rgba(76, 141, 255, 0.14);
+  color: #8fb8ff;
+  border-color: var(--q-border-strong);
 }
 
 /* 按钮（危险） */
@@ -249,12 +290,19 @@ button.cc-card:hover {
 
 .cc-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(59, 130, 246, 0.35);
+  border-color: var(--q-primary);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(76, 141, 255, 0.35);
 }
 
 html.dark .cc-input:focus {
-  box-shadow: 0 0 0 2px var(--q-card), 0 0 0 4px rgba(59, 130, 246, 0.45);
+  border-color: var(--q-primary);
+  box-shadow: 0 0 0 2px var(--q-card), 0 0 0 4px rgba(76, 141, 255, 0.45);
+}
+
+/* 深色下输入框用凹陷底，只比卡片暗一档，不再与卡片同色或陷入纯黑 */
+html.dark .cc-input {
+  background: var(--q-bg-inset);
+  border-color: var(--q-border);
 }
 
 .cc-input::placeholder {
@@ -273,7 +321,7 @@ a:focus-visible,
 button:focus-visible,
 [role='button']:focus-visible,
 .el-button:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--q-primary);
   outline-offset: 2px;
 }
 
@@ -368,6 +416,11 @@ button:focus-visible,
   color: var(--q-text-secondary);
 }
 
+/* 深色下统计块是卡片上的凹陷容器，用 inset 底而不是页面底（否则会形成“黑洞”） */
+html.dark .stat-item {
+  background: var(--q-bg-inset);
+}
+
 /* ========== 顶部 / 底部导航 ========== */
 
 .app-nav {
@@ -428,6 +481,25 @@ button:focus-visible,
 .app-nav .nav-item.active {
   color: var(--q-primary);
   border-bottom-color: var(--q-primary);
+}
+
+/* 深色下导航栏沉入页面底色，用发丝线收边；未选中项用第三级文字色 */
+html.dark .app-nav {
+  background: var(--q-bg);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+html.dark .app-nav .nav-item {
+  color: var(--q-text-placeholder);
+}
+
+html.dark .app-nav .nav-item:hover {
+  color: var(--q-text-secondary);
+}
+
+html.dark .app-nav .nav-item.active {
+  color: var(--q-primary);
 }
 
 /* ========== Lucide 图标（@lucide/vue） ========== */
@@ -536,6 +608,11 @@ button:focus-visible,
   color: var(--q-text-secondary);
   background: var(--q-card);
   margin-top: 1px;
+}
+
+/* 深色下选项序号球用凹陷底，与选项卡片分层 */
+html.dark .option-key {
+  background: var(--q-bg-inset);
 }
 
 .option-text {
@@ -774,7 +851,12 @@ button:focus-visible,
 }
 
 html.dark .rich-editor .ql-toolbar {
-  background: #262727;
+  background: var(--q-bg-inset);
+}
+
+/* 编辑器正文区属于输入框，深色下同样用凹陷底 */
+html.dark .rich-editor .ql-container {
+  background: var(--q-bg-inset);
 }
 
 html.dark .rich-editor .ql-toolbar .ql-stroke {
@@ -799,18 +881,34 @@ html.dark .rich-editor .ql-toolbar .ql-picker {
   box-shadow: var(--q-shadow-md) !important;
 }
 
-/* ---- 表格：深色下对齐 Corporate Clean（slate）配色 ----
+/* ---- 表格：深色下对齐 5 级背景 token ----
    Element Plus 深色主题自带的是中性灰（#141414 / #1d1d1d / #4c4d4f），
-   放在 slate 蓝调的卡片(#1e293b)里会显得脏、条纹与卡片底几乎同色。
-   这里把表格的底色、表头、条纹、悬停全部换成同一套 slate token。 */
+   放在蓝灰卡片(#1a2536)里会显得脏、条纹与卡片底几乎同色。
+   这里把表格的底色、表头、条纹、悬停全部换成同一套 token。 */
 :root {
   --q-table-stripe: #f8fafc;
   --q-table-hover: #f1f5f9;
 }
 
 html.dark {
-  --q-table-stripe: #2b3a52;
-  --q-table-hover: #34455f;
+  /* 斑马纹弱化为 2% 白，行与行的跳跃感小于行与卡片的从属关系 */
+  --q-table-stripe: rgba(255, 255, 255, 0.02);
+  --q-table-hover: #223049;
+}
+
+/* 深色下表头用凹陷底，与卡片明确分层 */
+html.dark .el-table {
+  --el-table-header-bg-color: var(--q-bg-inset);
+}
+
+html.dark .el-table th.el-table__cell {
+  background-color: var(--q-bg-inset);
+  border-bottom-color: var(--q-border);
+}
+
+/* 展开行内容区用凹陷底，与展开行本体区分开（斑马纹已弱化为近透明） */
+html.dark .el-table .el-table__body tr > td.el-table__expanded-cell {
+  background: var(--q-bg-inset) !important;
 }
 
 .el-table {
@@ -978,8 +1076,15 @@ html.dark .el-table {
   box-shadow: var(--q-shadow-sm);
 }
 
+/* 深色下分段控件：容器为凹陷底（--q-info-soft 已映射），选中段用浮起底 + 强调蓝文字 */
+html.dark .seg-item.is-active {
+  background: var(--q-bg-elevated);
+  color: #8fb8ff;
+  box-shadow: none;
+}
+
 .seg-item:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--q-primary);
   outline-offset: 2px;
 }
 
@@ -1007,8 +1112,8 @@ html.dark .el-table {
 }
 
 html.dark .banner-info {
-  color: #93c5fd;
-  border-color: #1e3a8a;
+  color: #8fb8ff;
+  border-color: rgba(76, 141, 255, 0.25);
 }
 
 html.dark .banner-warning {
@@ -1109,6 +1214,11 @@ html.dark .banner-warning {
 
 .usage-row:not(.usage-head):hover {
   background: var(--q-info-soft);
+}
+
+/* 深色下 hover 用浮起底（--q-info-soft 在深色下是凹陷底，留给表头/标签用） */
+html.dark .usage-row:not(.usage-head):hover {
+  background: var(--q-bg-elevated);
 }
 
 .usage-head {

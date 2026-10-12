@@ -566,7 +566,7 @@ onBeforeUnmount(() => {
         <span v-if="!isMobile">编辑</span>
       </el-button>
       <el-button text @click="toggleFav" style="margin-left: 0px; display: inline-flex; align-items: center;">
-        <el-icon :color="isFaved ? '#e6a23c' : undefined">
+        <el-icon :color="isFaved ? '#ffc94d' : undefined">
           <Star :fill="isFaved ? 'currentColor' : 'none'" />
         </el-icon>
         <span v-if="!isMobile">收藏</span>

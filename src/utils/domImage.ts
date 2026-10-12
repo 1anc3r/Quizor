@@ -273,7 +273,7 @@ export async function captureElementsAsPng(
   const bodyColor = bodyStyle.color
   const dark = document.documentElement.classList.contains('dark')
   const hostBg = TRANSPARENT.has(bodyBg) ? '#ffffff' : bodyBg
-  const hostColor = dark || TRANSPARENT.has(bodyColor) ? '#1f2937' : bodyColor
+  const hostColor = dark || TRANSPARENT.has(bodyColor) ? '#1a2536' : bodyColor
 
   // 把克隆出来的内容包进临时宿主：在真实文档里参与一次布局，量完尺寸就移除。
   // 宿主自身也会被序列化，所以位置类样式在创建时就定死，之后不再改动。
