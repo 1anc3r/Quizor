@@ -233,7 +233,7 @@ onMounted(async () => {
 /* ---------- 外链跳转 ---------- */
 
 const redirectToExternalLink = () => {
-  window.location.href = 'https://1anc3r.github.io/Flashcard-Collector/#/'
+  window.location.href = 'https://github.com/1anc3r/Quizor'
 }
 </script>
 
@@ -486,15 +486,15 @@ const redirectToExternalLink = () => {
       </el-alert>
     </section>
 
-    <!-- 外链与赞赏 -->
+    <!-- 关于 -->
     <section class="cc-card settings-card about-card">
       <div class="cc-card-title">
-        <span class="title-text">支持与外链</span>
+        <span class="title-text">关于</span>
       </div>
       <div class="set-row" style="margin-top: 4px">
         <div class="set-info">
-          <div class="set-label">闪卡收藏家 Collector</div>
-          <div class="set-desc">同作者的卡片记忆应用，与 Quizor 搭配使用。</div>
+          <div class="set-label">Quizor·做题家</div>
+          <div class="set-desc">纯静态题库刷题 Web 应用：无后端、无登录。题库以 JSON 静态文件承载，用户数据（答题记录、错题、收藏、设置）全部保存在浏览器 localStorage / IndexedDB，构建产物可直接发布 GitHub Pages。</div>
         </div>
         <button type="button" class="cc-btn cc-btn-secondary btn-sm" @click="redirectToExternalLink">
           <el-icon :size="14">
@@ -502,10 +502,16 @@ const redirectToExternalLink = () => {
           </el-icon>前往
         </button>
       </div>
+      <div class="set-row" style="margin-top: 4px">
+        <div class="set-info">
+          <div class="set-label">版本</div>
+          <div class="set-desc">v0.1.0</div>
+        </div>
+      </div>
 
       <div class="donate">
+        <div class="set-label">赞赏码</div>
         <img src="/WechatCode.jpg" alt="赞赏码" class="donate-img" />
-        <p class="donate-quote">「微信赞赏码」</p>
       </div>
     </section>
   </div>

@@ -969,6 +969,12 @@ html.dark .el-table {
   box-shadow: var(--q-shadow-sm);
 }
 
+/* 深色下 plain 主按钮的边框不再跟随 --el-color-primary-light-5（过亮的发光描边），
+   改用 35% 强调蓝描边，hover 时 EP 默认会切到实色强调蓝 */
+html.dark .el-button--primary.is-plain {
+  --el-button-border-color: rgba(76, 141, 255, 0.35);
+}
+
 /* ========== 设置页 ========== */
 
 .page-header {
