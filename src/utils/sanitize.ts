@@ -27,7 +27,7 @@ const ALLOWED_TAGS = new Set([
  * 整段重建，保留它们只有体积成本，而 SVG/MathML 是事件属性的常见藏身处。
  */
 const DROP_WITH_CONTENT = new Set([
-  'script', 'style', 'iframe', 'frame', 'frameset', 'object', 'embed', 'link',
+  'script', 'iframe', 'frame', 'frameset', 'object', 'embed', 'link',
   'meta', 'base', 'title', 'template', 'noscript', 'svg', 'math', 'form',
   'input', 'button', 'textarea', 'select', 'option', 'optgroup', 'fieldset',
   'legend', 'audio', 'video', 'source', 'track', 'canvas', 'applet', 'portal'
@@ -42,6 +42,23 @@ const ALLOWED_ATTRS = new Set([
   'height', 'href', 'rel', 'rowspan', 'span', 'src', 'start', 'style',
   'target', 'title', 'valign', 'width'
 ])
+
+/**
+ * `data-*` 一律放行（DOMPurify 的默认策略也是如此）。
+ *
+ * 富文本编辑器把自身的结构状态写在 `data-*` 上，丢掉一个属性就会毁掉内容：
+ * quill-better-table 用 `data-row` / `data-cell` 标识行与单元格，用 `data-rowspan` /
+ * `data-colspan` 记录合并跨度。这些属性一旦被剥掉，Quill 接管 DOM 时
+ * `TableCell.checkMerge()` / `TableRow.checkMerge()` 会读到一串 `undefined`，
+ * 而 `undefined === undefined` 被判成「同一行 / 同一格」，于是 2 行 11 列的表格
+ * 在用户下次编辑保存后塌缩成 1 行 1 格（22 个 `qlbt-cell-line` 全挤进一个 td）。
+ * 内嵌图片的 `data-image-id` 同理，丢失后拖拽缩放手柄失效。
+ *
+ * 放行 `data-*` 不会扩大 XSS 面：`data-*` 不可能成为事件处理器（`on*` 仍一律剔除），
+ * 也不承载 URL（`src` / `href` 的白名单照旧生效）。公式的 `data-value` 是渲染阶段
+ * `katex.render()` 的输入，`trust: false` 下本身安全，故在 `ALLOWED_ATTRS` 里显式列出。
+ */
+const DATA_ATTR = /^data-[a-z0-9_.:-]+$/
 
 /** 允许的 URL 前缀：http(s)、邮件、电话、锚点、相对路径、内联图片 */
 const SAFE_URL = /^(?:https?:|mailto:|tel:|#|\/|\.{1,2}\/|data:image\/(?:png|jpe?g|gif|webp|bmp);base64,)/
@@ -77,7 +94,7 @@ function sanitizeElement(el: Element): void {
 
   for (const attr of Array.from(el.attributes)) {
     const name = attr.name.toLowerCase()
-    if (name.startsWith('on') || !ALLOWED_ATTRS.has(name)) {
+    if (name.startsWith('on') || !(ALLOWED_ATTRS.has(name) || DATA_ATTR.test(name))) {
       el.removeAttribute(attr.name)
       continue
     }

@@ -198,7 +198,10 @@ onMounted(() => {
   })
   // 编辑路径与渲染路径一样只接收净化后的 HTML：题库可以来自外部文件，
   // 把带 onerror 的 <img> 原样写进 contenteditable，用户一点"编辑题目"就会
-  // 在应用源下执行（RichText.vue 早已净化，这里此前漏了）
+  // 在应用源下执行（RichText.vue 早已净化，这里此前漏了）。
+  // 注意：净化器必须原样保留编辑器自己的结构属性（quill-better-table 的
+  // data-row / data-cell / data-rowspan / data-colspan），否则 Quill 接管这段 DOM 时
+  // 会认为整张表的行列都"相同"，把 2 行 11 列合并成 1 行 1 格——见 utils/sanitize.ts 的 DATA_ATTR。
   editor!.root.innerHTML = sanitizeHtml(props.modelValue)
   document.addEventListener('paste', onPaste, true)
   document.addEventListener('drop', onDrop, true)
