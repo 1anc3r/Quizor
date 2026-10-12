@@ -330,7 +330,7 @@ onMounted(async () => {
       <!-- 展开章节＝明确的"我要看题"意图，此时再拉全文 -->
       <el-collapse v-model="activeChapters" @change="onChapterToggle">
         <el-collapse-item v-for="g in chapterGroups" :key="g.chapter" :name="g.chapter">
-          <template #title>{{ g.chapter }}（{{ g.questions.length }}）</template>
+          <template #title><span style="padding: 0 12px;">{{ g.chapter }}（{{ g.questions.length }}）</span></template>
 
           <!-- 收起时不渲染表格：880 题全部进 DOM 是首屏最大的一笔渲染开销 -->
           <template v-if="renderedChapters[g.chapter] || activeChapters.includes(g.chapter)">
@@ -359,7 +359,7 @@ onMounted(async () => {
               :page-size="chapterPageState[g.chapter].pageSize"
               @update:page-size="(val: number) => setChapterPageSize(g.chapter, val)"
               :page-sizes="PAGE_SIZES" :total="g.questions.length" :layout="PAGINATION_LAYOUT"
-              style="margin-top: 10px" />
+              style="margin-top: 10px; margin-left: 12px;" />
           </template>
           <el-empty v-else :image-size="60" description="展开后加载本节题目" />
         </el-collapse-item>
