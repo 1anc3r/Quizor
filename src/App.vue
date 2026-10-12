@@ -23,7 +23,7 @@ function onStorageFull(): void {
   storageFullNotified = true
   window.setTimeout(() => (storageFullNotified = false), 30_000)
   ElMessage.warning({
-    message: '本地存储空间不足，本次改动未能保存。请在「设置 → 存储占用」查看占用并清理数据，或先导出备份。',
+    message: '本地存储空间不足，本次改动未能保存。请在「设置」先导出题库和备份，再查看占用并清理数据',
     duration: 6000,
     showClose: true
   })

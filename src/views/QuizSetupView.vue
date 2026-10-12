@@ -171,7 +171,7 @@ function launch(session: import('@/types').QuizSession): void {
   if (!loadStoredSession(session.id)) {
     // 会话确实没存上：删除旧会话并撤掉指针，避免首页出现无法恢复的"继续上次答题"
     replaceUnfinished(session.bankId, '')
-    ElMessage.error('本地存储空间不足，会话保存失败。请在设置页导出备份后清理缓存。')
+    ElMessage.error('本地存储空间不足，会话保存失败。请在「设置」先导出题库和备份，再查看占用并清理数据')
     return
   }
   router.push(`/quiz/${session.id}`)
