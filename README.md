@@ -226,6 +226,13 @@ npx gh-pages -d dist        # 或把 dist/ 直接丢到任意静态托管
 - `*_index.json` 已加入 `.gitignore`：索引必须与题库文件同源生成，提交进仓库会随题库更新而腐坏。
 - **下载进度的分母必须用"解压后字节数"，不能用响应头的 `Content-Length`**：托管方开了 gzip 时它是压缩体积（6.06MB 的题库实测 1.20MB），而流式分片拿到的字节是解压后的，两者相除会算出 480% 的进度、进度条在下载只走 1/5 时就满格。解压后的总体积浏览器查不到，只能构建期记账——索引里的 `fullSize` 就是它（`vite-plugins/bankIndex.ts` 与 `scripts/build-bank-index.mjs` 用 `TextEncoder` 数真实字节），`bankWorker.ts` 的 `resolveTotal()` 负责在压缩传输时改用它；拿不到 `fullSize` 时按"总量未知"处理（不确定态进度条 + 只报"已下载 X"）。
 
+### 重计算的异步化（组卷 / 判分 Worker）
+
+- **组卷和交卷判分与题库加载同一套 Worker 模式**：`services/quizCompute.ts` 是纯计算本体（不碰 storage / window，Worker 与主线程兜底共用同一份分片实现，每处理一小批就让出事件循环并汇报进度）；`services/quizWorker.ts` 把它跑在独立线程里；`services/quizWorkerApi.ts` 是主线程封装——Worker 不可用时自动退回主线程分片执行，功能不降级。
+- **入 Worker 前必须脱壳**：Pinia 的 reactive 代理无法结构化克隆（`postMessage` 直接抛 `DataCloneError`），统一走 `structuredClone(toRaw(x))`（`quizWorkerApi.ts` 的 `detach()`）。
+- **Worker 里没有 DOM**：题干摘要的 `htmlToText` 在 Worker 中自动退到"正则剥标签 + 解码常见实体"（`utils/text.ts`），主线程仍走 DOMParser，摘要口径一致。
+- 界面侧统一用 `components/BusyOverlay.vue`（遮罩 + 圆形进度，进度未知时走旋转不确定态）消费 Worker 上报的真实进度，不编假百分比。
+
 <br>
 
 ## 数据存储
@@ -255,7 +262,7 @@ Quizor/
 │   ├── components/                # 导航 / 富文本 / 富文本编辑器 / 选项组 / 答题卡 / 题目详情 / 题库与试卷窗口
 │   ├── composables/               # 移动端判定
 │   ├── router/                    # hash 路由
-│   ├── services/                  # IndexedDB 与 localStorage 封装、题库加载与覆盖层、备份导入导出
+│   ├── services/                  # IndexedDB 与 localStorage 封装、题库加载与覆盖层、备份导入导出、组卷/判分 Worker（quizCompute · quizWorker · quizWorkerApi）
 │   ├── stores/                    # Pinia：设置 / 题库 / 用户数据（错题·收藏·记录）/ 会话与判分
 │   ├── styles/                    # 全局样式、主题变量、移动端适配
 │   ├── types/                     # 全部 TypeScript 类型

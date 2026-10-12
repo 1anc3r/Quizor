@@ -11,7 +11,7 @@
  * - 题干与选项导出为图片（见 utils/domImage）：桌面端「复制」写剪贴板，
  *   移动端剪贴板存不了图片，改为「保存图片」下载成文件
  */
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Copy, Download, Info, LayoutGrid, SquarePen, Star, Timer, X, Send } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
@@ -20,7 +20,6 @@ import { useUserDataStore } from '@/stores/userData'
 import {
   answerToText,
   flushSession,
-  gradeSession,
   hydrateSession,
   isChoiceCorrect,
   loadStoredSession,
@@ -29,6 +28,7 @@ import {
   saveSession,
   setUnfinished
 } from '@/stores/session'
+import { gradeSessionAsync } from '@/services/quizWorkerApi'
 import { saveBank } from '@/services/bankService'
 import { useIsMobile } from '@/composables/useIsMobile'
 import type { Question, QuestionType, QuizSession, SessionQuestion } from '@/types'
@@ -36,6 +36,7 @@ import { fmtDuration, typeLabel } from '@/utils/format'
 import { bankProgressText } from '@/utils/bankProgress'
 import { copyElementsAsImage, downloadElementsAsImage } from '@/utils/domImage'
 import AnswerSheet from '@/components/AnswerSheet.vue'
+import BusyOverlay from '@/components/BusyOverlay.vue'
 import OptionGroup from '@/components/OptionGroup.vue'
 import QuizFormDialog from '@/components/QuizFormDialog.vue'
 import RichText from '@/components/RichText.vue'
@@ -345,9 +346,15 @@ watch(now, () => {
 
 /* ---------- 交卷 ---------- */
 
+/* 结算进行中：判分在 Worker 里分批完成，遮罩展示真实进度；判分后落盘成绩这段时间
+   也留在遮罩里（几百题的记录写 localStorage 不是零开销），完成前挡住一切操作 */
+const settling = ref(false)
+const settleDetail = ref('')
+const settleRatio = ref<number | null>(null)
+
 async function submit(auto: boolean): Promise<void> {
   const s = session.value
-  if (!s || submitted.value) return
+  if (!s || submitted.value || settling.value) return
   if (!auto) {
     const unanswered = s.questions.filter((q) => {
       const a = s.answers[q.id]
@@ -366,18 +373,36 @@ async function submit(auto: boolean): Promise<void> {
   submitted.value = true
   flushSession()
   saveSession(s)
-  const record = gradeSession(s, bankStore.meta?.name ?? s.bankId)
-  // 考试模式：交卷后将答错题目统一收录错题本
-  if (s.mode === 'exam') {
-    for (const d of record.details) {
-      if (d.correct === false) userStore.addWrong(d.questionId, d.yourAnswer)
+  settling.value = true
+  settleRatio.value = null
+  settleDetail.value = '正在判分…'
+  try {
+    const record = await gradeSessionAsync(s, bankStore.meta?.name ?? s.bankId, (ratio, label) => {
+      settleRatio.value = ratio
+      settleDetail.value = label
+    })
+    settleDetail.value = '正在保存成绩…'
+    settleRatio.value = 1
+    // 让遮罩上的阶段文案先渲染一帧，再去做落盘这类同步写
+    await nextTick()
+    // 考试模式：交卷后将答错题目统一收录错题本
+    if (s.mode === 'exam') {
+      for (const d of record.details) {
+        if (d.correct === false) userStore.addWrong(d.questionId, d.yourAnswer)
+      }
     }
+    userStore.addRecord(record)
+    removeSession(s.id)
+    setUnfinished(s.bankId, null)
+    session.value = null
+    router.replace(`/result/${record.bankId}/${record.id}`)
+  } catch (e) {
+    // 判分失败（几乎只可能是存储/线程异常）：恢复可交卷状态，让用户重试而不是卡死
+    submitted.value = false
+    ElMessage.error(e instanceof Error ? e.message : '结算失败，请重试')
+  } finally {
+    settling.value = false
   }
-  userStore.addRecord(record)
-  removeSession(s.id)
-  setUnfinished(s.bankId, null)
-  session.value = null
-  router.replace(`/result/${record.bankId}/${record.id}`)
 }
 
 function exit(): void {
@@ -652,6 +677,9 @@ onBeforeUnmount(() => {
       :chapter-option-count="editChapterOptionCount" :all-tags="editAllTags" :existing-ids="editExistingIds"
       @save="onSaveQuestion" />
   </div>
+
+  <!-- 结算遮罩：判分在 Worker 里分批执行，进度环展示真实进度；完成前挡住一切操作 -->
+  <BusyOverlay :visible="settling" title="正在结算…" :detail="settleDetail" :ratio="settleRatio" />
 </template>
 
 <style scoped>

@@ -4,24 +4,30 @@
  * 落盘形态与会话形态不同：localStorage 里只存题目的 id/分值/题型/章节/难度
  * （见 StoredQuizSession），题干等内容在恢复时按 id 从题库回填（hydrateSession）。
  * 原因：整题落盘会让"练习 · 全部"这种会话等于整份题库的副本，单条就撑爆配额。
+ *
+ * 组卷 / 判分的**纯计算**本体在 services/quizCompute.ts（Worker 安全、分片异步），
+ * 这里原样转出口，调用方 import 路径不变；要 Worker 异步执行时走
+ * services/quizWorkerApi.ts（见 quizWorker.ts 的说明）。
  */
 import type {
-  AnswerState,
-  BankData,
-  BankRule,
-  ExamConfig,
-  PracticeConfig,
   Question,
-  QuizMode,
-  QuizRecord,
   QuizSession,
-  RecordDetail,
   SessionQuestion,
   StoredQuizSession
 } from '@/types'
 import * as storage from '../services/storage'
-import { genId } from '@/utils/id'
-import { stemSummary } from '@/utils/text'
+
+export {
+  shuffle,
+  isChoiceCorrect,
+  answerToText,
+  correctToText,
+  buildPracticeQuestions,
+  buildExamQuestions,
+  makeSession,
+  gradeSession,
+  recomputeRecord
+} from '../services/quizCompute'
 
 const K_SESSION = 'session:' // + sessionId → StoredQuizSession
 const K_UNFINISHED = 'unfinished:' // + bankId → sessionId
@@ -224,184 +230,3 @@ export function getUnfinished(bankId: string): StoredQuizSession | null {
   return s
 }
 
-/* ---------------- 判分工具 ---------------- */
-
-export function shuffle<T>(arr: T[]): T[] {
-  const r = [...arr]
-  for (let i = r.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[r[i], r[j]] = [r[j], r[i]]
-  }
-  return r
-}
-
-export function isChoiceCorrect(q: Question, keys: string[]): boolean {
-  if (q.type === 'text' || keys.length === 0) return false
-  return [...keys].sort().join('|') === [...q.answer].sort().join('|')
-}
-
-export function answerToText(q: Question, ans?: AnswerState): string {
-  if (!ans) return '（未作答）'
-  if (q.type === 'text') return ans.text.trim() || '（未作答）'
-  return ans.keys.length ? [...ans.keys].sort().join('、') : '（未作答）'
-}
-
-export function correctToText(q: Question): string {
-  if (q.type === 'text') return '见解析'
-  return [...q.answer].sort().join('、')
-}
-
-/* ---------------- 组卷 ---------------- */
-
-/** 练习模式抽题：范围（全部/按章节/仅错题/仅收藏）+ 题型筛选 + 乱序 + 限量 */
-export function buildPracticeQuestions(
-  bank: BankData,
-  cfg: PracticeConfig,
-  wrongIds: Set<string>,
-  favIds: Set<string>
-): SessionQuestion[] {
-  let pool = bank.Questions
-  if (cfg.scope === 'chapter' && cfg.chapter) pool = pool.filter((q) => q.chapter === cfg.chapter)
-  if (cfg.scope === 'wrong') pool = pool.filter((q) => wrongIds.has(q.id))
-  if (cfg.scope === 'favorite') pool = pool.filter((q) => favIds.has(q.id))
-  if (cfg.types.length) pool = pool.filter((q) => cfg.types.includes(q.type))
-  pool = shuffle(pool)
-  if (cfg.count !== 'all') pool = pool.slice(0, cfg.count)
-  // 练习模式每题 1 分，便于结算页统计"分数"
-  return pool.map((q) => ({ ...q, score: 1 }))
-}
-
-function scoreFor(rule: BankRule, chapter: string, type: string): number {
-  const item = rule.composition.find((c) => c.chapter === chapter && c.type === type)
-  return item ? item.scoreEach : 5
-}
-
-/** 考试模式组卷：模拟模式按组卷规则随机组卷；真题模式按试卷 questionIds 原始顺序 */
-export function buildExamQuestions(
-  bank: BankData,
-  cfg: ExamConfig,
-  rule: BankRule
-): { questions: SessionQuestion[]; paperName?: string } {
-  if (cfg.source === 'paper') {
-    const paper = bank.Papers.find((p) => p.id === cfg.paperId)
-    if (!paper) throw new Error('试卷不存在')
-    const map = new Map(bank.Questions.map((q) => [q.id, q]))
-    const questions = paper.questionIds
-      .map((id) => map.get(id))
-      .filter((q): q is Question => !!q)
-      .map((q) => ({ ...q, score: scoreFor(rule, q.chapter, q.type) }))
-    return { questions, paperName: paper.name }
-  }
-  const questions: SessionQuestion[] = []
-  for (const item of rule.composition) {
-    const pool = shuffle(bank.Questions.filter((q) => q.chapter === item.chapter && q.type === item.type))
-    pool.slice(0, item.count).forEach((q) => questions.push({ ...q, score: item.scoreEach }))
-  }
-  return { questions }
-}
-
-/** 创建完整会话对象（含题目快照、空作答、考试截止时间） */
-export function makeSession(
-  bankId: string,
-  mode: QuizMode,
-  config: PracticeConfig | ExamConfig,
-  questions: SessionQuestion[],
-  durationMinutes: number,
-  paperName?: string
-): QuizSession {
-  const now = Date.now()
-  const answers: Record<string, AnswerState> = {}
-  for (const q of questions) answers[q.id] = { keys: [], text: '', revealed: false, correct: null }
-  return {
-    id: genId('session'),
-    bankId,
-    mode,
-    config,
-    questions,
-    answers,
-    marks: [],
-    currentIndex: 0,
-    startTime: now,
-    endTime: mode === 'exam' ? now + durationMinutes * 60_000 : null,
-    totalScore: questions.reduce((s, q) => s + q.score, 0),
-    paperName,
-    createdAt: now,
-    updatedAt: now
-  }
-}
-
-/* ---------------- 交卷判分 ---------------- */
-
-/** 统一判分出分，生成做题记录（练习/考试共用；考试简答题待自评 correct=null） */
-export function gradeSession(s: QuizSession, bankName: string): QuizRecord {
-  const now = Date.now()
-  const details: RecordDetail[] = s.questions.map((q) => {
-    const ans = s.answers[q.id]
-    const answered = q.type === 'text' ? !!ans?.text.trim() : (ans?.keys.length ?? 0) > 0
-    let correct: boolean | null
-    if (s.mode === 'practice') {
-      correct = ans?.revealed ? ans.correct : null
-    } else if (q.type === 'text') {
-      correct = null
-    } else {
-      // 未作答的选择题必须是 null（约定见 RecordDetail.correct：null = 未作答或待自评）。
-      // 之前写成 `answered && isChoiceCorrect(...)`，未作答时短路得到 false，
-      // 于是跳过的题被当成"答错"计入 wrong/accuracy，还会被收藏进错题本。
-      const picked = ans?.keys ?? []
-      correct = picked.length > 0 ? isChoiceCorrect(q, picked) : null
-    }
-    const gotScore = correct === true ? q.score : 0
-    return {
-      questionId: q.id,
-      chapter: q.chapter,
-      type: q.type,
-      // 只存纯文本摘要：完整题干可从题库按 questionId 回查，
-      // 历史记录曾把富文本题干整份落盘（一份 100 题记录约 300KB）
-      stem: stemSummary(q.stem),
-      difficulty: q.difficulty,
-      yourAnswer: answerToText(q, ans),
-      rightAnswer: correctToText(q),
-      correct,
-      score: q.score,
-      gotScore
-    }
-  })
-  // 已作答 = 答题卡上有作答痕迹；不能再用 `d.correct !== null` 判断，
-  // 因为考试模式下未作答的选择题也是 null，而自评前的简答题同样为 null。
-  const answered = details.filter((d) => d.yourAnswer !== '（未作答）').length
-  const correct = details.filter((d) => d.correct === true).length
-  const wrong = details.filter((d) => d.correct === false).length
-  const judged = correct + wrong
-  const endPoint = s.mode === 'exam' && s.endTime ? Math.min(now, s.endTime) : now
-  return {
-    id: genId('record'),
-    bankId: s.bankId,
-    bankName,
-    mode: s.mode,
-    paperName: s.paperName,
-    total: s.questions.length,
-    answered,
-    correct,
-    wrong,
-    accuracy: judged > 0 ? Math.round((correct / judged) * 100) : 0,
-    score: details.reduce((sum, d) => sum + d.gotScore, 0),
-    totalScore: s.totalScore,
-    durationSec: Math.max(0, Math.round((endPoint - s.startTime) / 1000)),
-    startTime: s.startTime,
-    endTime: now,
-    details
-  }
-}
-
-/** 简答题自评后重算记录统计 */
-export function recomputeRecord(rec: QuizRecord): void {
-  rec.answered = rec.details.filter((d) => d.yourAnswer !== '（未作答）').length
-  rec.correct = rec.details.filter((d) => d.correct === true).length
-  rec.wrong = rec.details.filter((d) => d.correct === false).length
-  const judged = rec.correct + rec.wrong
-  rec.accuracy = judged > 0 ? Math.round((rec.correct / judged) * 100) : 0
-  rec.score = rec.details.reduce((sum, d) => sum + (d.correct === true ? d.score : 0), 0)
-  rec.details.forEach((d) => {
-    d.gotScore = d.correct === true ? d.score : 0
-  })
-}

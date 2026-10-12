@@ -10,10 +10,12 @@ import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
 import type { ExamConfig, ExamSource, PracticeConfig, PracticeScope } from '@/types'
-import { buildExamQuestions, buildPracticeQuestions, loadStoredSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
+import { buildExamQuestionsAsync, buildPracticeQuestionsAsync } from '@/services/quizWorkerApi'
+import { loadStoredSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
 import { bankProgressText } from '@/utils/bankProgress'
 import { TYPE_OPTIONS } from '@/utils/format'
 import SegmentedControl, { type SegOption } from '@/components/SegmentedControl.vue'
+import BusyOverlay from '@/components/BusyOverlay.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,6 +91,12 @@ onMounted(async () => {
 const papers = computed(() => bankStore.bank?.Papers ?? [])
 const rule = computed(() => bankStore.meta?.rule)
 
+/* ---------------- 组卷进行中（Worker 异步执行，遮罩展示真实进度） ---------------- */
+const building = ref(false)
+const buildDetail = ref('')
+/** null = 还没拿到第一批进度，进度环先走不确定态，不编假百分比 */
+const buildRatio = ref<number | null>(null)
+
 function start(): void {
   const bank = bankStore.bank
   const meta = bankStore.meta
@@ -96,37 +104,53 @@ function start(): void {
     ElMessage.error('题库尚未加载完成')
     return
   }
-  try {
-    if (mode.value === 'practice') {
-      const cfg = JSON.parse(JSON.stringify(practice)) as PracticeConfig
-      const questions = buildPracticeQuestions(bank, cfg, userStore.wrongIds, userStore.favoriteIds)
-      if (!questions.length) {
-        ElMessage.warning('按当前条件没有可练习的题目')
-        return
-      }
-      settingsStore.rememberPractice(cfg)
-      launch(makeSession(meta.id, 'practice', cfg, questions, 0))
-    } else {
-      const cfg = JSON.parse(JSON.stringify(exam)) as ExamConfig
-      if (cfg.source === 'paper' && !cfg.paperId) {
-        ElMessage.warning('请选择试卷')
-        return
-      }
-      if (cfg.source === 'simulate' && !meta.rule.composition.length) {
-        ElMessage.warning('当前题库未配置组卷规则，请先在题库管理中设置')
-        return
-      }
-      const { questions, paperName } = buildExamQuestions(bank, cfg, meta.rule)
-      if (!questions.length) {
-        ElMessage.warning('按当前组卷规则没有可出卷的题目')
-        return
-      }
-      settingsStore.rememberExam(cfg)
-      launch(makeSession(meta.id, 'exam', cfg, questions, meta.rule.durationMinutes, paperName))
+  // 先做不依赖题库计算的校验：不通过就直接提示，不弹遮罩
+  if (mode.value === 'exam') {
+    if (exam.source === 'paper' && !exam.paperId) {
+      ElMessage.warning('请选择试卷')
+      return
     }
-  } catch (e) {
-    ElMessage.error(e instanceof Error ? e.message : '组卷失败')
+    if (exam.source === 'simulate' && !meta.rule.composition.length) {
+      ElMessage.warning('当前题库未配置组卷规则，请先在题库管理中设置')
+      return
+    }
   }
+  building.value = true
+  buildRatio.value = null
+  buildDetail.value = '正在准备…'
+  const onProgress = (ratio: number, label: string): void => {
+    buildRatio.value = ratio
+    buildDetail.value = label
+  }
+  // 组卷整体异步：过滤/乱序/题目快照克隆在 Worker 里分批完成，
+  // 期间主线程只更新遮罩进度，"全部"这种几百题的会话也不会卡界面
+  void (async () => {
+    try {
+      if (mode.value === 'practice') {
+        const cfg = JSON.parse(JSON.stringify(practice)) as PracticeConfig
+        const questions = await buildPracticeQuestionsAsync(bank, cfg, userStore.wrongIds, userStore.favoriteIds, onProgress)
+        if (!questions.length) {
+          ElMessage.warning('按当前条件没有可练习的题目')
+          return
+        }
+        settingsStore.rememberPractice(cfg)
+        launch(makeSession(meta.id, 'practice', cfg, questions, 0))
+      } else {
+        const cfg = JSON.parse(JSON.stringify(exam)) as ExamConfig
+        const { questions, paperName } = await buildExamQuestionsAsync(bank, cfg, meta.rule, onProgress)
+        if (!questions.length) {
+          ElMessage.warning('按当前组卷规则没有可出卷的题目')
+          return
+        }
+        settingsStore.rememberExam(cfg)
+        launch(makeSession(meta.id, 'exam', cfg, questions, meta.rule.durationMinutes, paperName))
+      }
+    } catch (e) {
+      ElMessage.error(e instanceof Error ? e.message : '组卷失败')
+    } finally {
+      building.value = false
+    }
+  })()
 }
 
 /**
@@ -231,6 +255,9 @@ function launch(session: import('@/types').QuizSession): void {
         <el-button size="large" @click="router.back()">返回</el-button>
       </div>
     </el-card>
+
+    <!-- 组卷遮罩：Worker 分批执行，进度环展示真实进度；完成前挡住重复点击 -->
+    <BusyOverlay :visible="building" title="正在组卷…" :detail="buildDetail" :ratio="buildRatio" />
   </div>
 </template>
 
