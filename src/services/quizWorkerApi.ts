@@ -86,6 +86,10 @@ function runQuizTask<T>(
           break
         case 'done':
           finish()
+          // 计算已定，收尾（结果结构化克隆、建会话、落盘）仍在继续，
+          // 这里就把进度补到 100%：否则环会顶着一个没走满的百分比（练习组卷
+          // 最后一批不满 64 题时停在 95% 左右）在那里空转，看起来像卡住
+          onProgress?.(1, '组卷完成，正在进入答题页…')
           resolve(msg.payload as T)
           break
         case 'error':

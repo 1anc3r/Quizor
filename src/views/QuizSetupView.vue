@@ -3,13 +3,13 @@
  * 做题设置页：一张卡片，按入口渲染练习模式 / 考试模式两套配置。
  * 进入时自动恢复对应模式的上次设置（设置页记忆）；支持从错题本/收藏夹带范围跳入。
  */
-import { computed, onMounted, ref, reactive } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankStore } from '@/stores/bankStore'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserDataStore } from '@/stores/userData'
-import type { ExamConfig, ExamSource, PracticeConfig, PracticeScope } from '@/types'
+import type { BankData, BankMeta, ExamConfig, ExamSource, PracticeConfig, PracticeScope, QuizSession } from '@/types'
 import { buildExamQuestionsAsync, buildPracticeQuestionsAsync } from '@/services/quizWorkerApi'
 import { loadStoredSession, makeSession, pruneOrphanSessions, replaceUnfinished, saveSession } from '@/stores/session'
 import { bankProgressText } from '@/utils/bankProgress'
@@ -54,8 +54,16 @@ const EXAM_SOURCE_OPTIONS: SegOption<ExamSource>[] = [
  * 用户从首页点进来时如果预取还没跑完，这里会实打实地等一次下载。
  * 因此必须把"在等什么、还要等多久"显式画出来 —— 没有提示的等待，体感就是卡住。
  */
-/** 只在"真的还没到位"时才显示指示条，避免每次进页面闪一下 */
-const bankLoading = ref(!bankStore.hasFullBank)
+/**
+ * 指示条挂在题库的**真实状态**上，而不是挂载时拍下的那张快照。
+ *
+ * 快照版本（`ref(!hasFullBank)`，只在 `await ensureFullBank()` 返回后置 false）会跟真相脱节：
+ * 首页预取与本次进入页面共享同一次加载，全文真正到手的时刻是 `bank.value` 被赋值，
+ * 而"解析完成 → 本次 await 恢复执行"之间还隔着一次微任务调度，甚至可能是会话恢复那类
+ * 完全不带进度的加载路径。那段时间里进度条已经走满、按钮却仍是 loading，
+ * 用户看到的是"条走完了却什么都没发生"。
+ */
+const bankLoading = computed<boolean>(() => !bankStore.hasFullBank)
 
 /**
  * 等待文案，与首页进度条同一口径：分母是**解压后**的字节数。
@@ -72,7 +80,6 @@ onMounted(async () => {
   // 组卷需要题干、选项与答案，必须先把题库全文拉下来（首页只加载了索引）。
   // await 是必要的：下面的默认章节/试卷要从题库数据里挑第一个。
   await bankStore.ensureFullBank()
-  bankLoading.value = false
   // 恢复上次对应模式的设置
   if (mode.value === 'practice') {
     Object.assign(practice, JSON.parse(JSON.stringify(settingsStore.settings.practice)))
@@ -97,6 +104,30 @@ const buildDetail = ref('')
 /** null = 还没拿到第一批进度，进度环先走不确定态，不编假百分比 */
 const buildRatio = ref<number | null>(null)
 
+/** 让浏览器把当前这一帧（"100% / 正在进入答题页…"）画出来再去做同步的收尾工作 */
+function nextFrame(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()))
+}
+
+function resetBuilding(): void {
+  building.value = false
+  buildRatio.value = null
+  buildDetail.value = ''
+}
+
+/** 路由真的切走了才算这次跳转成功：由路由 watch 收尾，别在跳转途中把遮罩撤掉 */
+let navigated = false
+watch(
+  () => route.fullPath,
+  () => {
+    navigated = true
+    // 推到下一帧再撤遮罩：路由改完还要等答题页那个异步 chunk 到位，
+    // 而答题页自己的恢复遮罩（同一个环形进度）是在挂载时才出现的。
+    // 这里立刻撤掉的话，两块遮罩之间会露出空白的一拍
+    void nextFrame().then(resetBuilding)
+  }
+)
+
 function start(): void {
   const bank = bankStore.bank
   const meta = bankStore.meta
@@ -115,6 +146,7 @@ function start(): void {
       return
     }
   }
+  navigated = false
   building.value = true
   buildRatio.value = null
   buildDetail.value = '正在准备…'
@@ -126,31 +158,60 @@ function start(): void {
   // 期间主线程只更新遮罩进度，"全部"这种几百题的会话也不会卡界面
   void (async () => {
     try {
-      if (mode.value === 'practice') {
-        const cfg = JSON.parse(JSON.stringify(practice)) as PracticeConfig
-        const questions = await buildPracticeQuestionsAsync(bank, cfg, userStore.wrongIds, userStore.favoriteIds, onProgress)
-        if (!questions.length) {
-          ElMessage.warning('按当前条件没有可练习的题目')
-          return
-        }
-        settingsStore.rememberPractice(cfg)
-        launch(makeSession(meta.id, 'practice', cfg, questions, 0))
-      } else {
-        const cfg = JSON.parse(JSON.stringify(exam)) as ExamConfig
-        const { questions, paperName } = await buildExamQuestionsAsync(bank, cfg, meta.rule, onProgress)
-        if (!questions.length) {
-          ElMessage.warning('按当前组卷规则没有可出卷的题目')
-          return
-        }
-        settingsStore.rememberExam(cfg)
-        launch(makeSession(meta.id, 'exam', cfg, questions, meta.rule.durationMinutes, paperName))
-      }
+      const session =
+        mode.value === 'practice'
+          ? await practiceSession(bank, meta.id, onProgress)
+          : await examSession(bank, meta, onProgress)
+      // 组卷没出题时不能走到这里：进度条上去了就必须真的换页，
+      // "走满却停在原地"正是本页最容易被读成卡死的一种状态
+      if (!session) return
+      // 进度环走满 = 下一步就是答题页。落盘（会话序列化 + localStorage 写入）
+      // 是同步的实打实耗时，把它放进"已完成"这一格，别让它顶着一个没满的环
+      buildRatio.value = 1
+      buildDetail.value = '正在进入答题页…'
+      await nextFrame()
+      launch(session)
     } catch (e) {
       ElMessage.error(e instanceof Error ? e.message : '组卷失败')
     } finally {
-      building.value = false
+      // 跳转成功时由路由 watch 收尾（它在新页面挂载后才会跑到，遮罩能一路盖到答题页出现）；
+      // 走到这里说明这次没能前进（校验/落盘失败），遮罩必须撤掉，
+      // 否则界面会停在一个永远不动的进度环上
+      if (!navigated) resetBuilding()
     }
   })()
+}
+
+/** 练习组卷：没有可出的题返回 null（调用方据此提示并停在设置页） */
+async function practiceSession(
+  bank: BankData,
+  bankId: string,
+  onProgress: (ratio: number, label: string) => void
+): Promise<QuizSession | null> {
+  const cfg = JSON.parse(JSON.stringify(practice)) as PracticeConfig
+  const questions = await buildPracticeQuestionsAsync(bank, cfg, userStore.wrongIds, userStore.favoriteIds, onProgress)
+  if (!questions.length) {
+    ElMessage.warning('按当前条件没有可练习的题目')
+    return null
+  }
+  settingsStore.rememberPractice(cfg)
+  return makeSession(bankId, 'practice', cfg, questions, 0)
+}
+
+/** 考试组卷：同上 */
+async function examSession(
+  bank: BankData,
+  meta: BankMeta,
+  onProgress: (ratio: number, label: string) => void
+): Promise<QuizSession | null> {
+  const cfg = JSON.parse(JSON.stringify(exam)) as ExamConfig
+  const { questions, paperName } = await buildExamQuestionsAsync(bank, cfg, meta.rule, onProgress)
+  if (!questions.length) {
+    ElMessage.warning('按当前组卷规则没有可出卷的题目')
+    return null
+  }
+  settingsStore.rememberExam(cfg)
+  return makeSession(meta.id, 'exam', cfg, questions, meta.rule.durationMinutes, paperName)
 }
 
 /**
@@ -160,21 +221,30 @@ function start(): void {
  * 题干由答题页按 id 回填，因此"存得上"与"题量"无关。
  */
 function launch(session: import('@/types').QuizSession): void {
+  if (storeSession(session)) {
+    router.push(`/quiz/${session.id}`)
+    return
+  }
+  // 会话确实没存上：删除旧会话并撤掉指针，避免首页出现无法恢复的"继续上次答题"
+  replaceUnfinished(session.bankId, '')
+  // 这里是本页唯一一处"进度条走满却没换页"的合法出口，必须给出下一步动作：
+  // 只报一句错，用户盯着走完的进度环只会以为卡死了
+  ElMessage.error({
+    message: '本地存储空间不足，会话保存失败。请在「设置」先导出题库和备份，再查看占用并清理数据',
+    duration: 8000,
+    showClose: true
+  })
+}
+
+/** 落盘并在写失败时清理孤儿会话重试一次，返回会话是否真的存进去了 */
+function storeSession(session: import('@/types').QuizSession): boolean {
   pruneOrphanSessions()
   replaceUnfinished(session.bankId, session.id)
   saveSession(session)
-  if (!loadStoredSession(session.id)) {
-    // 写入失败：再清理一次并重试
-    pruneOrphanSessions()
-    saveSession(session)
-  }
-  if (!loadStoredSession(session.id)) {
-    // 会话确实没存上：删除旧会话并撤掉指针，避免首页出现无法恢复的"继续上次答题"
-    replaceUnfinished(session.bankId, '')
-    ElMessage.error('本地存储空间不足，会话保存失败。请在「设置」先导出题库和备份，再查看占用并清理数据')
-    return
-  }
-  router.push(`/quiz/${session.id}`)
+  if (loadStoredSession(session.id)) return true
+  pruneOrphanSessions()
+  saveSession(session)
+  return !!loadStoredSession(session.id)
 }
 </script>
 

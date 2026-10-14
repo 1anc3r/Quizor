@@ -66,6 +66,11 @@ const restoringText = computed<string>(() =>
   bankStore.hasFullBank ? '正在恢复会话…' : `正在恢复会话…（${bankProgressText(bankStore.progress)}）`
 )
 
+/** 遮罩里的副文案：全文仍在下载时报进度，已就绪时只说在回填题干 */
+const restoringDetail = computed<string>(() =>
+  bankStore.hasFullBank ? '正在按题号回填题干…' : bankProgressText(bankStore.progress)
+)
+
 const mode = computed(() => session.value?.mode ?? 'practice')
 const questions = computed<SessionQuestion[]>(() => session.value?.questions ?? [])
 const total = computed(() => questions.value.length)
@@ -540,13 +545,21 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- 恢复中：题干要从题库按 id 回填后再渲染，避免先闪一屏空题 -->
+  <!-- 恢复中：题干要从题库按 id 回填后再渲染，避免先闪一屏空题。
+       用与组卷同一个环形进度遮罩（而不是一张转圈的空白卡片）：
+       从设置页「开始答题」过来时，进度环是无缝接续往下走的 ——
+       上一页刚说"正在进入答题页"，这一页立刻换成"正在恢复会话"，
+       不会出现"进度条走完了，新页面却只是一张空白卡片"的断档。
+       题库仍在下载时用真实进度，已在内存里则走不确定态（不编假百分比） -->
+  <BusyOverlay :visible="restoring" title="正在恢复会话…" :detail="restoringDetail"
+    :ratio="bankStore.hasFullBank ? null : bankStore.progress.ratio" />
   <div v-if="restoring" class="quiz-page">
     <div class="quiz-main">
       <el-card v-loading="true" :element-loading-text="restoringText" shadow="never" class="page-card"
         style="min-height: 180px" />
     </div>
   </div>
+
   <div v-else-if="session" class="quiz-page" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
     <!-- 顶部栏 -->
     <header class="quiz-top">
