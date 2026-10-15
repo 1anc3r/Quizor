@@ -6,7 +6,7 @@ import { computed, onMounted, ref, watch, reactive } from 'vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { DEFAULT_PAGE_SIZE, PAGE_SIZES, PAGINATION_LAYOUT, clampPage, pageSlice } from '@/composables/usePagedList'
 import { useRouter } from 'vue-router'
-import { Plus, Search, SquarePen, Trophy, Sprout, Puzzle, BookText, BookCheck, BookX, BookHeart } from '@lucide/vue'
+import { Plus, Search, SquarePen, Loader, Trophy, Sprout, Puzzle, BookText, BookCheck, BookX, BookHeart } from '@lucide/vue'
 import { useBankStore } from '@/stores/bankStore'
 import { useUserDataStore } from '@/stores/userData'
 import { getUnfinished } from '@/stores/session'
@@ -295,16 +295,12 @@ onMounted(async () => {
         </div>
         <div class="progress-meta muted">
           <span>{{ bankProgressText(bankStore.progress) }}</span>
-          <span class="muted">此期间可继续浏览下方列表</span>
         </div>
       </div>
-
       <div class="card-title">
         <span class="title-text">试卷 & 题目列表</span>
-        <el-button v-if="!bankStore.hasFullBank" :loading="bankStore.showProgress" @click="onBrowseIntent">
-          {{ bankStore.showProgress ? '正在加载…' : '下载完整题库数据' }}
-        </el-button>
-        <el-button type="primary" plain :icon="SquarePen" @click="goEditBank">编辑题库</el-button>
+        <el-button v-if="!bankStore.hasFullBank" :loading="bankStore.showProgress" plain :icon="Loader" @click="onBrowseIntent">{{ bankStore.showProgress ? '正在加载题库' : '加载题库' }}</el-button>
+        <el-button v-else="bankStore.hasFullBank" type="primary" plain :icon="SquarePen" @click="goEditBank">编辑题库</el-button>
       </div>
 
       <el-divider content-position="left"><strong>试卷列表（{{ filteredPapers.length }}）</strong></el-divider>
